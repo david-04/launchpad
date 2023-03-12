@@ -1,0 +1,6 @@
+{
+  "name": "launchpad",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@3.4.1"
+}
