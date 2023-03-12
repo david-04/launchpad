@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {                                    // https://aka.ms/tsconfig
+
+        //------------------------------------------------------------------------------------------------------------------
+        // Emit
+        //------------------------------------------------------------------------------------------------------------------
+
+        "declaration": false,                               // Generate .d.ts files from TypeScript and JavaScript files in your project.
+        "declarationMap": false,                            // Create sourcemaps for d.ts files.
+        "emitDeclarationOnly": false,                       // Only output d.ts files and not JavaScript files.
+    }
+}
