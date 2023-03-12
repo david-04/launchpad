@@ -117,6 +117,6 @@
         "skipLibCheck": true                                // Only check the d.ts files that are actually used/imported | Skip type checking all .d.ts files.
     },
     "include": [
-        "../../src/**/*.ts"
+        "../../../src/**/*.ts"
     ]
 }

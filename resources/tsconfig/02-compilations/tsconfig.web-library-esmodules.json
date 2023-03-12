@@ -1,8 +1,0 @@
-{
-    "extends": [
-        "../01-fragments/tsconfig.base.json",
-        "../01-fragments/tsconfig.runtime-web.json",
-        "../01-fragments/tsconfig.artifact-library.json",
-        "../01-fragments/tsconfig.module-esmodules.json",
-    ]
-}
