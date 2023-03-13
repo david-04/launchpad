@@ -1,0 +1,31 @@
+#-----------------------------------------------------------------------------------------------------------------------
+# Compile
+#-----------------------------------------------------------------------------------------------------------------------
+
+ifeq "$(strip $(LP_TSC_ENABLED))" "true"
+
+.PHONY: tsc compile
+
+$(call doc.target, compile, $(LP_TSC_DESCRIPTION))
+$(call doc.target, tsc, $(LP_TSC_DESCRIPTION))
+
+tsc compile : $(LP_TSC_BUILDINFO);
+
+$(LP_TSC_BUILDINFO) : $(LP_TSC_PREREQUISITES)
+	echo Compiling... \
+		$(if $(LP_TSC_BEFORE_HOOK), && $(LP_TSC_BEFORE_HOOK)) \
+		&& tsc -b \
+		&& touch "$(LP_TSC_BUILDINFO)" \
+		$(if $(LP_TSC_AFTER_HOOK), && $(LP_TSC_AFTER_HOOK))
+
+endif
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Help
+#-----------------------------------------------------------------------------------------------------------------------
+
+lp.help:
+	$(info )
+    ifeq "$(LP_TSC_ENABLED)" "true"
+	$(LP_HELP_MESSAGE_TSC)
+    endif

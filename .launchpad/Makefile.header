@@ -1,0 +1,36 @@
+#-----------------------------------------------------------------------------------------------------------------------
+# Import the launchpad settings
+#-----------------------------------------------------------------------------------------------------------------------
+
+include $(patsubst %/Makefile.header, %/settings.cfg, $(lastword $(MAKEFILE_LIST)))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Utility functions
+#-----------------------------------------------------------------------------------------------------------------------
+
+lp.fn.wildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Help messages
+#-----------------------------------------------------------------------------------------------------------------------
+
+LP_DESCRIPTION_TSC=run the tsc compiler
+
+LP_HELP_MESSAGE_TSC = $(info ${}  compile ......... $(LP_DESCRIPTION_TSC)) \
+					  $(info ${}  tsc ............. $(LP_DESCRIPTION_TSC))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Compile
+#-----------------------------------------------------------------------------------------------------------------------
+
+LP_TSC_ENABLED=true
+LP_TSC_BUILDINFO=$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
+LP_TSC_PREREQUISITES=$(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) \
+					 $(wildcard Makefile* .launchpad/Makefile* tsconfig*.json .launchpad/tsconfig*.json .launchpad/settings.cfg)
+LP_TSC_BEFORE_HOOK=
+LP_TSC_AFTER_HOOK=
+
+lp.tsc.enabled=$(eval LP_TSC_ENABLED=$(strip $(1)))
+lp.tsc.extra-prerequisites=$(eval LP_TSC_PREREQUISITES+= $(1))
+lp.tsc.before-hook=$(eval LP_TSC_BEFORE_HOOK=$(strip $(1)))
+lp.tsc.after-hook=$(eval LP_TSC_AFTER_HOOK=$(strip $(1)))
