@@ -1,10 +1,11 @@
 {
     "compilerOptions": {
         "incremental": true,
-        "composite": true,
+        "composite": false,
         "disableSourceOfProjectReferenceRedirect": false,
         "disableSolutionSearching": false,
         "disableReferencedProjectLoad": false,
+        "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
         "experimentalDecorators": false,
         "emitDecoratorMetadata": false,
         "noLib": false,
@@ -29,7 +30,7 @@
         "stripInternal": true,
         "noEmitHelpers": false,
         "noEmitOnError": true,
-        "preserveConstEnums": false,
+        "preserveConstEnums": true,
         "isolatedModules": true,
         "verbatimModuleSyntax": true,
         "allowSyntheticDefaultImports": false,
