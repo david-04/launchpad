@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------------------------------------------------
-# Import the launchpad settings
+# Import the launchpad project settings
 #-----------------------------------------------------------------------------------------------------------------------
 
 include $(patsubst %/Makefile.header, %/settings.cfg, $(lastword $(MAKEFILE_LIST)))
@@ -9,15 +9,7 @@ include $(patsubst %/Makefile.header, %/settings.cfg, $(lastword $(MAKEFILE_LIST
 #-----------------------------------------------------------------------------------------------------------------------
 
 lp.fn.wildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Help messages
-#-----------------------------------------------------------------------------------------------------------------------
-
-LP_DESCRIPTION_TSC=run the tsc compiler
-
-LP_HELP_MESSAGE_TSC = $(info ${}  compile ......... $(LP_DESCRIPTION_TSC)) \
-					  $(info ${}  tsc ............. $(LP_DESCRIPTION_TSC))
+lp.fn.config-error=$(error The configured launchpad $(strip $(1)) must be $(strip $(2)) (current value: $(strip $(3))))
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Compile
@@ -26,7 +18,8 @@ LP_HELP_MESSAGE_TSC = $(info ${}  compile ......... $(LP_DESCRIPTION_TSC)) \
 LP_TSC_ENABLED=true
 LP_TSC_BUILDINFO=$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
 LP_TSC_PREREQUISITES=$(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) \
-					 $(wildcard Makefile* .launchpad/Makefile* tsconfig*.json .launchpad/tsconfig*.json .launchpad/settings.cfg)
+					 $(patsubst %, .launchpad/%, Makefile.header Makefile.footer settings.cfg tsconfig.default.json) \
+					 Makefile tsconfig.json
 LP_TSC_BEFORE_HOOK=
 LP_TSC_AFTER_HOOK=
 
@@ -34,3 +27,57 @@ lp.tsc.enabled=$(eval LP_TSC_ENABLED=$(strip $(1)))
 lp.tsc.extra-prerequisites=$(eval LP_TSC_PREREQUISITES+= $(1))
 lp.tsc.before-hook=$(eval LP_TSC_BEFORE_HOOK=$(strip $(1)))
 lp.tsc.after-hook=$(eval LP_TSC_AFTER_HOOK=$(strip $(1)))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Bundle
+#-----------------------------------------------------------------------------------------------------------------------
+
+# ifeq "$(LP_SETTINGS_BUNDLER)" "esbuild"
+#     LP_BUNDLER_ENABLED=true
+# else ifeq "$(LP_SETTINGS_BUNDLER)" "disabled"
+#     LP_BUNDLER_ENABLED=false
+# else
+# 	$(call lp.fn.config-error, bundler, "esbuild" or "disabled", $(LP_SETTINGS_BUNDLER))
+# endif
+
+# LP_BUNDLER_PREREQUISITES=$(LP_TSC_BUILDINFO) .launchpad/settings.cfg
+# LP_BUNDLER_ENTRY_POINTS=
+# LP_BUNDLER_BEFORE_HOOK=
+# LP_BUNDLER_AFTER_HOOK=
+
+# LP_ESBUILD_OPTIONS=--bundle \
+# 				   --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
+# 				   --minify \
+# 				   --sourcemap=linked \
+# 				   --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
+# 				   --outbase=$(LP_SETTINGS_SRC_DIR)
+
+# ifeq "$(LP_SETTINGS_RUNTIME)" "web"
+#     LP_ESBUILD_OPTIONS += --platform=browser --target=es6 --jsx=transform
+# else ifeq "$(LP_SETTINGS_RUNTIME)" "node"
+#     LP_ESBUILD_OPTIONS += --platform=node --target=es2022
+# else
+#     $(call lp.fn.config-error, runtime, "node" or "web", $(LP_SETTINGS_RUNTIME))
+# endif
+
+# ifeq "$(LP_SETTINGS_MODULE)" "esmodules"
+# 	LP_ESBUILD_OPTIONS += --format=esm
+# else ifeq "$(LP_SETTINGS_MODULE)" "commonjs"
+# 	LP_ESBUILD_OPTIONS += --format=cjs
+# else
+# 	$(call lp.fn.config-error, module format, "esmodules" or "commonjs", $(LP_SETTINGS_MODULE))
+# endif
+
+# ifeq "$(LP_SETTINGS_ARTIFACT)" "application"
+# 	LP_ESBUILD_OPTIONS +=  --sources-content=false
+# else ifeq "$(LP_SETTINGS_ARTIFACT)" "libray"
+# 	LP_ESBUILD_OPTIONS +=  --sources-content=true
+# else
+#     $(call lp.fn.config-error, artifact, "application" or "library", $(LP_SETTINGS_ARTIFACT))
+# endif
+
+# lp.bundler.enabled=$(eval LP_BUNDLER_ENABLED=$(strip $(1)))
+# lp.bundler.extra-prerequisites=$(eval LP_BUNDLER_PREREQUISITES+= $(1))
+# lp.bundler.add-entry-points=$(eval LP_BUNDLER_ENTRY_POINTS+= $(1))
+# lp.bundler.before-hook=$(eval LP_BUNDLER_BEFORE_HOOK=$(strip $(1)))
+# lp.bundler.after-hook=$(eval LP_BUNDLER_AFTER_HOOK=$(strip $(1)))

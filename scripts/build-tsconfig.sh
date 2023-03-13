@@ -6,7 +6,7 @@ cd "`dirname "${BASH_SOURCE[0]}"`/.."
 echo Building tsconfig.json...
 
 SOURCE_DIR=resources/tsconfig/03-compilations
-OUTPUT_DIR=.launchpad
+OUTPUT_DIR=resources/tsconfig
 TEMP_FILE=$(mktemp -u)
 
 rm -rf "$OUTPUT_DIR/tsconfig.*.json"

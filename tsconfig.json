@@ -1,5 +1,5 @@
 {
-    "extends": "./.launchpad/tsconfig.node-application-esmodules.json",
+    "extends": "./.launchpad/tsconfig.default.json",
     "compilerOptions": {
         "outDir": "./build",
         "tsBuildInfoFile": "./build/.tsbuildinfo",

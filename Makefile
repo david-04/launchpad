@@ -22,7 +22,8 @@ TSCONFIG_SRC_COMPONENTS=$(wildcard resources/tsconfig/02-components/tsconfig*.js
 TSCONFIG_SRC_COMPILATIONS=$(wildcard resources/tsconfig/03-compilations/tsconfig*.json)
 TSCONFIG_SRC_SCRIPTS=scripts/build-tsconfig.sh scripts/build-tsconfig.js
 TSCONFIG_SRC=$(TSCONFIG_SRC_COMPONENTS) $(TSCONFIG_SRC_COMPILATIONS) $(TSCONFIG_SRC_SCRIPTS)
-TSCONFIG_TARGETS=$(patsubst resources/tsconfig/03-compilations/%, .launchpad/%, $(TSCONFIG_SRC_COMPILATIONS))
+TSCONFIG_TARGETS=$(patsubst resources/tsconfig/03-compilations/%,resources/tsconfig/%, $(TSCONFIG_SRC_COMPILATIONS)) \
+				 .launchpad/tsconfig.default.json
 
 TSCONFIG_DESCRIPTION=recreate the tsconfig.json templates
 $(call doc.phony, tsconfig, $(TSCONFIG_DESCRIPTION))
@@ -30,7 +31,8 @@ $(call doc.phony, tsconfig, $(TSCONFIG_DESCRIPTION))
 tsconfig : $(TSCONFIG_TARGETS);
 
 $(TSCONFIG_TARGETS) : $(TSCONFIG_SRC)
-	scripts/build-tsconfig.sh
+	scripts/build-tsconfig.sh \
+		&& cp -f resources/tsconfig/tsconfig.node-application-esmodules.json .launchpad/tsconfig.default.json
 
 $(call lp.tsc.extra-prerequisites, $(TSCONFIG_TARGETS))
 
@@ -57,16 +59,22 @@ $(call lp.tsc.extra-prerequisites, $(VERSION_INFO_TARGETS))
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.tsc.enabled,             true)  # enable the built-in "tsc" and "compile" targets
-$(call lp.tsc.extra-prerequisites,     )  # auto-generated source files that might need to be created before building
-$(call lp.tsc.before-hook,             )  # shell commands to run before compiling
-$(call lp.tsc.after-hook,              )  # shell commands to run after compiling
+$(call lp.tsc.enabled,             true)     # enable launchpad's built-in "tsc" and "compile" targets
+$(call lp.tsc.extra-prerequisites,     )     # additional prerequisites (e.g. auto-generated source files)
+$(call lp.tsc.before-hook,             )     # shell commands to run before compiling
+$(call lp.tsc.after-hook,              )     # shell commands to run after compiling
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
 # not implemented yet
+
+$(call lp.bundler.enabled,             true)  # enable launchpad's built-in "bundle" target
+$(call lp.bundler.extra-prerequisites,     )  # additional prerequisites
+$(call lp.bundler.add-entry-points,        )  # entry points (relative to ./src) to be bundled
+$(call lp.bundler.before-hook,             )  # shell commands to run before bundling
+$(call lp.bundler.after-hook,              )  # shell commands to run after bundling
 
 #-----------------------------------------------------------------------------------------------------------------------
 # release

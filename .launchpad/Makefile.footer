@@ -1,4 +1,24 @@
 #-----------------------------------------------------------------------------------------------------------------------
+# Help
+#-----------------------------------------------------------------------------------------------------------------------
+
+LP_DESCRIPTION_TSC=run the tsc compiler
+LP_DESCRIPTION_BUNDLE=bundle artifacts (via esbuild)
+
+LP_HELP_MESSAGE_TSC    = $(info ${}  compile ......... $(LP_DESCRIPTION_TSC)) \
+					     $(info ${}  tsc ............. $(LP_DESCRIPTION_TSC))
+LP_HELP_MESSAGE_BUNDLE = $(info ${}  bundle .......... $(LP_DESCRIPTION_BUNDLE))
+
+lp.help:
+	$(info )
+    ifeq "$(LP_TSC_ENABLED)" "true"
+		$(LP_HELP_MESSAGE_TSC)
+    endif
+    ifeq "$(LP_BUNDLER_ENABLED)" "true"
+		$(LP_HELP_MESSAGE_TSC)
+    endif
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -21,11 +41,23 @@ $(LP_TSC_BUILDINFO) : $(LP_TSC_PREREQUISITES)
 endif
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Help
+# Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-lp.help:
-	$(info )
-    ifeq "$(LP_TSC_ENABLED)" "true"
-	$(LP_HELP_MESSAGE_TSC)
-    endif
+# ifeq "$(strip $(LP_BUNDLER_ENABLED))" "true"
+
+# .PHONY: bundle bundler pack webpack
+
+# $(call doc.target, bundle, $(LP_BUNDLER_DESCRIPTION))
+
+# bundle bundler pack webpack : $(LP_TSC_BUILDINFO);
+
+# $(LP_TSC_BUILDINFO) : $(LP_TSC_PREREQUISITES)
+# 	echo Compiling... \
+# 		$(if $(LP_TSC_BEFORE_HOOK), && $(LP_TSC_BEFORE_HOOK)) \
+# 		&& tsc -b \
+# 		&& touch "$(LP_TSC_BUILDINFO)" \
+# 		$(if $(LP_TSC_AFTER_HOOK), && $(LP_TSC_AFTER_HOOK))
+
+
+# endif
