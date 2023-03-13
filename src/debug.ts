@@ -1,1 +1,1 @@
-import "./launchpad.js";
+import "./scripts/launchpad-lib.js";
