@@ -3,7 +3,7 @@
 set -e
 cd "`dirname "${BASH_SOURCE[0]}"`/.."
 
-echo Assembling tsconfig.json...
+echo Building tsconfig.json...
 
 SOURCE_DIR=resources/tsconfig/03-compilations
 OUTPUT_DIR=.launchpad
