@@ -18,21 +18,18 @@ help : lp.help
 # tsconfig
 #-----------------------------------------------------------------------------------------------------------------------
 
-TSCONFIG_SRC_COMPONENTS=$(wildcard resources/tsconfig/02-components/tsconfig*.json)
-TSCONFIG_SRC_COMPILATIONS=$(wildcard resources/tsconfig/03-compilations/tsconfig*.json)
-TSCONFIG_SRC_SCRIPTS=scripts/build-tsconfig.sh scripts/build-tsconfig.js
-TSCONFIG_SRC=$(TSCONFIG_SRC_COMPONENTS) $(TSCONFIG_SRC_COMPILATIONS) $(TSCONFIG_SRC_SCRIPTS)
-TSCONFIG_TARGETS=$(patsubst resources/tsconfig/03-compilations/%,resources/tsconfig/%, $(TSCONFIG_SRC_COMPILATIONS)) \
-				 .launchpad/tsconfig.default.json
+TSCONFIG_SRC=$(wildcard resources/tsconfig/02-facets/tsconfig*.json) \
+			 $(wildcard resources/tsconfig/03-compilations/tsconfig*.json) \
+		     scripts/build-tsconfig.sh scripts/build-tsconfig.js
+TSCONFIG_TARGETS=src/resources/tsconfig-templates.ts .launchpad/tsconfig.default.json
 
-TSCONFIG_DESCRIPTION=recreate the tsconfig.json templates
+TSCONFIG_DESCRIPTION=assemble tsconfig.json templates
 $(call doc.phony, tsconfig, $(TSCONFIG_DESCRIPTION))
 .PHONY: tsconfig
 tsconfig : $(TSCONFIG_TARGETS);
 
 $(TSCONFIG_TARGETS) : $(TSCONFIG_SRC)
-	scripts/build-tsconfig.sh \
-		&& cp -f resources/tsconfig/tsconfig.node-application-esmodules.json .launchpad/tsconfig.default.json
+	scripts/build-tsconfig.sh
 
 $(call lp.tsc.extra-prerequisites, $(TSCONFIG_TARGETS))
 
@@ -91,6 +88,12 @@ $(call lp.bundler.after-hook,              )  # shell commands to run after bund
 #-----------------------------------------------------------------------------------------------------------------------
 # Clean
 #-----------------------------------------------------------------------------------------------------------------------
+
+CLEAN=resources/tsconfig/tsconfig.*.json
+clean :
+    ifneq "$(wildcard $(CLEAN))" ""
+	rm -rf $(CLEAN)
+    endif
 
 # not implemented yet
 

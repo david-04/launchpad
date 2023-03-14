@@ -1,8 +1,8 @@
 {
     "extends": [
-        "../02-components/tsconfig.base.json",
-        "../02-components/tsconfig.runtime-web.json",
-        "../02-components/tsconfig.artifact-application.json",
-        "../02-components/tsconfig.module-esmodules.json",
+        "../02-facets/tsconfig.base.json",
+        "../02-facets/tsconfig.runtime-web.json",
+        "../02-facets/tsconfig.artifact-application.json",
+        "../02-facets/tsconfig.module-esmodules.json",
     ]
 }
