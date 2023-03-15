@@ -1,5 +1,5 @@
 export const TSCONFIG_JSON_TEMPLATES = {
-    "tsconfig.node-application-commonjs.json": {
+    "tsconfig.node-application-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -73,7 +73,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.node-application-esmodules.json": {
+    "tsconfig.node-application-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -147,7 +147,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.node-library-commonjs.json": {
+    "tsconfig.node-library-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -221,7 +221,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.node-library-esmodules.json": {
+    "tsconfig.node-library-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -295,7 +295,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.web-application-commonjs.json": {
+    "tsconfig.web-application-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,
@@ -367,7 +367,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.web-application-esmodules.json": {
+    "tsconfig.web-application-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,
@@ -439,7 +439,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.web-library-commonjs.json": {
+    "tsconfig.web-library-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,
@@ -511,7 +511,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.web-library-esmodules.json": {
+    "tsconfig.web-library-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,

@@ -12,10 +12,10 @@ autorun : compile
 
 help : lp.help
 	$(info ${}  tsconfig ........ $(TSCONFIG_DESCRIPTION))
-	$(info ${}  version ......... $(VERSION_INFO_DESCRIPTION))
+	$(info ${}  version ......... $(UPDATE_VERSION_INFO_DESCRIPTION))
 
 #-----------------------------------------------------------------------------------------------------------------------
-# tsconfig
+# Create tsconfig.json templates
 #-----------------------------------------------------------------------------------------------------------------------
 
 TSCONFIG_SRC=$(wildcard resources/tsconfig/02-facets/tsconfig*.json) \
@@ -34,23 +34,21 @@ $(TSCONFIG_TARGETS) : $(TSCONFIG_SRC)
 $(call lp.tsc.extra-prerequisites, $(TSCONFIG_TARGETS))
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Version information
+# Update version information
 #-----------------------------------------------------------------------------------------------------------------------
 
-VERSION_INFO_SRC_DATA=CHANGELOG.md
-VERSION_INFO_SRC_SCRIPTS=$(patsubst %, scripts/%.sh, update-version-information get-copyright-years get-version-number)
-VERSION_INFO_SRC=$(VERSION_INFO_SRC_DATA) $(VERSION_INFO_SRC_SCRIPTS)
-VERSION_INFO_TARGETS=LICENSE package.json dist/package.json src/resources/version-information.ts
+UPDATE_VERSION_INFO_SRC=CHANGELOG.md scripts/update-version-information.sh scripts/get-copyright-years.sh scripts/get-version-number.sh
+UPDATE_VERSION_INFO_TARGETS=LICENSE package.json dist/package.json src/resources/version-information.ts
 
-VERSION_INFO_DESCRIPTION=update the version number
-$(call doc.phony, version, VERSION_INFO_DESCRIPTION)
+UPDATE_VERSION_INFO_DESCRIPTION=update the version number
+$(call doc.phony, version, UPDATE_VERSION_INFO_DESCRIPTION)
 .PHONY: version
-version version-info version-information : $(VERSION_INFO_TARGETS)
+version version-info version-information : $(UPDATE_VERSION_INFO_TARGETS)
 
-$(VERSION_INFO_TARGETS) : $(VERSION_INFO_SRC)
+$(UPDATE_VERSION_INFO_TARGETS) : $(UPDATE_VERSION_INFO_SRC)
 	scripts/update-version-information.sh
 
-$(call lp.tsc.extra-prerequisites, $(VERSION_INFO_TARGETS))
+$(call lp.tsc.extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Compile
@@ -60,14 +58,8 @@ $(call lp.tsc.extra-prerequisites, $(VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-# $(call lp.bundler.enabled,             true)  # enable launchpad's built-in "bundle" target
-# $(call lp.bundler.extra-prerequisites,     )  # additional prerequisites
-# # $(call lp.bundler.add-entry-points,        )  # entry points (relative to ./src) to be bundled
-# $(call lp.bundler.before-hook,             )  # shell commands to run before bundling
-# $(call lp.bundler.after-hook,              )  # shell commands to run after bundling
+# $(call lp.bundler.add-bundle, scripts/launchpad-cli, launchpad)
 
-# $(call lp.bundler.add-bundle, scripts/launchpad-cli, launchpad-cli)
-# $(call lp.bundler.bundle, scripts/launchpad-cli, launpad-cli)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # release

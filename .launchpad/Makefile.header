@@ -2,8 +2,8 @@
 # Environment and settings
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_SCRIPT_HOME    :=.launchpad
-__LP_SETTINGS_FILE	:=$(__LP_SCRIPT_HOME)/settings.cfg
+__LP_SCRIPT_HOME                       :=.launchpad
+__LP_SETTINGS_FILE                     :=$(__LP_SCRIPT_HOME)/settings.cfg
 
 include $(__LP_SETTINGS_FILE)
 
@@ -11,113 +11,144 @@ include $(__LP_SETTINGS_FILE)
 # Utility functions
 #-----------------------------------------------------------------------------------------------------------------------
 
-lp.fn.wildcard=$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d))
-lp.fn.config-error=	$(info Invalid configuration in $(__LP_SETTINGS_FILE):) \
-					$(error $(strip $(1)) must be $(strip $(2)) (current value: $(strip $(3))))
+lp.fn.wildcard                          =$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+lp.fn.config-error                      =$(info Invalid configuration property in $(__LP_SETTINGS_FILE):) \
+                                         $(error $(strip $(1)) must be $(strip $(2)) (current value: $(strip $($(1)))))
 
-# rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
-# $(info ---orig---)
-# $(info $(call rwildcard, ./src, *))
-# $(info ---src dir---)
-# $(info $(LP_SETTINGS_SRC_DIR))
-# $(info ---lp.fn.wildcard---)
-# $(info $(call rwildcard, src, *))
+#-----------------------------------------------------------------------------------------------------------------------
+# General
+#-----------------------------------------------------------------------------------------------------------------------
 
-# $(info $(call lp.fn.wildcard, src, *))
-# $(info $(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *))
-
+__LP_MAKEFILES                          =Makefile \
+                                         $(__LP_SCRIPT_HOME)/Makefile.header \
+                                         $(__LP_SCRIPT_HOME)/Makefile.footer \
+                                         $(wildcard Makefile* $(__LP_SCRIPT_HOME)/Makefile*)
+__LP_TSCONFIG_JSON                      =tsconfig.json $(__LP_SCRIPT_HOME)/tsconfig.default.json \
+                                         $(wildcard tsconfig*.json $(__LP_SCRIPT_HOME)/tsconfig*.json)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_TSC_ENABLED                 =true
-__LP_TSC_BUILDINFO               =$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
-__LP_TSC_DEFAULT_PREREQUISITES   =$(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) \
-                                  tsconfig.json \
-								  $(wildcard tsconfig*.json) \
-								  $(__LP_SCRIPT_HOME)/tsconfig.default.json \
-								  $(wildcard $(__LP_SCRIPT_HOME)/tsconfig*.json) \
-								  $(wildcard Makefile* $(__LP_SCRIPT_HOME)/Makefile*)
-__LP_TSC_EFFECTIVE_PREREQUISITES =$(__LP_TSC_DEFAULT_PREREQUISITES)
-__LP_TSC_DEFAULT_TARGETS         =$(__LP_TSC_BUILDINFO)
-__LP_TSC_EFFECTIVE_TARGETS       =$(__LP_TSC_DEFAULT_TARGETS)
-__LP_TSC_DEFAULT_BEFORE_HOOKS    =
-__LP_TSC_EFFECTIVE_BEFORE_HOOKS  =$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
-__LP_TSC_DEFAULT_AFTER_HOOKS     =touch "$(__LP_TSC_BUILDINFO)"
-__LP_TSC_EFFECTIVE_AFTER_HOOKS   =$(__LP_TSC_DEFAULT_AFTER_HOOKS)
-__LP_TSC_DEFAULT_COMMAND         =tsc -b
-__LP_TSC_EFFECTIVE_COMMAND       =$(__LP_TSC_DEFAULT_COMMAND)
+__LP_TSC_ENABLED                        =true
+__LP_TSC_BUILDINFO                      =$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
+__LP_TSC_DEFAULT_PREREQUISITES          =$(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) $(__LP_TSCONFIG_JSON) $(__LP_MAKEFILES)
+__LP_TSC_EFFECTIVE_PREREQUISITES        =$(__LP_TSC_DEFAULT_PREREQUISITES)
+__LP_TSC_DEFAULT_TARGETS                =$(__LP_TSC_BUILDINFO)
+__LP_TSC_EFFECTIVE_TARGETS              =$(__LP_TSC_DEFAULT_TARGETS)
+__LP_TSC_DEFAULT_BEFORE_HOOKS           =
+__LP_TSC_EFFECTIVE_BEFORE_HOOKS         =$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
+__LP_TSC_DEFAULT_AFTER_HOOKS            =touch "$(__LP_TSC_BUILDINFO)"
+__LP_TSC_EFFECTIVE_AFTER_HOOKS          =$(__LP_TSC_DEFAULT_AFTER_HOOKS)
+__LP_TSC_DEFAULT_COMMAND                =tsc -b
+__LP_TSC_EFFECTIVE_COMMAND              =$(__LP_TSC_DEFAULT_COMMAND)
 
-lp.tsc.disable					=$(eval __LP_TSC_ENABLED=false)
-lp.tsc.add-extra-prerequisites	=$(eval __LP_TSC_EFFECTIVE_PREREQUISITES+= $(1))
-lp.tsc.overwrite-prerequisites	=$(eval __LP_TSC_EFFECTIVE_PREREQUISITES=$(1))
-lp.tsc.add-extra-targets		=$(eval __LP_TSC_EFFECTIVE_TARGETS+= $(1))
-lp.tsc.overwrite-targets		=$(if $(strip $(1)), $(eval __LP_TSC_EFFECTIVE_TARGETS=$(1)), $(error No parameter was passed to lp.tsc.overwrite-targets))
-lp.tsc.add-before-hook			=$(if $(strip $(1)), $(if $(strip $(__LP_TSC_EFFECTIVE_BEFORE_HOOKS)), $(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS+= && $(1)), $(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS=$(1))))
-lp.tsc.overwrite-before-hooks	=$(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS=$(1))
-lp.tsc.add-after-hook			=$(if $(strip $(1)), $(if $(strip $(__LP_TSC_EFFECTIVE_AFTER_HOOKS)), $(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS+= && $(1)), $(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS=$(1))))
-lp.tsc.overwrite-after-hooks	=$(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS=$(1))
-lp.tsc.overwrite-command        =$(eval __LP_TSC_EFFECTIVE_COMMAND=$(1))
+lp.tsc.disable                          =$(eval __LP_TSC_ENABLED=false)
+lp.tsc.add-extra-prerequisites          =$(eval __LP_TSC_EFFECTIVE_PREREQUISITES+= $(1))
+lp.tsc.overwrite-prerequisites          =$(eval __LP_TSC_EFFECTIVE_PREREQUISITES=$(1))
+lp.tsc.add-extra-targets                =$(eval __LP_TSC_EFFECTIVE_TARGETS+= $(1))
+lp.tsc.overwrite-targets                =$(if $(strip $(1)), $(eval __LP_TSC_EFFECTIVE_TARGETS=$(1)), $(error No parameter was passed to lp.tsc.overwrite-targets))
+lp.tsc.add-before-hook                  =$(if $(strip $(1)), $(if $(strip $(__LP_TSC_EFFECTIVE_BEFORE_HOOKS)), $(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS+= && $(1)), $(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS=$(1))))
+lp.tsc.overwrite-before-hooks           =$(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS=$(1))
+lp.tsc.add-after-hook                   =$(if $(strip $(1)), $(if $(strip $(__LP_TSC_EFFECTIVE_AFTER_HOOKS)), $(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS+= && $(1)), $(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS=$(1))))
+lp.tsc.overwrite-after-hooks            =$(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS=$(1))
+lp.tsc.overwrite-command                =$(eval __LP_TSC_EFFECTIVE_COMMAND=$(1))
 
-lp.tsc.get-default-prerequisites=$(__LP_TSC_DEFAULT_PREREQUISITES)
-lp.tsc.get-prerequisites		=$(__LP_TSC_EFFECTIVE_PREREQUISITES)
-lp.tsc.get-default-targets		=$(__LP_TSC_DEFAULT_TARGETS)
-lp.tsc.get-targets				=$(__LP_TSC_EFFECTIVE_TARGETS)
-lp.tsc.get-default-before-hooks	=$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
-lp.tsc.get-before-hooks			=$(__LP_TSC_EFFECTIVE_BEFORE_HOOKS)
-lp.tsc.get-default-after-hooks	=$(__LP_TSC_DEFAULT_AFTER_HOOKS)
-lp.tsc.get-after-hooks			=$(__LP_TSC_EFFECTIVE_AFTER_HOOKS)
-lp.tsc.get-default-command		=$(__LP_TSC_DEFAULT_COMMAND)
-lp.tsc.get-command				=$(__LP_TSC_EFFECTIVE_COMMAND)
+lp.tsc.get-default-prerequisites        =$(__LP_TSC_DEFAULT_PREREQUISITES)
+lp.tsc.get-prerequisites                =$(__LP_TSC_EFFECTIVE_PREREQUISITES)
+lp.tsc.get-default-targets              =$(__LP_TSC_DEFAULT_TARGETS)
+lp.tsc.get-targets                      =$(__LP_TSC_EFFECTIVE_TARGETS)
+lp.tsc.get-default-before-hooks         =$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
+lp.tsc.get-before-hooks                 =$(__LP_TSC_EFFECTIVE_BEFORE_HOOKS)
+lp.tsc.get-default-after-hooks          =$(__LP_TSC_DEFAULT_AFTER_HOOKS)
+lp.tsc.get-after-hooks                  =$(__LP_TSC_EFFECTIVE_AFTER_HOOKS)
+lp.tsc.get-default-command              =$(__LP_TSC_DEFAULT_COMMAND)
+lp.tsc.get-command                      =$(__LP_TSC_EFFECTIVE_COMMAND)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-# ifeq "$(LP_SETTINGS_BUNDLER)" "esbuild"
-#     LP_BUNDLER_ENABLED=true
-# else ifeq "$(LP_SETTINGS_BUNDLER)" "disabled"
-#     LP_BUNDLER_ENABLED=false
-# else
-# 	$(call lp.fn.config-error, bundler, "esbuild" or "disabled", $(LP_SETTINGS_BUNDLER))
-# endif
+__LP_BUNDLER_DEFAULT_PREREQUISITES      =$(__LP_TSC_BUILDINFO) $(__LP_SETTINGS_FILE) $(__LP_MAKEFILES)
+__LP_BUNDLER_EFFECTIVE_PREREQUISITES    =$(__LP_BUNDLER_DEFAULT_PREREQUISITES)
+__LP_BUNDLER_DEFAULT_TARGETS            =
+__LP_BUNDLER_EFFECTIVE_TARGETS          =$(__LP_BUNDLER_DEFAULT_TARGETS)
+__LP_BUNDLER_DEFAULT_BEFORE_HOOKS       =
+__LP_BUNDLER_EFFECTIVE_BEFORE_HOOKS     =$(__LP_BUNDLER_DEFAULT_BEFORE_HOOKS)
+__LP_BUNDLER_DEFAULT_AFTER_HOOKS        =
+__LP_BUNDLER_EFFECTIVE_AFTER_HOOKS      =$(__LP_BUNDLER_DEFAULT_AFTER_HOOKS)
+__LP_BUNDLER_DEFAULT_COMMAND            =
+__LP_BUNDLER_EFFECTIVE_COMMAND          =$(__LP_BUNDLER_DEFAULT_COMMAND)
 
-# LP_BUNDLER_PREREQUISITES=$(LP_TSC_BUILDINFO) .launchpad/settings.cfg
-# LP_BUNDLER_ENTRY_POINTS=
-# LP_BUNDLER_BEFORE_HOOK=
-# LP_BUNDLER_AFTER_HOOK=
+ifeq "$(LP_SETTINGS_BUNDLER)" "esbuild"
+    __LP_BUNDLER_ENABLED=true
+else ifeq "$(LP_SETTINGS_BUNDLER)" "disabled"
+    __LP_BUNDLER_ENABLED=false
+else
+    $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "esbuild" or "disabled")
+endif
 
-# LP_ESBUILD_OPTIONS=--bundle \
-# 				   --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
-# 				   --minify \
-# 				   --sourcemap=linked \
-# 				   --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
-# 				   --outbase=$(LP_SETTINGS_SRC_DIR)
+__LP_ESBUILD_OPTIONS=--bundle \
+                     --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
+                     --minify \
+                     --sourcemap=linked \
+                     --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
+                     --outbase=$(LP_SETTINGS_SRC_DIR)
 
-# ifeq "$(LP_SETTINGS_RUNTIME)" "web"
-#     LP_ESBUILD_OPTIONS += --platform=browser --target=es6 --jsx=transform
-# else ifeq "$(LP_SETTINGS_RUNTIME)" "node"
-#     LP_ESBUILD_OPTIONS += --platform=node --target=es2022
-# else
-#     $(call lp.fn.config-error, runtime, "node" or "web", $(LP_SETTINGS_RUNTIME))
-# endif
+ifeq "$(LP_SETTINGS_RUNTIME)" "web"
+    _LP_ESBUILD_OPTIONS += --platform=browser --target=es6 --jsx=transform
+else ifeq "$(LP_SETTINGS_RUNTIME)" "node"
+    _LP_ESBUILD_OPTIONS += --platform=node --target=es2022
+else
+    $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "node" or "web")
+endif
 
-# ifeq "$(LP_SETTINGS_MODULE)" "esmodules"
-# 	LP_ESBUILD_OPTIONS += --format=esm
-# else ifeq "$(LP_SETTINGS_MODULE)" "commonjs"
-# 	LP_ESBUILD_OPTIONS += --format=cjs
-# else
-# 	$(call lp.fn.config-error, module format, "esmodules" or "commonjs", $(LP_SETTINGS_MODULE))
-# endif
+ifeq "$(LP_SETTINGS_MODULE)" "esmodules"
+    LP_ESBUILD_OPTIONS += --format=esm
+else ifeq "$(LP_SETTINGS_MODULE)" "commonjs"
+    LP_ESBUILD_OPTIONS += --format=cjs
+else
+    $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "esmodules" or "commonjs")
+endif
 
-# ifeq "$(LP_SETTINGS_ARTIFACT)" "application"
-# 	LP_ESBUILD_OPTIONS +=  --sources-content=false
-# else ifeq "$(LP_SETTINGS_ARTIFACT)" "libray"
-# 	LP_ESBUILD_OPTIONS +=  --sources-content=true
-# else
-#     $(call lp.fn.config-error, artifact, "application" or "library", $(LP_SETTINGS_ARTIFACT))
-# endif
+ifeq "$(LP_SETTINGS_ARTIFACT)" "application"
+    LP_ESBUILD_OPTIONS +=  --sources-content=false
+else ifeq "$(LP_SETTINGS_ARTIFACT)" "libray"
+    LP_ESBUILD_OPTIONS +=  --sources-content=true
+else
+    $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "application" or "library")
+endif
+
+
+
+
+
+lp.bundler.disable                      =$(eval __LP_BUNDLER_ENABLED=false)
+lp.bundler.add-extra-prerequisites      =$(eval __LP_BUNDLER_EFFECTIVE_PREREQUISITES+= $(1))
+lp.bundler.overwrite-prerequisites      =$(eval __LP_BUNDLER_EFFECTIVE_PREREQUISITES=$(1))
+lp.bundler.add-extra-targets            =$(eval __LP_BUNDLER_EFFECTIVE_TARGETS+= $(1))
+lp.bundler.overwrite-targets            =$(if $(strip $(1)), $(eval __LP_BUNDLER_EFFECTIVE_TARGETS=$(1)), $(error No parameter was passed to lp.bundler.overwrite-targets))
+lp.bundler.add-before-hook              =$(if $(strip $(1)), $(if $(strip $(__LP_BUNDLER_EFFECTIVE_BEFORE_HOOKS)), $(eval __LP_BUNDLER_EFFECTIVE_BEFORE_HOOKS+= && $(1)), $(eval __LP_BUNDLER_EFFECTIVE_BEFORE_HOOKS=$(1))))
+lp.bundler.overwrite-before-hooks       =$(eval __LP_BUNDLER_EFFECTIVE_BEFORE_HOOKS=$(1))
+lp.bundler.add-after-hook               =$(if $(strip $(1)), $(if $(strip $(__LP_BUNDLER_EFFECTIVE_AFTER_HOOKS)), $(eval __LP_BUNDLER_EFFECTIVE_AFTER_HOOKS+= && $(1)), $(eval __LP_BUNDLER_EFFECTIVE_AFTER_HOOKS=$(1))))
+lp.bundler.overwrite-after-hooks        =$(eval __LP_BUNDLER_EFFECTIVE_AFTER_HOOKS=$(1))
+lp.bundler.overwrite-command            =$(eval __LP_BUNDLER_EFFECTIVE_COMMAND=$(1))
+
+lp.bundler.get-default-prerequisites    =$(__LP_BUNDLER_DEFAULT_PREREQUISITES)
+lp.bundler.get-prerequisites            =$(__LP_BUNDLER_EFFECTIVE_PREREQUISITES)
+lp.bundler.get-default-targets          =$(__LP_BUNDLER_DEFAULT_TARGETS)
+lp.bundler.get-targets                  =$(__LP_BUNDLER_EFFECTIVE_TARGETS)
+lp.bundler.get-default-before-hooks     =$(__LP_BUNDLER_DEFAULT_BEFORE_HOOKS)
+lp.bundler.get-before-hooks             =$(__LP_BUNDLER_EFFECTIVE_BEFORE_HOOKS)
+lp.bundler.get-default-after-hooks      =$(__LP_BUNDLER_DEFAULT_AFTER_HOOKS)
+lp.bundler.get-after-hooks              =$(__LP_BUNDLER_EFFECTIVE_AFTER_HOOKS)
+lp.bundler.get-default-command          =$(__LP_BUNDLER_DEFAULT_COMMAND)
+lp.bundler.get-command                  =$(__LP_BUNDLER_EFFECTIVE_COMMAND)
+
+
+
+
+
 
 # lp.bundler.enabled=$(eval LP_BUNDLER_ENABLED=$(strip $(1)))
 # lp.bundler.extra-prerequisites=$(eval LP_BUNDLER_PREREQUISITES+= $(1))
