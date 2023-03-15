@@ -11,7 +11,7 @@ LP_HELP_MESSAGE_BUNDLE = $(info ${}  bundle .......... $(LP_DESCRIPTION_BUNDLE))
 
 lp.help:
 	$(info )
-    ifeq "$(LP_TSC_ENABLED)" "true"
+    ifeq "$(__LP_TSC_ENABLED)" "true"
 		$(LP_HELP_MESSAGE_TSC)
     endif
     ifeq "$(LP_BUNDLER_ENABLED)" "true"
@@ -22,21 +22,20 @@ lp.help:
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(strip $(LP_TSC_ENABLED))" "true"
+ifeq "$(__LP_TSC_ENABLED)" "true"
 
 .PHONY: tsc compile
 
 $(call doc.target, compile, $(LP_TSC_DESCRIPTION))
 $(call doc.target, tsc, $(LP_TSC_DESCRIPTION))
 
-tsc compile : $(LP_TSC_BUILDINFO);
+tsc compile : $(call lp.tsc.get-targets);
 
-$(LP_TSC_BUILDINFO) : $(LP_TSC_PREREQUISITES)
+$(call lp.tsc.get-targets) : $(call lp.tsc.get-prerequisites)
 	echo Compiling... \
-		$(if $(LP_TSC_BEFORE_HOOK), && $(LP_TSC_BEFORE_HOOK)) \
-		&& tsc -b \
-		&& touch "$(LP_TSC_BUILDINFO)" \
-		$(if $(LP_TSC_AFTER_HOOK), && $(LP_TSC_AFTER_HOOK))
+		$(if $(call lp.tsc.get-before-hooks), && $(call lp.tsc.get-before-hooks)) \
+		&& $(call lp.tsc.get-command) \
+		$(if $(call lp.tsc.get-after-hooks), && $(call lp.tsc.get-after-hooks))
 
 endif
 

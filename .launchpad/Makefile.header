@@ -1,32 +1,75 @@
 #-----------------------------------------------------------------------------------------------------------------------
-# Import the launchpad project settings
+# Environment and settings
 #-----------------------------------------------------------------------------------------------------------------------
 
-include $(patsubst %/Makefile.header, %/settings.cfg, $(lastword $(MAKEFILE_LIST)))
+__LP_SCRIPT_HOME    :=.launchpad
+__LP_SETTINGS_FILE	:=$(__LP_SCRIPT_HOME)/settings.cfg
+
+include $(__LP_SETTINGS_FILE)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Utility functions
 #-----------------------------------------------------------------------------------------------------------------------
 
-lp.fn.wildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
-lp.fn.config-error=$(error The configured launchpad $(strip $(1)) must be $(strip $(2)) (current value: $(strip $(3))))
+lp.fn.wildcard=$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+lp.fn.config-error=	$(info Invalid configuration in $(__LP_SETTINGS_FILE):) \
+					$(error $(strip $(1)) must be $(strip $(2)) (current value: $(strip $(3))))
+
+# rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+# $(info ---orig---)
+# $(info $(call rwildcard, ./src, *))
+# $(info ---src dir---)
+# $(info $(LP_SETTINGS_SRC_DIR))
+# $(info ---lp.fn.wildcard---)
+# $(info $(call rwildcard, src, *))
+
+# $(info $(call lp.fn.wildcard, src, *))
+# $(info $(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *))
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-LP_TSC_ENABLED=true
-LP_TSC_BUILDINFO=$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
-LP_TSC_PREREQUISITES=$(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) \
-					 $(patsubst %, .launchpad/%, Makefile.header Makefile.footer settings.cfg tsconfig.default.json) \
-					 Makefile tsconfig.json
-LP_TSC_BEFORE_HOOK=
-LP_TSC_AFTER_HOOK=
+__LP_TSC_ENABLED                 =true
+__LP_TSC_BUILDINFO               =$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
+__LP_TSC_DEFAULT_PREREQUISITES   =$(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) \
+                                  tsconfig.json \
+								  $(wildcard tsconfig*.json) \
+								  $(__LP_SCRIPT_HOME)/tsconfig.default.json \
+								  $(wildcard $(__LP_SCRIPT_HOME)/tsconfig*.json) \
+								  $(wildcard Makefile* $(__LP_SCRIPT_HOME)/Makefile*)
+__LP_TSC_EFFECTIVE_PREREQUISITES =$(__LP_TSC_DEFAULT_PREREQUISITES)
+__LP_TSC_DEFAULT_TARGETS         =$(__LP_TSC_BUILDINFO)
+__LP_TSC_EFFECTIVE_TARGETS       =$(__LP_TSC_DEFAULT_TARGETS)
+__LP_TSC_DEFAULT_BEFORE_HOOKS    =
+__LP_TSC_EFFECTIVE_BEFORE_HOOKS  =$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
+__LP_TSC_DEFAULT_AFTER_HOOKS     =touch "$(__LP_TSC_BUILDINFO)"
+__LP_TSC_EFFECTIVE_AFTER_HOOKS   =$(__LP_TSC_DEFAULT_AFTER_HOOKS)
+__LP_TSC_DEFAULT_COMMAND         =tsc -b
+__LP_TSC_EFFECTIVE_COMMAND       =$(__LP_TSC_DEFAULT_COMMAND)
 
-lp.tsc.enabled=$(eval LP_TSC_ENABLED=$(strip $(1)))
-lp.tsc.extra-prerequisites=$(eval LP_TSC_PREREQUISITES+= $(1))
-lp.tsc.before-hook=$(eval LP_TSC_BEFORE_HOOK=$(strip $(1)))
-lp.tsc.after-hook=$(eval LP_TSC_AFTER_HOOK=$(strip $(1)))
+lp.tsc.disable					=$(eval __LP_TSC_ENABLED=false)
+lp.tsc.add-extra-prerequisites	=$(eval __LP_TSC_EFFECTIVE_PREREQUISITES+= $(1))
+lp.tsc.overwrite-prerequisites	=$(eval __LP_TSC_EFFECTIVE_PREREQUISITES=$(1))
+lp.tsc.add-extra-targets		=$(eval __LP_TSC_EFFECTIVE_TARGETS+= $(1))
+lp.tsc.overwrite-targets		=$(if $(strip $(1)), $(eval __LP_TSC_EFFECTIVE_TARGETS=$(1)), $(error No parameter was passed to lp.tsc.overwrite-targets))
+lp.tsc.add-before-hook			=$(if $(strip $(1)), $(if $(strip $(__LP_TSC_EFFECTIVE_BEFORE_HOOKS)), $(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS+= && $(1)), $(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS=$(1))))
+lp.tsc.overwrite-before-hooks	=$(eval __LP_TSC_EFFECTIVE_BEFORE_HOOKS=$(1))
+lp.tsc.add-after-hook			=$(if $(strip $(1)), $(if $(strip $(__LP_TSC_EFFECTIVE_AFTER_HOOKS)), $(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS+= && $(1)), $(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS=$(1))))
+lp.tsc.overwrite-after-hooks	=$(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS=$(1))
+lp.tsc.overwrite-command        =$(eval __LP_TSC_EFFECTIVE_COMMAND=$(1))
+
+lp.tsc.get-default-prerequisites=$(__LP_TSC_DEFAULT_PREREQUISITES)
+lp.tsc.get-prerequisites		=$(__LP_TSC_EFFECTIVE_PREREQUISITES)
+lp.tsc.get-default-targets		=$(__LP_TSC_DEFAULT_TARGETS)
+lp.tsc.get-targets				=$(__LP_TSC_EFFECTIVE_TARGETS)
+lp.tsc.get-default-before-hooks	=$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
+lp.tsc.get-before-hooks			=$(__LP_TSC_EFFECTIVE_BEFORE_HOOKS)
+lp.tsc.get-default-after-hooks	=$(__LP_TSC_DEFAULT_AFTER_HOOKS)
+lp.tsc.get-after-hooks			=$(__LP_TSC_EFFECTIVE_AFTER_HOOKS)
+lp.tsc.get-default-command		=$(__LP_TSC_DEFAULT_COMMAND)
+lp.tsc.get-command				=$(__LP_TSC_EFFECTIVE_COMMAND)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle

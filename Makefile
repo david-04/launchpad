@@ -23,7 +23,7 @@ TSCONFIG_SRC=$(wildcard resources/tsconfig/02-facets/tsconfig*.json) \
 		     scripts/build-tsconfig.sh scripts/build-tsconfig.js
 TSCONFIG_TARGETS=src/resources/tsconfig-templates.ts .launchpad/tsconfig.default.json
 
-TSCONFIG_DESCRIPTION=assemble tsconfig.json templates
+TSCONFIG_DESCRIPTION=assemble the tsconfig.json templates
 $(call doc.phony, tsconfig, $(TSCONFIG_DESCRIPTION))
 .PHONY: tsconfig
 tsconfig : $(TSCONFIG_TARGETS);
@@ -34,7 +34,7 @@ $(TSCONFIG_TARGETS) : $(TSCONFIG_SRC)
 $(call lp.tsc.extra-prerequisites, $(TSCONFIG_TARGETS))
 
 #-----------------------------------------------------------------------------------------------------------------------
-# version information
+# Version information
 #-----------------------------------------------------------------------------------------------------------------------
 
 VERSION_INFO_SRC_DATA=CHANGELOG.md
@@ -56,22 +56,18 @@ $(call lp.tsc.extra-prerequisites, $(VERSION_INFO_TARGETS))
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.tsc.enabled,             true)     # enable launchpad's built-in "tsc" and "compile" targets
-$(call lp.tsc.extra-prerequisites,     )     # additional prerequisites (e.g. auto-generated source files)
-$(call lp.tsc.before-hook,             )     # shell commands to run before compiling
-$(call lp.tsc.after-hook,              )     # shell commands to run after compiling
-
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-# not implemented yet
+# $(call lp.bundler.enabled,             true)  # enable launchpad's built-in "bundle" target
+# $(call lp.bundler.extra-prerequisites,     )  # additional prerequisites
+# # $(call lp.bundler.add-entry-points,        )  # entry points (relative to ./src) to be bundled
+# $(call lp.bundler.before-hook,             )  # shell commands to run before bundling
+# $(call lp.bundler.after-hook,              )  # shell commands to run after bundling
 
-$(call lp.bundler.enabled,             true)  # enable launchpad's built-in "bundle" target
-$(call lp.bundler.extra-prerequisites,     )  # additional prerequisites
-$(call lp.bundler.add-entry-points,        )  # entry points (relative to ./src) to be bundled
-$(call lp.bundler.before-hook,             )  # shell commands to run before bundling
-$(call lp.bundler.after-hook,              )  # shell commands to run after bundling
+# $(call lp.bundler.add-bundle, scripts/launchpad-cli, launchpad-cli)
+# $(call lp.bundler.bundle, scripts/launchpad-cli, launpad-cli)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # release
@@ -90,11 +86,10 @@ $(call lp.bundler.after-hook,              )  # shell commands to run after bund
 #-----------------------------------------------------------------------------------------------------------------------
 
 CLEAN=resources/tsconfig/tsconfig.*.json
+
 clean :
     ifneq "$(wildcard $(CLEAN))" ""
 	rm -rf $(CLEAN)
     endif
-
-# not implemented yet
 
 include .launchpad/Makefile.footer
