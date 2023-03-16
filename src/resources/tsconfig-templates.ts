@@ -1,5 +1,5 @@
 export const TSCONFIG_JSON_TEMPLATES = {
-    "tsconfig.node-application-cjs.json": {
+    "tsconfig.cli-application-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -73,7 +73,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.node-application-esm.json": {
+    "tsconfig.cli-application-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -147,7 +147,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.node-library-cjs.json": {
+    "tsconfig.cli-library-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -221,7 +221,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "../src/**/*.ts"
         ]
     },
-    "tsconfig.node-library-esm.json": {
+    "tsconfig.cli-library-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,

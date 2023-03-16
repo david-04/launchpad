@@ -1,41 +1,16 @@
 #-----------------------------------------------------------------------------------------------------------------------
-# Help
-#-----------------------------------------------------------------------------------------------------------------------
-
-LP_DESCRIPTION_TSC=run the tsc compiler
-LP_DESCRIPTION_BUNDLE=bundle artifacts (via esbuild)
-
-LP_HELP_MESSAGE_TSC    = $(info ${}  compile ......... $(LP_DESCRIPTION_TSC)) \
-					     $(info ${}  tsc ............. $(LP_DESCRIPTION_TSC))
-LP_HELP_MESSAGE_BUNDLE = $(info ${}  bundle .......... $(LP_DESCRIPTION_BUNDLE))
-
-lp.help:
-	$(info )
-    ifeq "$(__LP_TSC_ENABLED)" "true"
-		$(LP_HELP_MESSAGE_TSC)
-    endif
-    ifeq "$(LP_BUNDLER_ENABLED)" "true"
-		$(LP_HELP_MESSAGE_TSC)
-    endif
-
-#-----------------------------------------------------------------------------------------------------------------------
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(__LP_TSC_ENABLED)" "true"
+ifeq "$(call lp.tsc.is-enabled)" "true"
 
-.PHONY: tsc compile
-
-$(call doc.target, compile, $(LP_TSC_DESCRIPTION))
-$(call doc.target, tsc, $(LP_TSC_DESCRIPTION))
-
-tsc compile : $(call lp.tsc.get-targets);
+$(call lp.fn.phony-targets, compile tsc, $(call lp.tsc.get-description), $(call lp.tsc.get-targets))
 
 $(call lp.tsc.get-targets) : $(call lp.tsc.get-prerequisites)
 	echo Compiling... \
-		$(if $(call lp.tsc.get-before-hooks), && $(call lp.tsc.get-before-hooks)) \
+		$(if $(call lp.tsc.get-before-hook), && $(call lp.tsc.get-before-hook)) \
 		&& $(call lp.tsc.get-command) \
-		$(if $(call lp.tsc.get-after-hooks), && $(call lp.tsc.get-after-hooks))
+		$(if $(call lp.tsc.get-after-hook), && $(call lp.tsc.get-after-hook))
 
 endif
 
@@ -43,20 +18,46 @@ endif
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-# ifeq "$(strip $(LP_BUNDLER_ENABLED))" "true"
+# ifeq "$(__LP_BUNDLER_ENABLED)" "true"
+#     ifeq "$(call lp.bundler.get-default-command)" "$(call lp.bundler.get-command)"
+#         ifeq "$(strip $(__LP_ESBUILD_MAPPINGS))" ""
+#             $(call lp.bundler.disable)
+#         endif
+#     endif
+# endif
 
-# .PHONY: bundle bundler pack webpack
+# ifeq "$(call lp.bundler.is-enabled)" "true"
+
+# .PHONY: bundle bundler pack webpack esbuild
 
 # $(call doc.target, bundle, $(LP_BUNDLER_DESCRIPTION))
 
-# bundle bundler pack webpack : $(LP_TSC_BUILDINFO);
+# bundle bundler pack webpack esbuild : $(LP_TSC_BUILDINFO);
 
-# $(LP_TSC_BUILDINFO) : $(LP_TSC_PREREQUISITES)
-# 	echo Compiling... \
-# 		$(if $(LP_TSC_BEFORE_HOOK), && $(LP_TSC_BEFORE_HOOK)) \
-# 		&& tsc -b \
-# 		&& touch "$(LP_TSC_BUILDINFO)" \
-# 		$(if $(LP_TSC_AFTER_HOOK), && $(LP_TSC_AFTER_HOOK))
-
+# $(call lp.bundler.get-targets) : $(call lp.bundler.get-prerequisites)
+# 	echo Bundling... \
+# 		$(if $(call lp.bundler.get-before-hooks), && $(call lp.bundler.get-before-hooks)) \
+# 		&& $(call lp.bundler.get-command) \
+# 		$(if $(call lp.bundler.get-after-hooks), && $(call lp.bundler.get-after-hooks))
 
 # endif
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Help
+#-----------------------------------------------------------------------------------------------------------------------
+
+lp.help:
+	$(info )
+	# $(call lp.fn.if-true, lp.bundler.is-enabled, $(info ${}  bundle .......... $(call lp.bundler.get-description)))
+	$(call lp.fn.if-true, lp.tsc.is-enabled,     $(info ${}  compile ......... $(call lp.tsc.get-description)))
+	                                             $(info ${}  diagnostics ..... $(call lp.diagnostics.get-description))
+	$(call lp.fn.if-true, lp.tsc.is-enabled,     $(info ${}  tsc ............. $(call lp.tsc.get-description)))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Diagnostics
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.fn.phony-targets, diagnostics diagnose dump, $(call lp.diagnostics.get-description), lp.diagnostics.dump)
+
+lp.diagnostics.dump : ;
+	$(call lp.tsc.print-diagnostics)
