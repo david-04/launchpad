@@ -21,7 +21,9 @@ ifeq "$(call lp.diagnostics.is-enabled)" "true"
 $(call lp.fn.declare-phony-targets, diagnostics, lp.target.diagnostics)
 
 lp.target.diagnostics : ;
-	$(call lp.tsc.print-diagnostics)
+	$(call lp.fn.print-diagnostics-for-target, Compile, tsc)
+	$(info )
+	$(call lp.fn.print-diagnostics-for-target, Bundle, bundle)
 
 endif
 
@@ -34,10 +36,7 @@ ifeq "$(call lp.tsc.is-enabled)" "true"
 $(call lp.fn.declare-phony-targets, tsc, $(call lp.tsc.get-targets))
 
 $(call lp.tsc.get-targets) : $(call lp.tsc.get-prerequisites)
-	echo Compiling... \
-		$(if $(call lp.tsc.get-before-hook), && $(call lp.tsc.get-before-hook)) \
-		&& $(call lp.tsc.get-command) \
-		$(if $(call lp.tsc.get-after-hook), && $(call lp.tsc.get-after-hook))
+	$(call lp.fn.get-command, Compiling..., tsc)
 
 endif
 
@@ -45,26 +44,25 @@ endif
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-# ifeq "$(__LP_BUNDLER_ENABLED)" "true"
-#     ifeq "$(call lp.bundler.get-default-command)" "$(call lp.bundler.get-command)"
-#         ifeq "$(strip $(__LP_ESBUILD_MAPPINGS))" ""
-#             $(call lp.bundler.disable)
-#         endif
-#     endif
-# endif
+ifeq "$(__LP_BUNDLE_ENABLED)" "true"
 
-# ifeq "$(call lp.bundler.is-enabled)" "true"
+ifneq "$(call lp.bundle.get-targets)" ""
 
-# .PHONY: bundle bundler pack webpack esbuild
+$(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
 
-# $(call doc.target, bundle, $(LP_BUNDLER_DESCRIPTION))
+$(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
+	$(call lp.fn.get-command, Bundling..., bundle)
 
-# bundle bundler pack webpack esbuild : $(LP_TSC_BUILDINFO);
+else
 
-# $(call lp.bundler.get-targets) : $(call lp.bundler.get-prerequisites)
-# 	echo Bundling... \
-# 		$(if $(call lp.bundler.get-before-hooks), && $(call lp.bundler.get-before-hooks)) \
-# 		&& $(call lp.bundler.get-command) \
-# 		$(if $(call lp.bundler.get-after-hooks), && $(call lp.bundler.get-after-hooks))
+$(call lp.fn.declare-phony-targets, bundle, lp.target.bundle)
 
-# endif
+lp.target.bundle : $(call lp.bundle.get-prerequisites)
+    ifeq "$(call lp.bundle.get-command)" "$(call lp.bundle.get-default-command)"
+		$(error No bundles have been defined. Call lp.bundle.add-bundle first)
+    else
+		$(call lp.fn.get-command, Bundling..., bundle)
+    endif
+endif
+
+endif
