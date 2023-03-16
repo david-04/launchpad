@@ -17,9 +17,9 @@ $(call lp.help.add-phony-target, version, ............ update the version number
 # Create tsconfig.json templates
 #-----------------------------------------------------------------------------------------------------------------------
 
-TSCONFIG_SRC=$(wildcard resources/tsconfig/02-facets/tsconfig*.json) \
-			 $(wildcard resources/tsconfig/03-compilations/tsconfig*.json) \
-		     scripts/build-tsconfig.sh scripts/build-tsconfig.js
+TSCONFIG_SRC_DIRECTORIES=resources/tsconfig/02-facets resources/tsconfig/03-compilations
+TSCONFIG_SRC_JSON=$(wildcard $(foreach dir, $(TSCONFIG_SRC_DIRECTORIES), $(dir)/tsconfig*.json))
+TSCONFIG_SRC=$(TSCONFIG_SRC_DIRECTORIES) $(TSCONFIG_SRC_JSON)
 TSCONFIG_TARGETS=src/resources/tsconfig-templates.ts .launchpad/tsconfig.default.json
 
 tsconfig : $(TSCONFIG_TARGETS);
@@ -54,7 +54,7 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.bundle.enable-source-maps)
-$(call lp.bundle.enable-inline-sources)
+# $(call lp.bundle.enable-inline-sources)
 
 $(call lp.bundle.add-bundle, scripts/launchpad-lib, launchpad-lib)
 
@@ -71,15 +71,21 @@ $(call lp.bundle.add-bundle, scripts/launchpad-lib, launchpad-lib)
 # not implemented yet
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Uplift
+#-----------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Clean
 #-----------------------------------------------------------------------------------------------------------------------
 
-CLEAN=resources/tsconfig/tsconfig.*.json
+# $(call lp.clean.add-files, resources/tsconfig/tsconfig.*.json)
 
-clean :
-    ifneq "$(wildcard $(CLEAN))" ""
-	rm -rf $(CLEAN)
-    endif
+# $(call lp.clean.add-bundles)
+# $(call lp.clean.add-tsc-output-directory)
+# $(call lp.clean.add-bundle-output-directory)
+# $(call lp.clean.add-files,xxx)
+
+# $(call lp.clean.add-files)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets

@@ -21,9 +21,9 @@ ifeq "$(call lp.diagnostics.is-enabled)" "true"
 $(call lp.fn.declare-phony-targets, diagnostics, lp.target.diagnostics)
 
 lp.target.diagnostics : ;
-	$(call lp.fn.print-diagnostics-for-target, Compile, tsc)
-	$(info )
-	$(call lp.fn.print-diagnostics-for-target, Bundle, bundle)
+	        $(call lp.fn.print-diagnostics-for-target, Compile, tsc)
+	$(info )$(call lp.fn.print-diagnostics-for-target, Bundle, bundle)
+	$(info )$(call lp.fn.print-diagnostics-for-target, Clean, clean)
 
 endif
 
@@ -44,7 +44,7 @@ endif
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(__LP_BUNDLE_ENABLED)" "true"
+ifeq "$(call lp.bundle.is-enabled)" "true"
 
 ifneq "$(call lp.bundle.get-targets)" ""
 
@@ -64,5 +64,20 @@ lp.target.bundle : $(call lp.bundle.get-prerequisites)
 		$(call lp.fn.get-command, Bundling..., bundle)
     endif
 endif
+
+endif
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Clean
+#-----------------------------------------------------------------------------------------------------------------------
+
+ifeq "$(call lp.clean.is-enabled)" "true"
+
+clean:
+    ifeq "$(call lp.clean.get-default-command)" "$(call lp.clean.get-command)"
+		$(if $(wildcard $(call lp.clean.get-files)), $(call lp.clean.get-command))
+    else
+		$(call lp.clean.get-command)
+    endif
 
 endif
