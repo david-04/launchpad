@@ -10,9 +10,10 @@ autorun : compile
 # Help
 #-----------------------------------------------------------------------------------------------------------------------
 
-help:  lp.help
-	$(info ${}  tsconfig ........ $(TSCONFIG_DESCRIPTION))
-	$(info ${}  version ......... $(UPDATE_VERSION_INFO_DESCRIPTION))
+# $(call lp.help.add-target,       test, ............... description)
+# $(call lp.help.add-target,       test2, .............. description)
+# $(call lp.help.add-phony-target, test3, .............. description)
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Create tsconfig.json templates

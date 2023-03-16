@@ -8,7 +8,7 @@ __LP_SETTINGS_FILE                     :=$(__LP_SCRIPT_HOME)/settings.cfg
 include $(__LP_SETTINGS_FILE)
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Utility functions
+# Internal utility functions
 #-----------------------------------------------------------------------------------------------------------------------
 
 lp.fn.wildcard                          =$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d))
@@ -20,22 +20,20 @@ lp.fn.print-header                      =$(info #-------------------------------
                                          $(info #-----------------------------------------------------------------------------------------------------------------------)
 lp.fn.print-property                    =$(info ) $(info $(strip $(1):)) $(info $(call lp.fn.empty-to, $(strip $(call $(2))), $(3)))
 lp.fn.if-true                           =$(if $(strip $(subst false,,$(call $(1)))),$(2),$(3))
-lp.fn.phony-targets                     =$(eval $(foreach target,$(1),$(call lp.fn.phony-target,$(target),$(2),$(3))))
+lp.fn.declare-phony-targets             =$(eval $(foreach target,$(call lp.$(strip $(1)).get-phony-targets),$(call lp.fn.declare-phony-target,$(target),$(call lp.$(strip $(1)).get-description),$(2))))
 
-define lp.fn.phony-target
-
-.PHONY: $(1)
-
+define lp.fn.declare-phony-target
 $(if $(strip $(doc.target)), $(call doc.target,$(target), $(2)))
-
+#----
+.PHONY: $(1)
 $(1) : $(3);
-
 endef
 
 #-----------------------------------------------------------------------------------------------------------------------
-# General variables
+# Global variables
 #-----------------------------------------------------------------------------------------------------------------------
 
+__LP_EMPTY                              =
 __LP_MAKEFILES                          =Makefile \
                                          $(__LP_SCRIPT_HOME)/Makefile.header \
                                          $(__LP_SCRIPT_HOME)/Makefile.footer \
@@ -44,12 +42,44 @@ __LP_TSCONFIG_JSON                      =tsconfig.json $(__LP_SCRIPT_HOME)/tscon
                                          $(wildcard tsconfig*.json $(__LP_SCRIPT_HOME)/tsconfig*.json)
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Help
+#-----------------------------------------------------------------------------------------------------------------------
+
+__LP_HELP_ENABLED                       =true
+__LP_HELP_TARGETS                       =$(call lp.help.add-builtin-target, bundler,     bundle .............) \
+                                         $(call lp.help.add-builtin-target, tsc,         compile ............) \
+                                         $(call lp.help.add-builtin-target, diagnostics, diagnostics ........) \
+                                         $(call lp.help.add-builtin-target, tsc,         tsc ................)
+
+lp.help.disable                         =$(eval __LP_HELP_ENABLED=)
+lp.help.add-target                      =$(eval __LP_HELP_TARGETS+=$$(info $$(__LP_EMPTY)  $$(strip $(1)) $$(strip $(2))))
+lp.help.add-phony-target                =$(eval .PHONY: $(1))$(call lp.help.add-target, $(strip $(1)) $(strip $(2)))
+lp.help.add-builtin-target              =$(if $(call lp.$(strip $(1)).is-enabled),$(info $(__LP_EMPTY)  $(strip $(2)) $(call lp.$(strip $(1)).get-description)))
+
+lp.help.get-phony-targets               =help
+lp.help.get-description                 =list available Makefile targets
+lp.help.is-enabled                      =$(strip $(__LP_HELP_ENABLED))
+lp.help.print-targets                   =$(__LP_HELP_TARGETS)
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Diagnostics
+#-----------------------------------------------------------------------------------------------------------------------
+
+__LP_DIAGNOSTICS_ENABLED                =true
+
+lp.diagnostics.disable                  =$(eval __LP_DIAGNOSTICS_ENABLED=)
+
+lp.diagnostics.get-phony-targets        =diagnostics
+lp.diagnostics.get-description          =list Makefile rules and settings
+lp.diagnostics.is-enabled               =$(strip $(__LP_DIAGNOSTICS_ENABLED))
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_TSC_ENABLED                        =true
 __LP_TSC_BUILDINFO                      =$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
-__LP_TSC_DEFAULT_PREREQUISITES          =$(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) $(__LP_TSCONFIG_JSON) $(__LP_MAKEFILES)
+__LP_TSC_DEFAULT_PREREQUISITES          =$(sort $(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) $(__LP_TSCONFIG_JSON) $(__LP_MAKEFILES))
 __LP_TSC_EFFECTIVE_PREREQUISITES        =$(__LP_TSC_DEFAULT_PREREQUISITES)
 __LP_TSC_DEFAULT_TARGETS                =$(__LP_TSC_BUILDINFO)
 __LP_TSC_EFFECTIVE_TARGETS              =$(__LP_TSC_DEFAULT_TARGETS)
@@ -71,6 +101,7 @@ lp.tsc.add-after-hook                   =$(if $(strip $(1)), $(if $(strip $(__LP
 lp.tsc.overwrite-after-hooks            =$(eval __LP_TSC_EFFECTIVE_AFTER_HOOKS=$(strip $(1)))
 lp.tsc.overwrite-command                =$(eval __LP_TSC_EFFECTIVE_COMMAND=$(strip $(1)))
 
+lp.tsc.get-phony-targets                =tsc compile lp.tsc lp.compile
 lp.tsc.get-description                  =run the TypeScript compiler
 lp.tsc.is-enabled                       =$(strip $(__LP_TSC_ENABLED))
 lp.tsc.get-default-prerequisites        =$(strip $(__LP_TSC_DEFAULT_PREREQUISITES))
@@ -183,9 +214,3 @@ lp.tsc.print-diagnostics                =$(call lp.fn.print-header, Compile) \
 # )
 
 # $(call lp.bundler.add-bundle, scripts/launchpad-lib, launchpad-lib)
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Diagnostics
-#-----------------------------------------------------------------------------------------------------------------------
-
-lp.diagnostics.get-description          =dump Makefile rules and settings
