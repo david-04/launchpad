@@ -2,6 +2,6 @@
     "extends": "./.launchpad/tsconfig.default.json",
     "compilerOptions": {
         "outDir": "./build",
-        "tsBuildInfoFile": "./build/.tsbuildinfo",
+        "tsBuildInfoFile": "./build/.tsbuildinfo"
     }
 }

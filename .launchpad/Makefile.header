@@ -63,6 +63,7 @@ __LP_HELP_ENABLED                       =true
 __LP_HELP_TARGETS                       =$(call lp.help.add-builtin-target, bundler,     bundle .............) \
                                          $(call lp.help.add-builtin-target, clean,       clean ..............) \
                                          $(call lp.help.add-builtin-target, tsc,         compile ............) \
+                                         $(call lp.help.add-builtin-target, format,      format .............) \
                                          $(call lp.help.add-builtin-target, diagnostics, diagnostics ........) \
                                          $(call lp.help.add-builtin-target, tsc,         tsc ................)
 
@@ -127,7 +128,7 @@ lp.tsc.add-before-hook                  =$(call lp.fn.append-with-separator, __L
 lp.tsc.overwrite-before-hooks           =$(call lp.fn.assign, __LP_TSC_EFFECTIVE_BEFORE_HOOKS, $(1))
 lp.tsc.add-after-hook                   =$(call lp.fn.append-with-separator, __LP_TSC_EFFECTIVE_AFTER_HOOKS, &&, $(1))
 lp.tsc.overwrite-after-hooks            =$(call lp.fn.assign, __LP_TSC_EFFECTIVE_AFTER_HOOKS, $(1))
-lp.tsc.overwrite-command                =$(call lp.fn.assert-not-empty, $(1)) \
+lp.tsc.overwrite-command                =$(call lp.fn.assert-not-empty, $(1), lp.tsc.overwrite-command) \
                                          $(call lp.fn.assign, __LP_TSC_EFFECTIVE_COMMAND, $(1))
 
 lp.tsc.get-phony-targets                =tsc compile lp.tsc lp.compile
@@ -239,7 +240,66 @@ lp.bundle.get-command                   =$(strip $(__LP_BUNDLE_EFFECTIVE_COMMAND
 lp.bundle.get-bundle-names              =$(strip $(__LP_BUNDLE_NAMES))
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Compile
+# Format
+#-----------------------------------------------------------------------------------------------------------------------
+
+__LP_FORMAT_ENABLED                     =true
+__LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
+__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
+__LP_FORMAT_DEFAULT_AFTER_HOOKS         =
+__LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
+__LP_FORMAT_DEFAULT_COMMAND             =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-globs))
+__LP_FORMAT_EFFECTIVE_COMMAND           =$(__LP_FORMAT_DEFAULT_COMMAND)
+__LP_FORMAT_DEFAULT_GLOBS               =. !node_modules $(patsubst %/, !%, $(filter-out ./ ../, $(wildcard .*/))) \
+                                         $(foreach extension, js js.map d.ts, $(patsubst %.js, !%.$(extension), $(call lp.bundle.get-bundle-names))) \
+                                         $(wildcard *.lock *-lock.*)
+__LP_FORMAT_EFFECTIVE_GLOBS             =$(if $(__LP_FORMAT_DISABLE_DEFAULT_GLOBS), , $(__LP_FORMAT_DEFAULT_GLOBS))
+__LP_FORMAT_DISABLE_DEFAULT_GLOBS       =
+
+lp.format.disable                       =$(call lp.fn.assign, __LP_FORMAT_ENABLED, $(__LP_EMPTY_STRING))
+lp.format.add-before-hook               =$(call lp.fn.append-with-separator, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
+lp.format.overwrite-before-hooks        =$(call lp.fn.assign, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, $(1))
+lp.format.add-after-hook                =$(call lp.fn.append-with-separator, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, &&, $(1))
+lp.format.overwrite-after-hooks         =$(call lp.fn.assign, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, $(1))
+lp.format.overwrite-command             =$(call lp.fn.assert-not-empty, $(1), lp.format.overwrite-command) \
+                                         $(call lp.fn.assign, __LP_FORMAT_EFFECTIVE_COMMAND, $(1))
+lp.format.disable-defaults              =$(call lp.fn.assign, __LP_FORMAT_DISABLE_DEFAULT_GLOBS, true)
+lp.format.include-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.include-files) \
+                                         $(if $(strip $(2)), \
+                                             $(foreach directory, $(1),\
+                                                 $(foreach glob, $(2), \
+                                                     $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(directory)/**/$(glob)) \
+                                                 ) \
+                                             ), \
+                                             $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(strip $(1))) \
+                                         )
+lp.format.exclude-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.exclude-files) \
+                                         $(if $(strip $(2)), \
+                                             $(foreach directory, $(1),\
+                                                 $(foreach glob, $(2), \
+                                                     $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, !$(directory)/**/$(glob)) \
+                                                 ) \
+                                             ), \
+                                             $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(patsubst %, !%, $(1))) \
+                                         )
+
+lp.format.get-phony-targets             =format reformat lp.format lp.reformat
+lp.format.get-description               =format sources with Prettier
+lp.format.is-enabled                    =$(strip $(__LP_FORMAT_ENABLED))
+lp.format.get-default-prerequisites     =<n/a>
+lp.format.get-prerequisites             =<n/a>
+lp.format.get-default-targets           =<n/a>
+lp.format.get-targets                   =<n/a>
+lp.format.get-default-before-hook       =$(strip $(__LP_FORMAT_DEFAULT_BEFORE_HOOKS))
+lp.format.get-before-hook               =$(strip $(__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS))
+lp.format.get-default-after-hook        =$(strip $(__LP_FORMAT_DEFAULT_AFTER_HOOKS))
+lp.format.get-after-hook                =$(strip $(__LP_FORMAT_EFFECTIVE_AFTER_HOOKS))
+lp.format.get-default-command           =$(strip $(__LP_FORMAT_DEFAULT_COMMAND))
+lp.format.get-command                   =$(strip $(__LP_FORMAT_EFFECTIVE_COMMAND))
+lp.format.get-globs                     =$(strip $(__LP_FORMAT_EFFECTIVE_GLOBS))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Clean
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_CLEAN_ENABLED                      =true

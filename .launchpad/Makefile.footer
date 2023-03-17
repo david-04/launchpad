@@ -23,7 +23,9 @@ $(call lp.fn.declare-phony-targets, diagnostics, lp.target.diagnostics)
 lp.target.diagnostics : ;
 	        $(call lp.fn.print-diagnostics-for-target, Compile, tsc)
 	$(info )$(call lp.fn.print-diagnostics-for-target, Bundle, bundle)
-	$(info )$(call lp.fn.print-diagnostics-for-target, Clean, clean)
+	$(info )$(call lp.fn.print-diagnostics-for-target, Format, format)
+
+# $(info )$(call lp.fn.print-diagnostics-for-target, Clean, clean)
 
 endif
 
@@ -64,6 +66,27 @@ lp.target.bundle : $(call lp.bundle.get-prerequisites)
 		$(call lp.fn.get-command, Bundling..., bundle)
     endif
 endif
+
+endif
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Format
+#-----------------------------------------------------------------------------------------------------------------------
+
+ifeq "$(call lp.format.is-enabled)" "true"
+
+$(call lp.fn.declare-phony-targets, format, lp.target.format)
+
+lp.target.format :
+    ifeq "$(call lp.format.get-globs)" ""
+        ifeq "$(call lp.format.get-default-command)" "$(call lp.format.get-command)"
+			$(error No file patterns are configured. Call lp.format.include-files or lp.format.exclude-files or don't call lp.format.disable-defaults)
+        else
+			$(call lp.fn.get-command, Reformatting..., format)
+        endif
+    else
+		$(call lp.fn.get-command, Reformatting..., format)
+    endif
 
 endif
 

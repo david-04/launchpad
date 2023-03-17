@@ -64,9 +64,9 @@ function parseJson(relativePath, rawContent) {
 function normalizeTsconfig(json) {
     const compilerOptionsIn = json.compilerOptions;
     const compilerOptionsOut = {};
-    Object.keys(compilerOptionsIn).sort().forEach(key => {
-        compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key]);
-    });
+    Object.keys(compilerOptionsIn)
+        .sort()
+        .forEach(key => (compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key])));
     return { compilerOptions: compilerOptionsOut, include: ["../src/**/*.ts"] };
 }
 
@@ -91,7 +91,7 @@ function normalizeTsconfigValue(value) {
 
 function createTsconfigTemplateTs(outputPath, files) {
     const output = {};
-    files.forEach(file => output[file.name] = file.json);
+    files.forEach(file => (output[file.name] = file.json));
     const content = `export const TSCONFIG_JSON_TEMPLATES = ${JSON.stringify(output, undefined, INDENT)} as const;`;
     writeFileSync(outputPath, content);
 }

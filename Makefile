@@ -53,13 +53,13 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.enable-source-maps)
+# $(call lp.bundle.enable-source-maps)
 # $(call lp.bundle.enable-inline-sources)
 
 $(call lp.bundle.add-bundle, scripts/launchpad-lib, launchpad-lib)
 
 #-----------------------------------------------------------------------------------------------------------------------
-# release
+# Release
 #-----------------------------------------------------------------------------------------------------------------------
 
 # not implemented yet
@@ -68,7 +68,8 @@ $(call lp.bundle.add-bundle, scripts/launchpad-lib, launchpad-lib)
 # Reformat
 #-----------------------------------------------------------------------------------------------------------------------
 
-# not implemented yet
+$(call lp.format.exclude-files, src/resources/tsconfig-templates.ts)
+$(call lp.format.exclude-files, resources/tsconfig, tsconfig*.json)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Uplift
