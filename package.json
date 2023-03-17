@@ -1,11 +1,8 @@
 {
-    "name": "david-04/launchpad",
-    "version": "0.0.0",
     "private": true,
     "type": "module",
-    "packageManager": "yarn@3.4.1",
-    "dependencies": {
-        "@types/node": "^18",
-        "typescript": "5.0.1-rc"
+    "packageManager": "yarn@3.5.0",
+    "devDependencies": {
+        "@types/node": "^18"
     }
 }

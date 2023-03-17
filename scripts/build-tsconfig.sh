@@ -12,7 +12,7 @@ OUTPUT_DIR=resources/tsconfig
 for COMPILATION in $COMPILATIONS
 do
     echo - $COMPILATION
-    node_modules/.bin/tsc -p "$SOURCE_DIR/$COMPILATION" --showConfig > "$OUTPUT_DIR/$COMPILATION"
+    tsc -p "$SOURCE_DIR/$COMPILATION" --showConfig > "$OUTPUT_DIR/$COMPILATION"
 done
 
 node scripts/build-tsconfig.js $COMPILATIONS
