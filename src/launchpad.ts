@@ -1,5 +1,7 @@
+import { init } from "./commands/init/init.js";
 import { VERSION_NUMBER } from "./resources/version-information.js";
-import { fail } from "./utils/fail.js";
+import { fail, formatError } from "./utilities/fail.js";
+import { Path, getConfigFilePath } from "./utilities/path.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Supported actions / command line arguments
@@ -12,78 +14,116 @@ const COMMANDS = [
 ] as const;
 
 //----------------------------------------------------------------------------------------------------------------------
-// The CLI main program
+// Main CLI entry point
 //----------------------------------------------------------------------------------------------------------------------
 
 export async function launchpad(argv: ReadonlyArray<string>) {
-    if (argv.some(arg => arg.match(/^--?h(elp)?$/))) {
-        const commands = COMMANDS.map(array => `  ${array[0]}`);
-        ["", "  Usage: launchpad [command]", "", ...commands].forEach(line => console.log(line));
-        process.exit(0);
-    } else if (argv.some(arg => arg.match(/^--?v(ersion)?$/))) {
-        console.log(VERSION_NUMBER);
-        process.exit(0);
-    } else {
-        const [command, ...options] = argv;
-        const handler = getHandler(command?.trim());
-        return await handler(options);
+    try {
+        if (argv.some(arg => arg.match(/^--?h(elp)?$/))) {
+            showHelp();
+        } else if (argv.some(arg => arg.match(/^--?v(ersion)?$/))) {
+            showVersion();
+        } else {
+            return await analyzeArgumentsAndExecuteCommand(argv);
+        }
+    } catch (error: unknown) {
+        console.error(formatError(error));
+        process.exit(1);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Postinstall entry point
+//----------------------------------------------------------------------------------------------------------------------
+
+export namespace launchpad {
+    export async function postinstall() {
+        const { projectRoot, configFile } = createPaths(process.env["INIT_CWD"]);
+        if (configFile.existsAndIsFile()) {
+            return await uplift([], projectRoot, configFile, true);
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Locate the project root directory and the configuration file within
+//----------------------------------------------------------------------------------------------------------------------
+
+function createPaths(preferredRootDirectory?: string) {
+    const projectRoot = new Path(preferredRootDirectory ?? process.cwd());
+    const configFile = getConfigFilePath(projectRoot);
+    return { projectRoot, configFile };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Analyze the command line arguments and perform the requested operation
+//----------------------------------------------------------------------------------------------------------------------
+
+async function analyzeArgumentsAndExecuteCommand(argv: ReadonlyArray<string>) {
+    const [command, ...options] = argv;
+    if (undefined === command) {
+        fail(`Missing command line arguments\nTry launchpad --help for more information`);
+    } else {
+        const handler = getHandler(command.trim());
+        const { projectRoot, configFile } = createPaths();
+        return await handler(options, projectRoot, configFile, false);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Show a help message
+//----------------------------------------------------------------------------------------------------------------------
+
+function showHelp() {
+    const commands = COMMANDS.map(array => `  ${array[0]}`);
+    ["", "  Usage: launchpad [command]", "", ...commands].forEach(line => console.log(line));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Show the version number
+//----------------------------------------------------------------------------------------------------------------------
+
+function showVersion() {
+    console.log(VERSION_NUMBER);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // Find the most suitable handler
 //----------------------------------------------------------------------------------------------------------------------
 
-function getHandler(command: string | undefined): Function {
-    if (undefined === command) {
-        fail(`Missing command line arguments\nTry launchpad --help for more information`);
-    } else if ("postinstall" === command) {
-        return postinstall;
+function getHandler(command: string) {
+    const matchingCommands = COMMANDS.filter(array => array[0].trim().replace(/\s.*/, "") === command);
+    const [handler, ...rest] = matchingCommands.map(array => array[1]);
+    if (rest.length) {
+        throw new Error(`INTERNAL ERROR: Found more than one command handler for ${command}`);
     } else {
-        const matchingCommands = COMMANDS.filter(array => array[0].trim().replace(/\s.*/, "") === command);
-        const [handler, ...rest] = matchingCommands.map(array => array[1]);
-        if (rest.length) {
-            throw new Error(`INTERNAL ERROR: Found more than one command handler for ${command}`);
-        } else if (handler) {
-            return handler;
-        } else {
-            fail(`Invalid command: ${command}\nTry launchpad --help for more information`);
-        }
+        return handler ? handler : fail(`Invalid command: ${command}\nTry launchpad --help for more information`);
     }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Initialize a new project
-//----------------------------------------------------------------------------------------------------------------------
-
-async function init(_options: ReadonlyArray<string>) {
-    console.log("init");
-    return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // Uplift an existing project
 //----------------------------------------------------------------------------------------------------------------------
 
-async function uplift(_options: ReadonlyArray<string>) {
-    console.log("uplift");
-    return true;
+async function uplift(options: ReadonlyArray<string>, _projectRoot: Path, _configFile: Path, _isPostinstall: boolean) {
+    assertNoCommandLineOptions("uplift", options);
+    fail("The 'uplift' command is not implemented yet");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // Run unit tests
 //----------------------------------------------------------------------------------------------------------------------
 
-async function test(_options: ReadonlyArray<string>) {
-    console.log("test");
-    return true;
+async function test(_options: ReadonlyArray<string>, _projectRoot: Path, _configFile: Path, _isPostinstall: boolean) {
+    fail("The 'test' command is not implemented yet");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Run post-install steps
+// Assert that no command line options array is empty
 //----------------------------------------------------------------------------------------------------------------------
 
-async function postinstall(_options: ReadonlyArray<string>) {
-    console.log("postinstall");
-    return true;
+function assertNoCommandLineOptions(command: string, options: ReadonlyArray<string>) {
+    if (options.length) {
+        fail(`The ${command} command does not support parameter options`);
+    }
 }
