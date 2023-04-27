@@ -68,11 +68,11 @@ __LP_HELP_TARGETS                       =$(call lp.help.add-builtin-target, bund
                                          $(call lp.help.add-builtin-target, tsc,         tsc ................)
 
 lp.help.disable                         =$(call lp.fn.assign, __LP_HELP_ENABLED, $(__LP_EMPTY_STRING))
-lp.help.add-target                      =$(call lp.fn.append, __LP_HELP_TARGETS, $$(info $$(__LP_EMPTY_STRING) $$(strip $(1)) $$(strip $(2))))
+lp.help.add-target                      =$(call lp.fn.append, __LP_HELP_TARGETS, $$(info $$(__LP_EMPTY_STRING) $$(__LP_EMPTY_STRING) $$(strip $(1)) $$(strip $(2))))
 lp.help.add-phony-target                =$(eval .PHONY: $(1))\
                                          $(call lp.help.add-target, $(strip $(1)) $(strip $(2)))
 lp.help.add-builtin-target              =$(if $(call lp.$(strip $(1)).is-enabled),\
-                                              $(info $(__LP_EMPTY_STRING) $(strip $(2)) $(call lp.$(strip $(1)).get-description)) \
+                                              $(info $(__LP_EMPTY_STRING)  $(strip $(2)) $(call lp.$(strip $(1)).get-description)) \
                                          )
 lp.help.get-phony-targets               =help lp.help
 lp.help.get-description                 =list available Makefile targets
@@ -182,10 +182,10 @@ endif
 
 ifeq "$(LP_SETTINGS_RUNTIME)" "web"
     _LP_ESBUILD_OPTIONS += --platform=browser --target=es6 --jsx=transform
-else ifeq "$(LP_SETTINGS_RUNTIME)" "node"
+else ifeq "$(LP_SETTINGS_RUNTIME)" "cli"
     _LP_ESBUILD_OPTIONS += --platform=node --target=es2022
 else
-    $(call lp.fn.config-error, LP_SETTINGS_RUNTIME, "node" or "web")
+    $(call lp.fn.config-error, LP_SETTINGS_RUNTIME, "cli" or "web")
 endif
 
 ifeq "$(LP_SETTINGS_MODULE)" "esm"
@@ -198,7 +198,7 @@ endif
 
 ifeq "$(LP_SETTINGS_ARTIFACT)" "application"
     LP_ESBUILD_OPTIONS +=  --sources-content=false
-else ifeq "$(LP_SETTINGS_ARTIFACT)" "libray"
+else ifeq "$(LP_SETTINGS_ARTIFACT)" "library"
     LP_ESBUILD_OPTIONS +=  --sources-content=true
 else
     $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "application" or "library")
