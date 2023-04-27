@@ -11,7 +11,7 @@ OUTPUT_DIR=resources/tsconfig
 
 for COMPILATION in $COMPILATIONS
 do
-    echo - $COMPILATION
+    echo - "$COMPILATION"
     tsc -p "$SOURCE_DIR/$COMPILATION" --showConfig > "$OUTPUT_DIR/$COMPILATION"
 done
 

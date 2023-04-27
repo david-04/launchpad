@@ -1,1 +1,3 @@
-import "./scripts/launchpad-lib.js";
+import { launchpad } from "./launchpad.js";
+
+launchpad(["postinstall"]);

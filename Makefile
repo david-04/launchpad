@@ -4,12 +4,15 @@ include .launchpad/Makefile.header
 # Default target
 #-----------------------------------------------------------------------------------------------------------------------
 
-autorun : compile
+autorun : help;
+
+autorun.editor: compile;
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Help
 #-----------------------------------------------------------------------------------------------------------------------
 
+$(call lp.help.add-phony-target, run, ................ compile and run launchpad)
 $(call lp.help.add-phony-target, tsconfig, ........... assemble the tsconfig.json templates)
 $(call lp.help.add-phony-target, version, ............ update the version numbers and copyright years)
 
@@ -79,14 +82,17 @@ $(call lp.format.exclude-files, resources/tsconfig, tsconfig*.json)
 # Clean
 #-----------------------------------------------------------------------------------------------------------------------
 
-# $(call lp.clean.add-files, resources/tsconfig/tsconfig.*.json)
-
 # $(call lp.clean.add-bundles)
-# $(call lp.clean.add-tsc-output-directory)
 # $(call lp.clean.add-bundle-output-directory)
-# $(call lp.clean.add-files,xxx)
+$(call lp.clean.add-tsc-output-directory)
+$(call lp.clean.add-files, resources/tsconfig/tsconfig.*.json)
 
-# $(call lp.clean.add-files)
+#-----------------------------------------------------------------------------------------------------------------------
+# Run
+#-----------------------------------------------------------------------------------------------------------------------
+
+run : $(call lp.tsc.get-targets)
+	node build/scripts/launchpad-postinstall.js
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets
