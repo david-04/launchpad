@@ -28,7 +28,7 @@ type SplitLine = Line & { key: string; value: string };
 
 type Properties = ReadonlyArray<{
     key: string;
-    parse: (config: OldConfig, line: SplitLine, errors: Array<ErrorLine>) => OldConfig;
+    parse: (line: SplitLine, errors: Array<ErrorLine>) => OldConfig;
 }>;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ export function loadConfigFile(configFile: Path, properties: Properties) {
     const rawLines = fileContent.split(/\r?\n/).map((line, index) => ({ lineNumber: index + 1, content: line.trim() }));
     const relevantLines = rawLines.filter(line => line.content.match(/^[^#]/));
     const keyValues = splitLines(relevantLines, errors);
-    const config = keyValues.reduce((config, line) => reduceLine(properties, config, line, errors), {} as OldConfig);
+    const config = keyValues.reduce<OldConfig>((config, line) => reduceLine(properties, config, line, errors), {});
     return { config, errors };
 }
 
@@ -83,7 +83,7 @@ function splitLine(line: Line) {
 function reduceLine(properties: Properties, config: OldConfig, line: SplitLine, errors: Array<ErrorLine>) {
     const property = properties.filter(property => property.key === line.key)[0];
     if (property) {
-        return property.parse(config, line, errors);
+        return property.parse(line, errors);
     } else {
         errors.push({ ...line, error: `Unknown property ${line.key}` });
         return config;
@@ -94,13 +94,13 @@ function reduceLine(properties: Properties, config: OldConfig, line: SplitLine, 
 // Reducers
 //----------------------------------------------------------------------------------------------------------------------
 
-export function createReducer<T>(parse: (key: string, value: string) => T, reduce: (value: T) => OldConfig) {
-    return (config: OldConfig, line: SplitLine, errors: Array<ErrorLine>) => {
+export function createParser<T>(parse: (key: string, value: string) => T, reduce: (value: T) => OldConfig) {
+    return (line: SplitLine, errors: Array<ErrorLine>) => {
         try {
-            return { ...config, ...reduce(parse(line.key, line.value)) };
+            return reduce(parse(line.key, line.value));
         } catch (error: unknown) {
             errors.push({ ...line, error: error instanceof Error ? error.message : `${error}` });
-            return config;
+            return {};
         }
     };
 }

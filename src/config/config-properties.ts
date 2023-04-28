@@ -1,5 +1,5 @@
 import {
-    createReducer,
+    createParser,
     parseArtifact,
     parseBundler,
     parseBundlerOutDir,
@@ -19,42 +19,42 @@ import {
 export const CONFIG_PROPERTIES = [
     {
         key: "LP_SETTINGS_VERSION",
-        parse: createReducer(parseVersion, version => ({ version })),
+        parse: createParser(parseVersion, version => ({ version })),
     },
     {
         key: "LP_SETTINGS_RUNTIME",
-        parse: createReducer(parseRuntime, runtime => ({ runtime })),
+        parse: createParser(parseRuntime, runtime => ({ runtime })),
     },
     {
         key: "LP_SETTINGS_ARTIFACT",
-        parse: createReducer(parseArtifact, artifact => ({ artifact })),
+        parse: createParser(parseArtifact, artifact => ({ artifact })),
     },
     {
         key: "LP_SETTINGS_MODULE",
-        parse: createReducer(parseModule, module => ({ module })),
+        parse: createParser(parseModule, module => ({ module })),
     },
     {
         key: "LP_SETTINGS_SRC_DIR",
-        parse: createReducer(parseSrcDir, srcDir => ({ srcDir })),
+        parse: createParser(parseSrcDir, srcDir => ({ srcDir })),
     },
     {
         key: "LP_SETTINGS_TSC_OUT_DIR",
-        parse: createReducer(parseTscOutDir, tscOutDir => ({ tscOutDir })),
+        parse: createParser(parseTscOutDir, tscOutDir => ({ tscOutDir })),
     },
     {
         key: "LP_SETTINGS_BUNDLER_OUT_DIR",
-        parse: createReducer(parseBundlerOutDir, bundlerOutDir => ({ bundlerOutDir })),
+        parse: createParser(parseBundlerOutDir, bundlerOutDir => ({ bundlerOutDir })),
     },
     {
         key: "LP_SETTINGS_BUNDLER",
-        parse: createReducer(parseBundler, bundler => ({ bundler })),
+        parse: createParser(parseBundler, bundler => ({ bundler })),
     },
     {
         key: "LP_SETTINGS_FORMATTER",
-        parse: createReducer(parseFormatter, formatter => ({ formatter })),
+        parse: createParser(parseFormatter, formatter => ({ formatter })),
     },
     {
         key: "LP_SETTINGS_PACKAGE_MANAGER",
-        parse: createReducer(parsePackageManager, packageManager => ({ packageManager })),
+        parse: createParser(parsePackageManager, packageManager => ({ packageManager })),
     },
 ] as const;

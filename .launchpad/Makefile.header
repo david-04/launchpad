@@ -1,40 +1,116 @@
 #-----------------------------------------------------------------------------------------------------------------------
-# Environment and settings
+# Files and directories
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_SCRIPT_HOME                       :=.launchpad
-__LP_SETTINGS_FILE                     :=$(__LP_SCRIPT_HOME)/settings.cfg
-
-include $(__LP_SETTINGS_FILE)
+__LP_HOME_DIR                  :=$(strip $(patsubst %/Makefile.header,%,$(lastword $(MAKEFILE_LIST))))
+__LP_SETTINGS_CFG              :=$(strip $(__LP_HOME_DIR)/settings.cfg)
+__LP_MAKEFILE_HEADER           :=$(strip $(__LP_HOME_DIR)/Makefile.header)
+__LP_MAKEFILE_FOOTER           :=$(strip $(__LP_HOME_DIR)/Makefile.footer)
+__LP_TSCONFIG_JSON             :=$(strip $(__LP_HOME_DIR)/tsconfig.default.json)
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Internal utility functions
+# General purpose constants
 #-----------------------------------------------------------------------------------------------------------------------
 
-lp.fn.wildcard                          =$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d))
-lp.fn.config-error                      =$(info Invalid configuration property in $(__LP_SETTINGS_FILE):) \
-                                         $(error $(strip $(1)) must be $(strip $(2)) (current value: $(strip $($(1)))))
-lp.fn.empty-to                          =$(if $(strip $(1)),$(strip $(1)),$(strip $(2)))
-lp.fn.print-header                      =$(info #-----------------------------------------------------------------------------------------------------------------------) \
-                                         $(info # $(strip $(1))) \
-                                         $(info #-----------------------------------------------------------------------------------------------------------------------)
-lp.fn.print-property                    =$(info ) $(info $(strip $(1):)) $(info $(call lp.fn.empty-to, $(strip $(call $(2))), $(3)))
-lp.fn.get-command                       =$(if $(strip $(1)), echo "$(strip $(1))") \
-                                         $(if $(call lp.$(strip $(2)).get-before-hook), && $(call lp.$(strip $(2)).get-before-hook)) \
-                                         && $(call lp.$(strip $(2)).get-command) \
-                                         $(if $(call lp.$(strip $(2)).get-after-hook), && $(call lp.$(strip $(2)).get-after-hook))
-lp.fn.declare-phony-targets             =$(foreach target, \
-                                             $(call lp.$(strip $(1)).get-phony-targets), \
-                                             $(eval $(call lp.fn.declare-phony-target,$(target),$(call lp.$(strip $(1)).get-description),$(2))) \
-                                         )
-lp.fn.append                            =$(if $(strip $(2)), $(eval $(strip $(1))$(if $(strip $(2)),+= ,)$(strip $(2))))
-lp.fn.assign                            =$(eval $(strip $(1))=$(strip $(2)))
-lp.fn.append-with-seprator              =$(if $(strip $(3)), $(if $(strip $($(1))), \
-                                              $(call lp.fn.append, $(1), $(strip $(2)) $(strip $(3)))) \
-                                              $(call lp.fn.assign, $(1), $(strip $(3)))) \
-                                         )
-lp.fn.assert-not-empty                  =$(if $(strip $(1)),,$(error Missing parameter in $(if $(strip $(2)), call to $(strip $(2), function call))))
+__LP_EMPTY_STRING               =#
+__LP_BLANK                      =$(__LP_EMPTY_STRING) $(__LP_EMPTY_STRING)#
+__LP_COMMA                      =,
 
+#-----------------------------------------------------------------------------------------------------------------------
+# General purpose functions
+#-----------------------------------------------------------------------------------------------------------------------
+
+lp.fn.assert.param-not-empty    =$(if $(strip $(2)),,$(error Missing parameter in $(if $(strip $(1)), call to $(strip $(1), function call))))
+
+lp.fn.map.empty-to              =$(if $(strip $(1)),$(strip $(1)),$(strip $(2)))
+
+lp.fn.var.assign                =$(eval $(strip $(1))=$(strip $(2)))
+lp.fn.var.append                =$(if $(strip $(2)), $(eval $(strip $(1))$(if $(strip $(2)),+= ,)$(strip $(2))))
+lp.fn.var.erase                 =$(call lp.fn.var.assign, $(1),)
+
+lp.fn.wildcard                  =$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Functions for normalizing and validating configuration properties
+#-----------------------------------------------------------------------------------------------------------------------
+
+lp.fn.config.normalize.string   =$(call lp.fn.var.assign, $(strip $(1)), $(strip $($(strip $(1)))))
+lp.fn.config.normalize.enum     =$(call lp.fn.var.assign, $(strip $(1)), $(strip $(patsubst %::pinned,%,$($(strip $(1))))))
+lp.fn.config.normalize.disabled =$(if $(filter disabled, $($(strip $(1)))),$(call lp.fn.var.erase, $(1)))
+
+lp.fn.config.clean-enums        =$(strip $(filter-out or, $(subst ",,$(subst $(__LP_COMMA),,$(strip $(1))))))
+lp.fn.config.extract-enums      =$(strip $(filter $(call lp.fn.config.clean-enums, $($(strip $(1))_ENUMS)), $($(strip $(1)))))
+
+lp.fn.config.assert.not-empty   =$(if $(strip $($(strip $(1)))),,$(call lp.fn.config.fail.missing-value, $(1), $($(strip $(1))_ENUMS)))
+lp.fn.config.assert.valid-enum  =$(if $(call lp.fn.config.extract-enums, $(1)),,$(call lp.fn.config.fail.invalid-enum, $(1)))
+lp.fn.config.assert.single-enum =$(if $(patsubst 1%,%,$(words $(strip $($(strip $(1)))))), $(call lp.fn.config.fail.invalid-enum, $(1)))
+lp.fn.config.assert.enum        =$(foreach fn, not-empty valid-enum single-enum, $(call lp.fn.config.assert.$(fn), $(1)))
+
+lp.fn.config.fail               =$(info Invalid configuration in $(__LP_SETTINGS_CFG)) \
+                                 $(info $(strip $(1))) \
+                                 $(error $(__LP_BLANK))
+lp.fn.config.fail.missing-value =$(call lp.fn.config.fail, $(1) is not set $(if $(2), (should be $(strip $(2)))))
+lp.fn.config.fail.invalid-enum  =$(call lp.fn.config.fail, $(strip $(1)) must be $($(strip $(1))_ENUMS) (current value: "$(strip $($(strip $(1)))")))
+
+lp.fn.config.validate-enum      =$(call lp.fn.config.normalize.enum, $(1))\
+                                 $(call lp.fn.config.assert.enum, $(1))\
+                                 $(call lp.fn.config.normalize.disabled, $(1))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Import, normalize and validate configuration
+#-----------------------------------------------------------------------------------------------------------------------
+
+include $(__LP_SETTINGS_CFG)
+
+LP_SETTINGS_ARTIFACT_ENUMS="app" or "lib"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_ARTIFACT)
+
+LP_SETTINGS_RUNTIME_ENUMS="node", "ts-node" or "web"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_RUNTIME)
+
+LP_SETTINGS_MODULE_ENUMS="cjs" or "esm"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_MODULE)
+
+LP_SETTINGS_BUNDLER_ENUMS="disabled" or "esbuild"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_BUNDLER)
+
+LP_SETTINGS_FORMATTER_ENUMS="disabled", "prettier" or "rome"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_FORMATTER)
+
+LP_SETTINGS_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_PACKAGE_MANAGER)
+
+$(call lp.fn.config.normalize.string, LP_SETTINGS_SRC_DIR)
+$(call lp.fn.config.assert.not-empty, LP_SETTINGS_SRC_DIR)
+
+$(call lp.fn.config.normalize.string, LP_SETTINGS_TSC_OUT_DIR)
+
+ifeq "$(LP_SETTINGS_TSC_OUT_DIR)" ""
+    ifeq "$(LP_SETTINGS_ARTIFACT)" "lib"
+        $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty if LP_SETTINGS_ARTIFACT is "lib")
+    else ifeq "$(LP_SETTINGS_BUNDLER)" ""
+        ifneq "$(LP_SETTINGS_RUNTIME)" "ts-node"
+            $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty unless the runtime is "ts-node" or bundling is enabled)
+        endif
+    endif
+endif
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Functions for configuring and creating targets
+#-----------------------------------------------------------------------------------------------------------------------
+
+lp.fn.print.header          =$(info #-----------------------------------------------------------------------------------------------------------------------) \
+                             $(info # $(strip $(1))) \
+                             $(info #-----------------------------------------------------------------------------------------------------------------------)
+lp.fn.print.property        =$(info ) $(info $(strip $(1):)) $(info $(call lp.fn.map.empty-to, $(strip $(call $(2))), $(3)))
+lp.fn.get-command           =$(if $(strip $(1)), echo "$(strip $(1))") \
+                             $(if $(call lp.$(strip $(2)).get-before-hook), && $(call lp.$(strip $(2)).get-before-hook)) \
+                             && $(call lp.$(strip $(2)).get-command) \
+                             $(if $(call lp.$(strip $(2)).get-after-hook), && $(call lp.$(strip $(2)).get-after-hook))
+lp.fn.declare-phony-targets =$(foreach target, \
+                                 $(call lp.$(strip $(1)).get-phony-targets), \
+                                 $(eval $(call lp.fn.declare-phony-target,$(target),$(call lp.$(strip $(1)).get-description),$(2))) \
+                              )
 define lp.fn.declare-phony-target
 $(if $(strip $(doc.target)), $(call doc.target,$(target), $(2)))
 #----
@@ -42,294 +118,288 @@ $(if $(strip $(doc.target)), $(call doc.target,$(target), $(2)))
 $(1) : $(3);
 endef
 
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Global variables
+# #-----------------------------------------------------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Global variables
-#-----------------------------------------------------------------------------------------------------------------------
+# __LP_MAKEFILES                          =Makefile $(foreach ext, header footer, $(__LP_HOME_DIR)/Makefile.$(ext))
+# __LP_TSCONFIG_JSON                      =tsconfig.json $(__LP_HOME_DIR)/tsconfig.default.json $(wildcard tsconfig*.json)
 
-__LP_EMPTY_STRING                       =#
-__LP_MAKEFILES                          =Makefile \
-                                         $(__LP_SCRIPT_HOME)/Makefile.header \
-                                         $(__LP_SCRIPT_HOME)/Makefile.footer \
-                                         $(wildcard Makefile* $(__LP_SCRIPT_HOME)/Makefile*)
-__LP_TSCONFIG_JSON                      =tsconfig.json $(__LP_SCRIPT_HOME)/tsconfig.default.json \
-                                         $(wildcard tsconfig*.json $(__LP_SCRIPT_HOME)/tsconfig*.json)
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Help
+# #-----------------------------------------------------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Help
-#-----------------------------------------------------------------------------------------------------------------------
+# __LP_HELP_ENABLED                       =true
+# __LP_HELP_TARGETS                       =$(call lp.help.add-builtin-target, bundler,     bundle .............) \
+#                                          $(call lp.help.add-builtin-target, clean,       clean ..............) \
+#                                          $(call lp.help.add-builtin-target, tsc,         compile ............) \
+#                                          $(call lp.help.add-builtin-target, format,      format .............) \
+#                                          $(call lp.help.add-builtin-target, diagnostics, diagnostics ........) \
+#                                          $(call lp.help.add-builtin-target, tsc,         tsc ................)
 
-__LP_HELP_ENABLED                       =true
-__LP_HELP_TARGETS                       =$(call lp.help.add-builtin-target, bundler,     bundle .............) \
-                                         $(call lp.help.add-builtin-target, clean,       clean ..............) \
-                                         $(call lp.help.add-builtin-target, tsc,         compile ............) \
-                                         $(call lp.help.add-builtin-target, format,      format .............) \
-                                         $(call lp.help.add-builtin-target, diagnostics, diagnostics ........) \
-                                         $(call lp.help.add-builtin-target, tsc,         tsc ................)
+# lp.help.disable                         =$(call lp.fn.var.assign, __LP_HELP_ENABLED, $(__LP_EMPTY_STRING))
+# lp.help.add-target                      =$(call lp.fn.var.append, __LP_HELP_TARGETS, $$(info $$(__LP_EMPTY_STRING) $$(__LP_EMPTY_STRING) $$(strip $(1)) $$(strip $(2))))
+# lp.help.add-phony-target                =$(eval .PHONY: $(1))\
+#                                          $(call lp.help.add-target, $(strip $(1)) $(strip $(2)))
+# lp.help.add-builtin-target              =$(if $(call lp.$(strip $(1)).is-enabled),\
+#                                               $(info $(__LP_EMPTY_STRING)  $(strip $(2)) $(call lp.$(strip $(1)).get-description)) \
+#                                          )
+# lp.help.get-phony-targets               =help lp.help
+# lp.help.get-description                 =list available Makefile targets
+# lp.help.is-enabled                      =$(strip $(__LP_HELP_ENABLED))
+# lp.help.print-targets                   =$(__LP_HELP_TARGETS)
 
-lp.help.disable                         =$(call lp.fn.assign, __LP_HELP_ENABLED, $(__LP_EMPTY_STRING))
-lp.help.add-target                      =$(call lp.fn.append, __LP_HELP_TARGETS, $$(info $$(__LP_EMPTY_STRING) $$(__LP_EMPTY_STRING) $$(strip $(1)) $$(strip $(2))))
-lp.help.add-phony-target                =$(eval .PHONY: $(1))\
-                                         $(call lp.help.add-target, $(strip $(1)) $(strip $(2)))
-lp.help.add-builtin-target              =$(if $(call lp.$(strip $(1)).is-enabled),\
-                                              $(info $(__LP_EMPTY_STRING)  $(strip $(2)) $(call lp.$(strip $(1)).get-description)) \
-                                         )
-lp.help.get-phony-targets               =help lp.help
-lp.help.get-description                 =list available Makefile targets
-lp.help.is-enabled                      =$(strip $(__LP_HELP_ENABLED))
-lp.help.print-targets                   =$(__LP_HELP_TARGETS)
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Diagnostics
+# #-----------------------------------------------------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Diagnostics
-#-----------------------------------------------------------------------------------------------------------------------
+# __LP_DIAGNOSTICS_ENABLED                =true
 
-__LP_DIAGNOSTICS_ENABLED                =true
+# lp.diagnostics.disable                  =$(call lp.fn.var.assign, __LP_DIAGNOSTICS_ENABLED, $(__LP_EMPTY_STRING))
 
-lp.diagnostics.disable                  =$(call lp.fn.assign, __LP_DIAGNOSTICS_ENABLED, $(__LP_EMPTY_STRING))
+# lp.diagnostics.get-phony-targets        =diagnostics lp.diagnostics
+# lp.diagnostics.get-description          =list Makefile rules and settings
+# lp.diagnostics.is-enabled               =$(strip $(__LP_DIAGNOSTICS_ENABLED))
 
-lp.diagnostics.get-phony-targets        =diagnostics lp.diagnostics
-lp.diagnostics.get-description          =list Makefile rules and settings
-lp.diagnostics.is-enabled               =$(strip $(__LP_DIAGNOSTICS_ENABLED))
-
-lp.fn.print-diagnostics-for-target      =$(call lp.fn.print-header, $(1)) \
-                                         $(call lp.fn.print-property, Enabled,       lp.$(strip $(2)).is-enabled,        false  ) \
-                                         $(call lp.fn.print-property, Phony names,   lp.$(strip $(2)).get-phony-targets, <none> ) \
-                                         $(call lp.fn.print-property, Prerequisites, lp.$(strip $(2)).get-prerequisites, <none> ) \
-                                         $(call lp.fn.print-property, Targets,       lp.$(strip $(2)).get-targets,       <none> ) \
-                                         $(call lp.fn.print-property, Before-hook,   lp.$(strip $(2)).get-before-hooks,  <none> ) \
-                                         $(call lp.fn.print-property, Command,       lp.$(strip $(2)).get-command,       <none> ) \
-                                         $(call lp.fn.print-property, After-hook,    lp.$(strip $(2)).get-after-hooks,   <none> )
+# lp.fn.print-diagnostics-for-target      =$(call lp.fn.print.header, $(1)) \
+#                                          $(call lp.fn.print.property, Enabled,       lp.$(strip $(2)).is-enabled,        false  ) \
+#                                          $(call lp.fn.print.property, Phony names,   lp.$(strip $(2)).get-phony-targets, <none> ) \
+#                                          $(call lp.fn.print.property, Prerequisites, lp.$(strip $(2)).get-prerequisites, <none> ) \
+#                                          $(call lp.fn.print.property, Targets,       lp.$(strip $(2)).get-targets,       <none> ) \
+#                                          $(call lp.fn.print.property, Before-hook,   lp.$(strip $(2)).get-before-hooks,  <none> ) \
+#                                          $(call lp.fn.print.property, Command,       lp.$(strip $(2)).get-command,       <none> ) \
+#                                          $(call lp.fn.print.property, After-hook,    lp.$(strip $(2)).get-after-hooks,   <none> )
 
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Compile
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Compile
+# #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_TSC_ENABLED                        =true
-__LP_TSC_BUILDINFO                      =$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
-__LP_TSC_DEFAULT_PREREQUISITES          =$(sort $(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) $(__LP_TSCONFIG_JSON) $(__LP_MAKEFILES))
-__LP_TSC_EFFECTIVE_PREREQUISITES        =$(__LP_TSC_DEFAULT_PREREQUISITES)
-__LP_TSC_DEFAULT_TARGETS                =$(__LP_TSC_BUILDINFO)
-__LP_TSC_EFFECTIVE_TARGETS              =$(__LP_TSC_DEFAULT_TARGETS)
-__LP_TSC_DEFAULT_BEFORE_HOOKS           =
-__LP_TSC_EFFECTIVE_BEFORE_HOOKS         =$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
-__LP_TSC_DEFAULT_AFTER_HOOKS            =touch "$(__LP_TSC_BUILDINFO)"
-__LP_TSC_EFFECTIVE_AFTER_HOOKS          =$(__LP_TSC_DEFAULT_AFTER_HOOKS)
-__LP_TSC_DEFAULT_COMMAND                =tsc -b
-__LP_TSC_EFFECTIVE_COMMAND              =$(__LP_TSC_DEFAULT_COMMAND)
+# __LP_TSC_ENABLED                        =true
+# __LP_TSC_BUILDINFO                      =$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo
+# __LP_TSC_DEFAULT_PREREQUISITES          =$(sort $(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) $(__LP_TSCONFIG_JSON) $(__LP_MAKEFILES))
+# __LP_TSC_EFFECTIVE_PREREQUISITES        =$(__LP_TSC_DEFAULT_PREREQUISITES)
+# __LP_TSC_DEFAULT_TARGETS                =$(__LP_TSC_BUILDINFO)
+# __LP_TSC_EFFECTIVE_TARGETS              =$(__LP_TSC_DEFAULT_TARGETS)
+# __LP_TSC_DEFAULT_BEFORE_HOOKS           =
+# __LP_TSC_EFFECTIVE_BEFORE_HOOKS         =$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
+# __LP_TSC_DEFAULT_AFTER_HOOKS            =touch "$(__LP_TSC_BUILDINFO)"
+# __LP_TSC_EFFECTIVE_AFTER_HOOKS          =$(__LP_TSC_DEFAULT_AFTER_HOOKS)
+# __LP_TSC_DEFAULT_COMMAND                =tsc -b
+# __LP_TSC_EFFECTIVE_COMMAND              =$(__LP_TSC_DEFAULT_COMMAND)
 
-lp.tsc.disable                          =$(call lp.fn.assign, __LP_TSC_ENABLED, $(__LP_EMPTY_STRING))
-lp.tsc.add-extra-prerequisites          =$(call lp.fn.append, __LP_TSC_EFFECTIVE_PREREQUISITES, $(1))
-lp.tsc.overwrite-prerequisites          =$(call lp.fn.assign, __LP_TSC_EFFECTIVE_PREREQUISITES, $(1))
-lp.tsc.add-extra-targets                =$(call lp.fn.append, __LP_TSC_EFFECTIVE_TARGETS, $(1))
-lp.tsc.overwrite-targets                =$(call lp.fn.assert-not-empty, $(1), lp.tsc.overwrite-targets) \
-                                         $(call lp.fn.assign, __LP_TSC_EFFECTIVE_TARGETS, $(1))
-lp.tsc.add-before-hook                  =$(call lp.fn.append-with-separator, __LP_TSC_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
-lp.tsc.overwrite-before-hooks           =$(call lp.fn.assign, __LP_TSC_EFFECTIVE_BEFORE_HOOKS, $(1))
-lp.tsc.add-after-hook                   =$(call lp.fn.append-with-separator, __LP_TSC_EFFECTIVE_AFTER_HOOKS, &&, $(1))
-lp.tsc.overwrite-after-hooks            =$(call lp.fn.assign, __LP_TSC_EFFECTIVE_AFTER_HOOKS, $(1))
-lp.tsc.overwrite-command                =$(call lp.fn.assert-not-empty, $(1), lp.tsc.overwrite-command) \
-                                         $(call lp.fn.assign, __LP_TSC_EFFECTIVE_COMMAND, $(1))
+# lp.tsc.disable                          =$(call lp.fn.var.assign, __LP_TSC_ENABLED, $(__LP_EMPTY_STRING))
+# lp.tsc.add-extra-prerequisites          =$(call lp.fn.var.append, __LP_TSC_EFFECTIVE_PREREQUISITES, $(1))
+# lp.tsc.overwrite-prerequisites          =$(call lp.fn.var.assign, __LP_TSC_EFFECTIVE_PREREQUISITES, $(1))
+# lp.tsc.add-extra-targets                =$(call lp.fn.var.append, __LP_TSC_EFFECTIVE_TARGETS, $(1))
+# lp.tsc.overwrite-targets                =$(call lp.fn.assert.param-not-empty, lp.tsc.overwrite-targets, $(1)) \
+#                                          $(call lp.fn.var.assign, __LP_TSC_EFFECTIVE_TARGETS, $(1))
+# lp.tsc.add-before-hook                  =$(call lp.fn.var.append-with-separator, __LP_TSC_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
+# lp.tsc.overwrite-before-hooks           =$(call lp.fn.var.assign, __LP_TSC_EFFECTIVE_BEFORE_HOOKS, $(1))
+# lp.tsc.add-after-hook                   =$(call lp.fn.var.append-with-separator, __LP_TSC_EFFECTIVE_AFTER_HOOKS, &&, $(1))
+# lp.tsc.overwrite-after-hooks            =$(call lp.fn.var.assign, __LP_TSC_EFFECTIVE_AFTER_HOOKS, $(1))
+# lp.tsc.overwrite-command                =$(call lp.fn.assert.param-not-empty, lp.tsc.overwrite-command, $(1)) \
+#                                          $(call lp.fn.var.assign, __LP_TSC_EFFECTIVE_COMMAND, $(1))
 
-lp.tsc.get-phony-targets                =tsc compile lp.tsc lp.compile
-lp.tsc.get-description                  =run the TypeScript compiler
-lp.tsc.is-enabled                       =$(strip $(__LP_TSC_ENABLED))
-lp.tsc.get-default-prerequisites        =$(strip $(__LP_TSC_DEFAULT_PREREQUISITES))
-lp.tsc.get-prerequisites                =$(strip $(__LP_TSC_EFFECTIVE_PREREQUISITES))
-lp.tsc.get-default-targets              =$(strip $(__LP_TSC_DEFAULT_TARGETS))
-lp.tsc.get-targets                      =$(strip $(__LP_TSC_EFFECTIVE_TARGETS))
-lp.tsc.get-default-before-hook          =$(strip $(__LP_TSC_DEFAULT_BEFORE_HOOKS))
-lp.tsc.get-before-hook                  =$(strip $(__LP_TSC_EFFECTIVE_BEFORE_HOOKS))
-lp.tsc.get-default-after-hook           =$(strip $(__LP_TSC_DEFAULT_AFTER_HOOKS))
-lp.tsc.get-after-hook                   =$(strip $(__LP_TSC_EFFECTIVE_AFTER_HOOKS))
-lp.tsc.get-default-command              =$(strip $(__LP_TSC_DEFAULT_COMMAND))
-lp.tsc.get-command                      =$(strip $(__LP_TSC_EFFECTIVE_COMMAND))
+# lp.tsc.get-phony-targets                =tsc compile lp.tsc lp.compile
+# lp.tsc.get-description                  =run the TypeScript compiler
+# lp.tsc.is-enabled                       =$(strip $(__LP_TSC_ENABLED))
+# lp.tsc.get-default-prerequisites        =$(strip $(__LP_TSC_DEFAULT_PREREQUISITES))
+# lp.tsc.get-prerequisites                =$(strip $(__LP_TSC_EFFECTIVE_PREREQUISITES))
+# lp.tsc.get-default-targets              =$(strip $(__LP_TSC_DEFAULT_TARGETS))
+# lp.tsc.get-targets                      =$(strip $(__LP_TSC_EFFECTIVE_TARGETS))
+# lp.tsc.get-default-before-hook          =$(strip $(__LP_TSC_DEFAULT_BEFORE_HOOKS))
+# lp.tsc.get-before-hook                  =$(strip $(__LP_TSC_EFFECTIVE_BEFORE_HOOKS))
+# lp.tsc.get-default-after-hook           =$(strip $(__LP_TSC_DEFAULT_AFTER_HOOKS))
+# lp.tsc.get-after-hook                   =$(strip $(__LP_TSC_EFFECTIVE_AFTER_HOOKS))
+# lp.tsc.get-default-command              =$(strip $(__LP_TSC_DEFAULT_COMMAND))
+# lp.tsc.get-command                      =$(strip $(__LP_TSC_EFFECTIVE_COMMAND))
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Bundle
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Bundle
+# #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_BUNDLE_DEFAULT_PREREQUISITES       =$(call lp.tsc.get-prerequisites) $(__LP_SETTINGS_FILE) $(__LP_MAKEFILES)
-__LP_BUNDLE_EFFECTIVE_PREREQUISITES     =$(__LP_BUNDLE_DEFAULT_PREREQUISITES)
-__LP_BUNDLE_DEFAULT_TARGETS             =
-__LP_BUNDLE_EFFECTIVE_TARGETS           =$(__LP_BUNDLE_DEFAULT_TARGETS)
-__LP_BUNDLE_DEFAULT_BEFORE_HOOKS        =
-__LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS      =$(__LP_BUNDLE_DEFAULT_BEFORE_HOOKS)
-__LP_BUNDLE_DEFAULT_AFTER_HOOKS         =
-__LP_BUNDLE_EFFECTIVE_AFTER_HOOKS       =$(__LP_BUNDLE_DEFAULT_AFTER_HOOKS)
-__LP_BUNDLE_DEFAULT_COMMAND             =esbuild $(__LP_ESBUILD_MAPPINGS) $(__LP_ESBUILD_OPTIONS)
-__LP_BUNDLE_EFFECTIVE_COMMAND           =$(__LP_BUNDLE_DEFAULT_COMMAND)
-__LP_BUNDLE_SOURCE_MAPS_ENABLED         =
-__LP_BUNDLE_INLINE_SOURCES_ENABLED      =
-__LP_BUNDLE_NAMES                       =
+# __LP_BUNDLE_DEFAULT_PREREQUISITES       =$(call lp.tsc.get-prerequisites) $(__LP_SETTINGS_FILE) $(__LP_MAKEFILES)
+# __LP_BUNDLE_EFFECTIVE_PREREQUISITES     =$(__LP_BUNDLE_DEFAULT_PREREQUISITES)
+# __LP_BUNDLE_DEFAULT_TARGETS             =
+# __LP_BUNDLE_EFFECTIVE_TARGETS           =$(__LP_BUNDLE_DEFAULT_TARGETS)
+# __LP_BUNDLE_DEFAULT_BEFORE_HOOKS        =
+# __LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS      =$(__LP_BUNDLE_DEFAULT_BEFORE_HOOKS)
+# __LP_BUNDLE_DEFAULT_AFTER_HOOKS         =
+# __LP_BUNDLE_EFFECTIVE_AFTER_HOOKS       =$(__LP_BUNDLE_DEFAULT_AFTER_HOOKS)
+# __LP_BUNDLE_DEFAULT_COMMAND             =esbuild $(__LP_ESBUILD_MAPPINGS) $(__LP_ESBUILD_OPTIONS)
+# __LP_BUNDLE_EFFECTIVE_COMMAND           =$(__LP_BUNDLE_DEFAULT_COMMAND)
+# __LP_BUNDLE_SOURCE_MAPS_ENABLED         =
+# __LP_BUNDLE_INLINE_SOURCES_ENABLED      =
+# __LP_BUNDLE_NAMES                       =
 
-__LP_ESBUILD_MAPPINGS                   =
-__LP_ESBUILD_OPTIONS                    =--bundle \
-                                         --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
-                                         --minify \
-                                         --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
-                                         --outbase=$(LP_SETTINGS_SRC_DIR) \
-                                         $(if $(strip $(__LP_BUNDLE_SOURCE_MAPS_ENABLED)), --sourcemap=linked) \
-                                         $(if $(strip $(__LP_BUNDLE_INLINE_SOURCES_ENABLED)), --sources-content=true)
+# __LP_ESBUILD_MAPPINGS                   =
+# __LP_ESBUILD_OPTIONS                    =--bundle \
+#                                          --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
+#                                          --minify \
+#                                          --outdir=$(LP_SETTINGS_BUNDLER_OUT_DIR) \
+#                                          --outbase=$(LP_SETTINGS_SRC_DIR) \
+#                                          $(if $(strip $(__LP_BUNDLE_SOURCE_MAPS_ENABLED)), --sourcemap=linked) \
+#                                          $(if $(strip $(__LP_BUNDLE_INLINE_SOURCES_ENABLED)), --sources-content=true)
 
-ifeq "$(LP_SETTINGS_BUNDLER)" "esbuild"
-    __LP_BUNDLE_ENABLED=true
-else ifeq "$(LP_SETTINGS_BUNDLER)" "disabled"
-    __LP_BUNDLE_ENABLED=false
-else
-    $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "esbuild" or "disabled")
-endif
+# ifeq "$(LP_SETTINGS_BUNDLER)" "esbuild"
+#     __LP_BUNDLE_ENABLED=true
+# else ifeq "$(LP_SETTINGS_BUNDLER)" "disabled"
+#     __LP_BUNDLE_ENABLED=false
+# else
+#     $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "esbuild" or "disabled")
+# endif
 
-ifeq "$(LP_SETTINGS_RUNTIME)" "web"
-    _LP_ESBUILD_OPTIONS += --platform=browser --target=es6 --jsx=transform
-else ifeq "$(LP_SETTINGS_RUNTIME)" "cli"
-    _LP_ESBUILD_OPTIONS += --platform=node --target=es2022
-else
-    $(call lp.fn.config-error, LP_SETTINGS_RUNTIME, "cli" or "web")
-endif
+# ifeq "$(LP_SETTINGS_RUNTIME)" "web"
+#     _LP_ESBUILD_OPTIONS += --platform=browser --target=es6 --jsx=transform
+# else ifeq "$(LP_SETTINGS_RUNTIME)" "cli"
+#     _LP_ESBUILD_OPTIONS += --platform=node --target=es2022
+# else
+#     $(call lp.fn.config-error, LP_SETTINGS_RUNTIME, "cli" or "web")
+# endif
 
-ifeq "$(LP_SETTINGS_MODULE)" "esm"
-    LP_ESBUILD_OPTIONS += --format=esm
-else ifeq "$(LP_SETTINGS_MODULE)" "cjs"
-    LP_ESBUILD_OPTIONS += --format=cjs
-else
-    $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "esm" or "cjs")
-endif
+# ifeq "$(LP_SETTINGS_MODULE)" "esm"
+#     LP_ESBUILD_OPTIONS += --format=esm
+# else ifeq "$(LP_SETTINGS_MODULE)" "cjs"
+#     LP_ESBUILD_OPTIONS += --format=cjs
+# else
+#     $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "esm" or "cjs")
+# endif
 
-ifeq "$(LP_SETTINGS_ARTIFACT)" "application"
-    LP_ESBUILD_OPTIONS +=  --sources-content=false
-else ifeq "$(LP_SETTINGS_ARTIFACT)" "library"
-    LP_ESBUILD_OPTIONS +=  --sources-content=true
-else
-    $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "application" or "library")
-endif
+# ifeq "$(LP_SETTINGS_ARTIFACT)" "application"
+#     LP_ESBUILD_OPTIONS +=  --sources-content=false
+# else ifeq "$(LP_SETTINGS_ARTIFACT)" "library"
+#     LP_ESBUILD_OPTIONS +=  --sources-content=true
+# else
+#     $(call lp.fn.config-error, LP_SETTINGS_BUNDLER, "application" or "library")
+# endif
 
-lp.bundle.disable                       =$(call lp.fn.assign, __LP_BUNDLE_ENABLED, $(__LP_EMPTY_STRING))
-lp.bundle.add-extra-prerequisites       =$(call lp.fn.append, __LP_BUNDLE_EFFECTIVE_PREREQUISITES, $(1))
-lp.bundle.overwrite-prerequisites       =$(call lp.fn.assign, __LP_BUNDLE_EFFECTIVE_PREREQUISITES, $(1))
-lp.bundle.add-extra-targets             =$(call lp.fn.append, __LP_BUNDLE_EFFECTIVE_TARGETS, $(1)) \
-                                         $(call lp.fn.append, __LP_BUNDLE_NAMES, $(1))
-lp.bundle.overwrite-targets             =$(call lp.fn.assert-not-empty, $(1), lp.bundle.overwrite-targets) \
-                                         $(call lp.fn.assign, __LP_BUNDLE_EFFECTIVE_TARGETS, $(1))
-lp.bundle.add-before-hook               =$(call lp.fn.append-with-separator, __LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
-lp.bundle.overwrite-before-hooks        =$(call lp.fn.assign. __LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS, $(1))
-lp.bundle.add-after-hook                =$(call lp.fn.append-with-separator, __LP_BUNDLE_EFFECTIVE_AFTER_HOOKS, &&, $(1))
-lp.bundle.overwrite-after-hooks         =$(call lp.fn.assign, __LP_BUNDLE_EFFECTIVE_AFTER_HOOKS, $(1))
-lp.bundle.overwrite-command             =$(call lp.fn.assert-not-empty, $(1), lp.bundle.overwrite-command) \
-                                         $(call lp.fn.assign, __LP_BUNDLE_EFFECTIVE_COMMAND, $(1))
-lp.bundle.add-bundle                    =$(call lp.fn.assert-not-empty, $(1), lp.bundle.add-bundle) \
-                                         $(call lp.fn.assert-not-empty, $(2), lp.bundle.add-bundle) \
-                                         $(call lp.fn.append, __LP_ESBUILD_MAPPINGS, $(strip $(2))=$(strip $(LP_SETTINGS_SRC_DIR))/$(strip $(1).ts)) \
-                                         $(call lp.bundle.add-extra-targets, $(LP_SETTINGS_BUNDLER_OUT_DIR)/$(strip $(2)).js)
-lp.bundle.enable-source-maps            =$(call lp.fn.assign, __LP_BUNDLE_SOURCE_MAPS_ENABLED, true)
-lp.bundle.enable-inline-sources         =$(call lp.fn.assign, __LP_BUNDLE_INLINE_SOURCES_ENABLED, true) $(call lp.bundle.enable-source-maps)
+# lp.bundle.disable                       =$(call lp.fn.var.assign, __LP_BUNDLE_ENABLED, $(__LP_EMPTY_STRING))
+# lp.bundle.add-extra-prerequisites       =$(call lp.fn.var.append, __LP_BUNDLE_EFFECTIVE_PREREQUISITES, $(1))
+# lp.bundle.overwrite-prerequisites       =$(call lp.fn.var.assign, __LP_BUNDLE_EFFECTIVE_PREREQUISITES, $(1))
+# lp.bundle.add-extra-targets             =$(call lp.fn.var.append, __LP_BUNDLE_EFFECTIVE_TARGETS, $(1)) \
+#                                          $(call lp.fn.var.append, __LP_BUNDLE_NAMES, $(1))
+# lp.bundle.overwrite-targets             =$(call lp.fn.assert.param-not-empty, lp.bundle.overwrite-targets, $(1)) \
+#                                          $(call lp.fn.var.assign, __LP_BUNDLE_EFFECTIVE_TARGETS, $(1))
+# lp.bundle.add-before-hook               =$(call lp.fn.var.append-with-separator, __LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
+# lp.bundle.overwrite-before-hooks        =$(call lp.fn.var.assign. __LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS, $(1))
+# lp.bundle.add-after-hook                =$(call lp.fn.var.append-with-separator, __LP_BUNDLE_EFFECTIVE_AFTER_HOOKS, &&, $(1))
+# lp.bundle.overwrite-after-hooks         =$(call lp.fn.var.assign, __LP_BUNDLE_EFFECTIVE_AFTER_HOOKS, $(1))
+# lp.bundle.overwrite-command             =$(call lp.fn.assert.param-not-empty, lp.bundle.overwrite-command, $(1)) \
+#                                          $(call lp.fn.var.assign, __LP_BUNDLE_EFFECTIVE_COMMAND, $(1))
+# lp.bundle.add-bundle                    =$(call lp.fn.assert.param-not-empty, lp.bundle.add-bundle, $(1)) \
+#                                          $(call lp.fn.assert.param-not-empty, lp.bundle.add-bundle, $(2)) \
+#                                          $(call lp.fn.var.append, __LP_ESBUILD_MAPPINGS, $(strip $(2))=$(strip $(LP_SETTINGS_SRC_DIR))/$(strip $(1).ts)) \
+#                                          $(call lp.bundle.add-extra-targets, $(LP_SETTINGS_BUNDLER_OUT_DIR)/$(strip $(2)).js)
+# lp.bundle.enable-source-maps            =$(call lp.fn.var.assign, __LP_BUNDLE_SOURCE_MAPS_ENABLED, true)
+# lp.bundle.enable-inline-sources         =$(call lp.fn.var.assign, __LP_BUNDLE_INLINE_SOURCES_ENABLED, true) $(call lp.bundle.enable-source-maps)
 
-lp.bundle.get-phony-targets             =bundle lp.bundle
-lp.bundle.get-description               =bundle with esbuild
-lp.bundle.is-enabled                    =$(strip $(__LP_BUNDLE_ENABLED))
-lp.bundle.get-default-prerequisites     =$(strip $(__LP_BUNDLE_DEFAULT_PREREQUISITES))
-lp.bundle.get-prerequisites             =$(strip $(__LP_BUNDLE_EFFECTIVE_PREREQUISITES))
-lp.bundle.get-default-targets           =$(strip $(__LP_BUNDLE_DEFAULT_TARGETS))
-lp.bundle.get-targets                   =$(strip $(__LP_BUNDLE_EFFECTIVE_TARGETS))
-lp.bundle.get-default-before-hooks      =$(strip $(__LP_BUNDLE_DEFAULT_BEFORE_HOOKS))
-lp.bundle.get-before-hooks              =$(strip $(__LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS))
-lp.bundle.get-default-after-hooks       =$(strip $(__LP_BUNDLE_DEFAULT_AFTER_HOOKS))
-lp.bundle.get-after-hooks               =$(strip $(__LP_BUNDLE_EFFECTIVE_AFTER_HOOKS))
-lp.bundle.get-default-command           =$(strip $(__LP_BUNDLE_DEFAULT_COMMAND))
-lp.bundle.get-command                   =$(strip $(__LP_BUNDLE_EFFECTIVE_COMMAND))
-lp.bundle.get-bundle-names              =$(strip $(__LP_BUNDLE_NAMES))
+# lp.bundle.get-phony-targets             =bundle lp.bundle
+# lp.bundle.get-description               =bundle with esbuild
+# lp.bundle.is-enabled                    =$(strip $(__LP_BUNDLE_ENABLED))
+# lp.bundle.get-default-prerequisites     =$(strip $(__LP_BUNDLE_DEFAULT_PREREQUISITES))
+# lp.bundle.get-prerequisites             =$(strip $(__LP_BUNDLE_EFFECTIVE_PREREQUISITES))
+# lp.bundle.get-default-targets           =$(strip $(__LP_BUNDLE_DEFAULT_TARGETS))
+# lp.bundle.get-targets                   =$(strip $(__LP_BUNDLE_EFFECTIVE_TARGETS))
+# lp.bundle.get-default-before-hooks      =$(strip $(__LP_BUNDLE_DEFAULT_BEFORE_HOOKS))
+# lp.bundle.get-before-hooks              =$(strip $(__LP_BUNDLE_EFFECTIVE_BEFORE_HOOKS))
+# lp.bundle.get-default-after-hooks       =$(strip $(__LP_BUNDLE_DEFAULT_AFTER_HOOKS))
+# lp.bundle.get-after-hooks               =$(strip $(__LP_BUNDLE_EFFECTIVE_AFTER_HOOKS))
+# lp.bundle.get-default-command           =$(strip $(__LP_BUNDLE_DEFAULT_COMMAND))
+# lp.bundle.get-command                   =$(strip $(__LP_BUNDLE_EFFECTIVE_COMMAND))
+# lp.bundle.get-bundle-names              =$(strip $(__LP_BUNDLE_NAMES))
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Format
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Format
+# #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_FORMAT_ENABLED                     =true
-__LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
-__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
-__LP_FORMAT_DEFAULT_AFTER_HOOKS         =
-__LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
-__LP_FORMAT_DEFAULT_COMMAND             =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-globs))
-__LP_FORMAT_EFFECTIVE_COMMAND           =$(__LP_FORMAT_DEFAULT_COMMAND)
-__LP_FORMAT_DEFAULT_GLOBS               =. !node_modules $(patsubst %/, !%, $(filter-out ./ ../, $(wildcard .*/))) \
-                                         $(foreach extension, js js.map d.ts, $(patsubst %.js, !%.$(extension), $(call lp.bundle.get-bundle-names))) \
-                                         $(wildcard *.lock *-lock.*)
-__LP_FORMAT_EFFECTIVE_GLOBS             =$(if $(__LP_FORMAT_DISABLE_DEFAULT_GLOBS), , $(__LP_FORMAT_DEFAULT_GLOBS))
-__LP_FORMAT_DISABLE_DEFAULT_GLOBS       =
+# __LP_FORMAT_ENABLED                     =true
+# __LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
+# __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
+# __LP_FORMAT_DEFAULT_AFTER_HOOKS         =
+# __LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
+# __LP_FORMAT_DEFAULT_COMMAND             =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-globs))
+# __LP_FORMAT_EFFECTIVE_COMMAND           =$(__LP_FORMAT_DEFAULT_COMMAND)
+# __LP_FORMAT_DEFAULT_GLOBS               =. !node_modules $(patsubst %/, !%, $(filter-out ./ ../, $(wildcard .*/))) \
+#                                          $(foreach extension, js js.map d.ts, $(patsubst %.js, !%.$(extension), $(call lp.bundle.get-bundle-names))) \
+#                                          $(wildcard *.lock *-lock.*)
+# __LP_FORMAT_EFFECTIVE_GLOBS             =$(if $(__LP_FORMAT_DISABLE_DEFAULT_GLOBS), , $(__LP_FORMAT_DEFAULT_GLOBS))
+# __LP_FORMAT_DISABLE_DEFAULT_GLOBS       =
 
-lp.format.disable                       =$(call lp.fn.assign, __LP_FORMAT_ENABLED, $(__LP_EMPTY_STRING))
-lp.format.add-before-hook               =$(call lp.fn.append-with-separator, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
-lp.format.overwrite-before-hooks        =$(call lp.fn.assign, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, $(1))
-lp.format.add-after-hook                =$(call lp.fn.append-with-separator, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, &&, $(1))
-lp.format.overwrite-after-hooks         =$(call lp.fn.assign, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, $(1))
-lp.format.overwrite-command             =$(call lp.fn.assert-not-empty, $(1), lp.format.overwrite-command) \
-                                         $(call lp.fn.assign, __LP_FORMAT_EFFECTIVE_COMMAND, $(1))
-lp.format.disable-defaults              =$(call lp.fn.assign, __LP_FORMAT_DISABLE_DEFAULT_GLOBS, true)
-lp.format.include-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.include-files) \
-                                         $(if $(strip $(2)), \
-                                             $(foreach directory, $(1),\
-                                                 $(foreach glob, $(2), \
-                                                     $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(directory)/**/$(glob)) \
-                                                 ) \
-                                             ), \
-                                             $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(strip $(1))) \
-                                         )
-lp.format.exclude-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.exclude-files) \
-                                         $(if $(strip $(2)), \
-                                             $(foreach directory, $(1),\
-                                                 $(foreach glob, $(2), \
-                                                     $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, !$(directory)/**/$(glob)) \
-                                                 ) \
-                                             ), \
-                                             $(call lp.fn.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(patsubst %, !%, $(1))) \
-                                         )
+# lp.format.disable                       =$(call lp.fn.var.assign, __LP_FORMAT_ENABLED, $(__LP_EMPTY_STRING))
+# lp.format.add-before-hook               =$(call lp.fn.var.append-with-separator, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
+# lp.format.overwrite-before-hooks        =$(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, $(1))
+# lp.format.add-after-hook                =$(call lp.fn.var.append-with-separator, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, &&, $(1))
+# lp.format.overwrite-after-hooks         =$(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, $(1))
+# lp.format.overwrite-command             =$(call lp.fn.assert.param-not-empty, lp.format.overwrite-command, $(1)) \
+#                                          $(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_COMMAND, $(1))
+# lp.format.disable-defaults              =$(call lp.fn.var.assign, __LP_FORMAT_DISABLE_DEFAULT_GLOBS, true)
+# lp.format.include-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.include-files) \
+#                                          $(if $(strip $(2)), \
+#                                              $(foreach directory, $(1),\
+#                                                  $(foreach glob, $(2), \
+#                                                      $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(directory)/**/$(glob)) \
+#                                                  ) \
+#                                              ), \
+#                                              $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(strip $(1))) \
+#                                          )
+# lp.format.exclude-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.exclude-files) \
+#                                          $(if $(strip $(2)), \
+#                                              $(foreach directory, $(1),\
+#                                                  $(foreach glob, $(2), \
+#                                                      $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, !$(directory)/**/$(glob)) \
+#                                                  ) \
+#                                              ), \
+#                                              $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(patsubst %, !%, $(1))) \
+#                                          )
 
-lp.format.get-phony-targets             =format reformat lp.format lp.reformat
-lp.format.get-description               =format sources with Prettier
-lp.format.is-enabled                    =$(strip $(__LP_FORMAT_ENABLED))
-lp.format.get-default-prerequisites     =<n/a>
-lp.format.get-prerequisites             =<n/a>
-lp.format.get-default-targets           =<n/a>
-lp.format.get-targets                   =<n/a>
-lp.format.get-default-before-hook       =$(strip $(__LP_FORMAT_DEFAULT_BEFORE_HOOKS))
-lp.format.get-before-hook               =$(strip $(__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS))
-lp.format.get-default-after-hook        =$(strip $(__LP_FORMAT_DEFAULT_AFTER_HOOKS))
-lp.format.get-after-hook                =$(strip $(__LP_FORMAT_EFFECTIVE_AFTER_HOOKS))
-lp.format.get-default-command           =$(strip $(__LP_FORMAT_DEFAULT_COMMAND))
-lp.format.get-command                   =$(strip $(__LP_FORMAT_EFFECTIVE_COMMAND))
-lp.format.get-globs                     =$(strip $(__LP_FORMAT_EFFECTIVE_GLOBS))
+# lp.format.get-phony-targets             =format reformat lp.format lp.reformat
+# lp.format.get-description               =format sources with Prettier
+# lp.format.is-enabled                    =$(strip $(__LP_FORMAT_ENABLED))
+# lp.format.get-default-prerequisites     =<n/a>
+# lp.format.get-prerequisites             =<n/a>
+# lp.format.get-default-targets           =<n/a>
+# lp.format.get-targets                   =<n/a>
+# lp.format.get-default-before-hook       =$(strip $(__LP_FORMAT_DEFAULT_BEFORE_HOOKS))
+# lp.format.get-before-hook               =$(strip $(__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS))
+# lp.format.get-default-after-hook        =$(strip $(__LP_FORMAT_DEFAULT_AFTER_HOOKS))
+# lp.format.get-after-hook                =$(strip $(__LP_FORMAT_EFFECTIVE_AFTER_HOOKS))
+# lp.format.get-default-command           =$(strip $(__LP_FORMAT_DEFAULT_COMMAND))
+# lp.format.get-command                   =$(strip $(__LP_FORMAT_EFFECTIVE_COMMAND))
+# lp.format.get-globs                     =$(strip $(__LP_FORMAT_EFFECTIVE_GLOBS))
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Clean
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Clean
+# #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_CLEAN_ENABLED                      =true
-__LP_CLEAN_DEFAULT_COMMAND              =rm -rf $(call lp.clean.get-files)
-__LP_CLEAN_EFFECTIVE_COMMAND            =$(__LP_CLEAN_DEFAULT_COMMAND)
-__LP_CLEAN_FILES                        =
+# __LP_CLEAN_ENABLED                      =true
+# __LP_CLEAN_DEFAULT_COMMAND              =rm -rf $(call lp.clean.get-files)
+# __LP_CLEAN_EFFECTIVE_COMMAND            =$(__LP_CLEAN_DEFAULT_COMMAND)
+# __LP_CLEAN_FILES                        =
 
-lp.clean.disable                        =$(call lp.fn.assign, __LP_CLEAN_ENABLED, $(__LP_EMPTY_STRING))
-lp.clean.overwrite-command              =$(call lp.fn.assert-not-empty, $(1), lp.clean.overwrite-command) \
-                                         $(call lp.fn.assign, __LP_CLEAN_EFFECTIVE_COMMAND, $(1))
-lp.clean.remove-tsc-output-directory    =$(call lp.clean.add-files, $(LP_SETTINGS_TSC_OUT_DIR))
-lp.clean.remove-bundle-output-directory =$(call lp.clean.add-files, $(LP_SETTINGS_BUNDLER_OUT_DIR))
-lp.clean.remove-bundles                 =$(foreach file, $(call lp.bundle.get-bundle-names), \
-                                             $(foreach extension, js js.map d.ts, \
-                                                 $(call lp.clean.add-files, $(patsubst %.js, %.$(extension), $(file))) \
-                                             ) \
-                                         )
-lp.clean.remove-files                   =$(call lp.fn.append, __LP_CLEAN_FILES, $(1))
+# lp.clean.disable                        =$(call lp.fn.var.assign, __LP_CLEAN_ENABLED, $(__LP_EMPTY_STRING))
+# lp.clean.overwrite-command              =$(call lp.fn.assert.param-not-empty, lp.clean.overwrite-command, $(1)) \
+#                                          $(call lp.fn.var.assign, __LP_CLEAN_EFFECTIVE_COMMAND, $(1))
+# lp.clean.remove-tsc-output-directory    =$(call lp.clean.add-files, $(LP_SETTINGS_TSC_OUT_DIR))
+# lp.clean.remove-bundle-output-directory =$(call lp.clean.add-files, $(LP_SETTINGS_BUNDLER_OUT_DIR))
+# lp.clean.remove-bundles                 =$(foreach file, $(call lp.bundle.get-bundle-names), \
+#                                              $(foreach extension, js js.map d.ts, \
+#                                                  $(call lp.clean.add-files, $(patsubst %.js, %.$(extension), $(file))) \
+#                                              ) \
+#                                          )
+# lp.clean.remove-files                   =$(call lp.fn.var.append, __LP_CLEAN_FILES, $(1))
 
-lp.clean.get-phony-targets              =clean lp.clean
-lp.clean.get-description                =delete temporary files
-lp.clean.is-enabled                     =$(strip $(__LP_CLEAN_ENABLED))
-lp.clean.get-default-prerequisites      =<n/a>
-lp.clean.get-prerequisites              =<n/a>
-lp.clean.get-default-targets            =<n/a>
-lp.clean.get-targets                    =<n/a>
-lp.clean.get-default-before-hooks       =<n/a>
-lp.clean.get-before-hooks               =<n/a>
-lp.clean.get-default-after-hooks        =<n/a>
-lp.clean.get-after-hooks                =<n/a>
-lp.clean.get-default-command            =$(strip $(__LP_CLEAN_DEFAULT_COMMAND))
-lp.clean.get-command                    =$(strip $(__LP_CLEAN_EFFECTIVE_COMMAND))
-lp.clean.get-files                      =$(strip $(__LP_CLEAN_FILES))
+# lp.clean.get-phony-targets              =clean lp.clean
+# lp.clean.get-description                =delete temporary files
+# lp.clean.is-enabled                     =$(strip $(__LP_CLEAN_ENABLED))
+# lp.clean.get-default-prerequisites      =<n/a>
+# lp.clean.get-prerequisites              =<n/a>
+# lp.clean.get-default-targets            =<n/a>
+# lp.clean.get-targets                    =<n/a>
+# lp.clean.get-default-before-hooks       =<n/a>
+# lp.clean.get-before-hooks               =<n/a>
+# lp.clean.get-default-after-hooks        =<n/a>
+# lp.clean.get-after-hooks                =<n/a>
+# lp.clean.get-default-command            =$(strip $(__LP_CLEAN_DEFAULT_COMMAND))
+# lp.clean.get-command                    =$(strip $(__LP_CLEAN_EFFECTIVE_COMMAND))
+# lp.clean.get-files                      =$(strip $(__LP_CLEAN_FILES))

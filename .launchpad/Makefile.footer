@@ -1,106 +1,106 @@
-#-----------------------------------------------------------------------------------------------------------------------
-# Help
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Help
+# #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.help.is-enabled)" "true"
+# ifeq "$(call lp.help.is-enabled)" "true"
 
-$(call lp.fn.declare-phony-targets, help, lp.target.help)
+# $(call lp.fn.declare-phony-targets, help, lp.target.help)
 
-lp.target.help :
-	$(info )
-	$(call lp.help.print-targets)
+# lp.target.help :
+# 	$(info )
+# 	$(call lp.help.print-targets)
 
-endif
+# endif
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Diagnostics
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Diagnostics
+# #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.diagnostics.is-enabled)" "true"
+# ifeq "$(call lp.diagnostics.is-enabled)" "true"
 
-$(call lp.fn.declare-phony-targets, diagnostics, lp.target.diagnostics)
+# $(call lp.fn.declare-phony-targets, diagnostics, lp.target.diagnostics)
 
-lp.target.diagnostics : ;
-	        $(call lp.fn.print-diagnostics-for-target, Compile, tsc)
-	$(info )$(call lp.fn.print-diagnostics-for-target, Bundle, bundle)
-	$(info )$(call lp.fn.print-diagnostics-for-target, Format, format)
+# lp.target.diagnostics : ;
+# 	        $(call lp.fn.print-diagnostics-for-target, Compile, tsc)
+# 	$(info )$(call lp.fn.print-diagnostics-for-target, Bundle, bundle)
+# 	$(info )$(call lp.fn.print-diagnostics-for-target, Format, format)
 
-# $(info )$(call lp.fn.print-diagnostics-for-target, Clean, clean)
+# # $(info )$(call lp.fn.print-diagnostics-for-target, Clean, clean)
 
-endif
+# endif
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Compile
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Compile
+# #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.tsc.is-enabled)" "true"
+# ifeq "$(call lp.tsc.is-enabled)" "true"
 
-$(call lp.fn.declare-phony-targets, tsc, $(call lp.tsc.get-targets))
+# $(call lp.fn.declare-phony-targets, tsc, $(call lp.tsc.get-targets))
 
-$(call lp.tsc.get-targets) : $(call lp.tsc.get-prerequisites)
-	$(call lp.fn.get-command, Compiling..., tsc)
+# $(call lp.tsc.get-targets) : $(call lp.tsc.get-prerequisites)
+# 	$(call lp.fn.get-command, Compiling..., tsc)
 
-endif
+# endif
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Bundle
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Bundle
+# #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.bundle.is-enabled)" "true"
+# ifeq "$(call lp.bundle.is-enabled)" "true"
 
-ifneq "$(call lp.bundle.get-targets)" ""
+# ifneq "$(call lp.bundle.get-targets)" ""
 
-$(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
+# $(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
 
-$(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
-	$(call lp.fn.get-command, Bundling..., bundle)
+# $(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
+# 	$(call lp.fn.get-command, Bundling..., bundle)
 
-else
+# else
 
-$(call lp.fn.declare-phony-targets, bundle, lp.target.bundle)
+# $(call lp.fn.declare-phony-targets, bundle, lp.target.bundle)
 
-lp.target.bundle : $(call lp.bundle.get-prerequisites)
-    ifeq "$(call lp.bundle.get-command)" "$(call lp.bundle.get-default-command)"
-		$(error No bundles have been defined. Call lp.bundle.add-bundle first)
-    else
-		$(call lp.fn.get-command, Bundling..., bundle)
-    endif
-endif
+# lp.target.bundle : $(call lp.bundle.get-prerequisites)
+#     ifeq "$(call lp.bundle.get-command)" "$(call lp.bundle.get-default-command)"
+# 		$(error No bundles have been defined. Call lp.bundle.add-bundle first)
+#     else
+# 		$(call lp.fn.get-command, Bundling..., bundle)
+#     endif
+# endif
 
-endif
+# endif
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Format
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Format
+# #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.format.is-enabled)" "true"
+# ifeq "$(call lp.format.is-enabled)" "true"
 
-$(call lp.fn.declare-phony-targets, format, lp.target.format)
+# $(call lp.fn.declare-phony-targets, format, lp.target.format)
 
-lp.target.format :
-    ifeq "$(call lp.format.get-globs)" ""
-        ifeq "$(call lp.format.get-default-command)" "$(call lp.format.get-command)"
-			$(error No file patterns are configured. Call lp.format.include-files or lp.format.exclude-files or don't call lp.format.disable-defaults)
-        else
-			$(call lp.fn.get-command, Reformatting..., format)
-        endif
-    else
-		$(call lp.fn.get-command, Reformatting..., format)
-    endif
+# lp.target.format :
+#     ifeq "$(call lp.format.get-globs)" ""
+#         ifeq "$(call lp.format.get-default-command)" "$(call lp.format.get-command)"
+# 			$(error No file patterns are configured. Call lp.format.include-files or lp.format.exclude-files or don't call lp.format.disable-defaults)
+#         else
+# 			$(call lp.fn.get-command, Reformatting..., format)
+#         endif
+#     else
+# 		$(call lp.fn.get-command, Reformatting..., format)
+#     endif
 
-endif
+# endif
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Clean
-#-----------------------------------------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# # Clean
+# #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.clean.is-enabled)" "true"
+# ifeq "$(call lp.clean.is-enabled)" "true"
 
-clean:
-    ifeq "$(call lp.clean.get-default-command)" "$(call lp.clean.get-command)"
-		$(if $(wildcard $(call lp.clean.get-files)), $(call lp.clean.get-command))
-    else
-		$(call lp.clean.get-command)
-    endif
+# clean:
+#     ifeq "$(call lp.clean.get-default-command)" "$(call lp.clean.get-command)"
+# 		$(if $(wildcard $(call lp.clean.get-files)), $(call lp.clean.get-command))
+#     else
+# 		$(call lp.clean.get-command)
+#     endif
 
-endif
+# endif
