@@ -1,33 +1,49 @@
-# #-----------------------------------------------------------------------------------------------------------------------
-# # Help
-# #-----------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------
+# Help
+#-----------------------------------------------------------------------------------------------------------------------
 
-# ifeq "$(call lp.help.is-enabled)" "true"
+$(foreach name, $(call lp.help.get-phony-targets), lp.$(name)) : ;
+	$(info )
+	$(call lp.help.print-targets)
 
-# $(call lp.fn.declare-phony-targets, help, lp.target.help)
+ifeq "$(call lp.help.is-enabled)" "true"
+$(call lp.fn.publicize-phony-targets, help)
+endif
 
-# lp.target.help :
-# 	$(info )
-# 	$(call lp.help.print-targets)
+#-----------------------------------------------------------------------------------------------------------------------
+# Diagnostics
+#-----------------------------------------------------------------------------------------------------------------------
 
-# endif
+lp.diagnostics : ;
+	       $(call lp.fn.print-diagnostics-for-target, tsc    ) \
+	$(info )$(call lp.fn.print-diagnostics-for-target, bundle ) \
+	$(info )$(call lp.fn.print-diagnostics-for-target, format ) \
+	$(info )$(call lp.fn.print-diagnostics-for-target, clean  )
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # Diagnostics
-# #-----------------------------------------------------------------------------------------------------------------------
+$(foreach target, $(call lp.tsc.get-phony-targets), lp.diagnostics.$(target)) : ;
+	$(call lp.fn.print-diagnostics-for-target, tsc)
 
-# ifeq "$(call lp.diagnostics.is-enabled)" "true"
+$(foreach target, $(call lp.bundle.get-phony-targets), lp.diagnostics.$(target)) : ;
+	$(call lp.fn.print-diagnostics-for-target, bundle)
 
-# $(call lp.fn.declare-phony-targets, diagnostics, lp.target.diagnostics)
+$(foreach target, $(call lp.format.get-phony-targets), lp.diagnostics.$(target)) : ;
+	$(call lp.fn.print-diagnostics-for-target, format)
 
-# lp.target.diagnostics : ;
-# 	        $(call lp.fn.print-diagnostics-for-target, Compile, tsc)
-# 	$(info )$(call lp.fn.print-diagnostics-for-target, Bundle, bundle)
-# 	$(info )$(call lp.fn.print-diagnostics-for-target, Format, format)
+$(foreach target, $(call lp.clean.get-phony-targets), lp.diagnostics.$(target)) : ;
+	$(call lp.fn.print-diagnostics-for-target, clean)
 
-# # $(info )$(call lp.fn.print-diagnostics-for-target, Clean, clean)
+ifeq "$(call lp.diagnostics.is-enabled)" "true"
+$(call lp.fn.publicize-phony-targets, diagnostics)
+$(foreach name, \
+	$(foreach target, $(call tsc bundle format clean), $(call lp.$(strip $(target)).get-phony-targets)), \
+	$(eval .PHONY: diagnostics.$(name)) $(eval diagnostics.$(name) : lp.diagnostics.$(name);) \
+)
+endif
 
-# endif
+
+
+
+
 
 # #-----------------------------------------------------------------------------------------------------------------------
 # # Compile
