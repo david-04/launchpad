@@ -16,6 +16,7 @@
 # Temporary build files
 #-----------------------------------------------------------------------------------------------------------------------
 
+/.launchpad/.tsbuildinfo.tmp
 /build
 /dist/*.js*
 /resources/tsconfig/tsconfig.*.json

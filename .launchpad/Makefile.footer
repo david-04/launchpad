@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------------------------------------------------
-# Help
+# Help and diagnostics
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(foreach name, $(call lp.help.get-phony-targets), lp.$(name)) : ;
@@ -10,57 +10,42 @@ ifeq "$(call lp.help.is-enabled)" "true"
 $(call lp.fn.publicize-phony-targets, help)
 endif
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Diagnostics
-#-----------------------------------------------------------------------------------------------------------------------
-
-lp.diagnostics : ;
-	       $(call lp.fn.print-diagnostics-for-target, tsc    ) \
-	$(info )$(call lp.fn.print-diagnostics-for-target, bundle ) \
-	$(info )$(call lp.fn.print-diagnostics-for-target, format ) \
-	$(info )$(call lp.fn.print-diagnostics-for-target, clean  )
-
-$(foreach target, $(call lp.tsc.get-phony-targets), lp.diagnostics.$(target)) : ;
-	$(call lp.fn.print-diagnostics-for-target, tsc)
-
-$(foreach target, $(call lp.bundle.get-phony-targets), lp.diagnostics.$(target)) : ;
-	$(call lp.fn.print-diagnostics-for-target, bundle)
-
-$(foreach target, $(call lp.format.get-phony-targets), lp.diagnostics.$(target)) : ;
-	$(call lp.fn.print-diagnostics-for-target, format)
-
-$(foreach target, $(call lp.clean.get-phony-targets), lp.diagnostics.$(target)) : ;
-	$(call lp.fn.print-diagnostics-for-target, clean)
-
-ifeq "$(call lp.diagnostics.is-enabled)" "true"
-
-$(call lp.fn.publicize-phony-targets, diagnostics)
-$(foreach name, \
-	$(foreach target, tsc bundle format clean, $(call lp.$(strip $(target)).get-phony-targets)), \
-	$(eval .PHONY: diagnostics.$(name)) $(eval diagnostics.$(name) : lp.diagnostics.$(name);) \
-)
-
-endif
+$(foreach feature, tsc bundle format clean, \
+	$(foreach target, $(call lp.$(feature).get-phony-targets), \
+        $(foreach help, $(call lp.help.get-phony-targets), \
+		    $(eval $(call lp.fn.create-diagnostics-target, $(help), $(target)))) \
+	 ) \
+ )
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
-
-.PHONY: $(foreach name, $(call lp.tsc.get-phony-targets), lp.$(name))
 
 ifeq "$(call lp.tsc.is-enabled)" "true"
 
 $(call lp.fn.declare-phony-targets, tsc, $(call lp.tsc.get-targets))
 
 $(call lp.tsc.get-targets) : $(call lp.tsc.get-prerequisites)
-	$(call lp.fn.get-command, Compiling..., tsc)
+	$(call lp.tsc.get-command-with-hooks, Compiling...)
 
 else
+
+.PHONY: $(foreach name, $(call lp.tsc.get-phony-targets), lp.$(name))
 
 $(foreach name, $(call lp.tsc.get-phony-targets), lp.$(name)) : ;
 	$(error Compiling is disabled)
 
 endif
+
+
+
+
+
+
+
+
+
+
 
 # #-----------------------------------------------------------------------------------------------------------------------
 # # Bundle
@@ -73,7 +58,7 @@ endif
 # $(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
 
 # $(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
-# 	$(call lp.fn.get-command, Bundling..., bundle)
+# 	$(call lp.fn.get-command, bundle, Bundling...)
 
 # else
 
@@ -83,7 +68,7 @@ endif
 #     ifeq "$(call lp.bundle.get-command)" "$(call lp.bundle.get-default-command)"
 # 		$(error No bundles have been defined. Call lp.bundle.add-bundle first)
 #     else
-# 		$(call lp.fn.get-command, Bundling..., bundle)
+# 		$(call lp.fn.get-command, bundle, Bundling...)
 #     endif
 # endif
 
@@ -102,10 +87,10 @@ endif
 #         ifeq "$(call lp.format.get-default-command)" "$(call lp.format.get-command)"
 # 			$(error No file patterns are configured. Call lp.format.include-files or lp.format.exclude-files or don't call lp.format.disable-defaults)
 #         else
-# 			$(call lp.fn.get-command, Reformatting..., format)
+# 			$(call lp.fn.get-command, format, Reformatting...)
 #         endif
 #     else
-# 		$(call lp.fn.get-command, Reformatting..., format)
+# 		$(call lp.fn.get-command, format, Reformatting...)
 #     endif
 
 # endif
