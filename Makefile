@@ -64,7 +64,8 @@ $(call lp.tsc.add-extra-prerequisites, $(TSCONFIG_TARGETS) $(UPDATE_VERSION_INFO
 # # $(call lp.bundle.enable-source-maps)
 # # $(call lp.bundle.enable-inline-sources)
 
-# $(call lp.bundle.add-bundle, scripts/launchpad-lib, launchpad-lib)
+$(call lp.bundle.add-bundle, src/launchpad.ts, dist/launchpad-lib.js)
+$(call lp.bundle.add-bundle, src/debug.ts, dist/debug.js)
 
 # #-----------------------------------------------------------------------------------------------------------------------
 # # Release

@@ -18,5 +18,6 @@
 
 /.launchpad/.tsbuildinfo.tmp
 /build
-/dist/*.js*
+/dist/**/*.js*
+/dist/**/*.d.ts
 /resources/tsconfig/tsconfig.*.json

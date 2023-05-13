@@ -7,7 +7,7 @@ $(foreach name, $(call lp.help.get-phony-targets), lp.$(name)) : ;
 	$(call lp.help.print-targets)
 
 ifeq "$(call lp.help.is-enabled)" "true"
-$(call lp.fn.publicize-phony-targets, help)
+    $(call lp.fn.publicize-phony-targets, help)
 endif
 
 $(foreach feature, tsc bundle format clean, \
@@ -21,19 +21,58 @@ $(foreach feature, tsc bundle format clean, \
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.tsc.is-enabled)" "true"
+ifeq "$(call lp.tsc.is-enabled)" "true" # ......................................................... compiling is enabled
 
 $(call lp.fn.declare-phony-targets, tsc, $(call lp.tsc.get-targets))
 
 $(call lp.tsc.get-targets) : $(call lp.tsc.get-prerequisites)
 	$(call lp.tsc.get-command-with-hooks, Compiling...)
 
-else
+else # ........................................................................................... compiling is disabled
 
 .PHONY: $(foreach name, $(call lp.tsc.get-phony-targets), lp.$(name))
 
 $(foreach name, $(call lp.tsc.get-phony-targets), lp.$(name)) : ;
-	$(error Compiling is disabled)
+    ifeq "$(strip $(call lp.tsc.get-command-with-hooks))" ""
+		$(error Compiling is disabled/not configured)
+    else
+		$(call lp.tsc.get-command-with-hooks, Compiling...)
+    endif
+
+endif
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Bundle
+#-----------------------------------------------------------------------------------------------------------------------
+
+ifeq "$(call lp.bundle.is-enabled)" "true" # ....................................................... bundling is enabled
+
+ifneq "$(call lp.bundle.get-targets)" "" # ........................... bundling is enabled and bundles have been defined
+
+$(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
+
+$(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
+	$(call lp.bundle.get-command-with-hooks, bundle, Bundling...)
+
+else # ............................................................ bundling is enabled but no bundles have been defined
+
+$(call lp.fn.declare-phony-targets, bundle, lp.bundle)
+
+lp.bundle :
+	$(error No bundles have been defined (missing call to lp.bundle.add-bundle))
+
+endif
+
+else # ............................................................................................ bundling is disabled
+
+.PHONY: lp.bundle
+
+lp.bundle : ;
+    ifeq "$(strip $(call lp.bundle.get-command-with-hooks))" ""
+		$(error Bundling is disabled/not configured)
+    else
+		$(call lp.bundle.get-command-with-hooks, Bundling...)
+    endif
 
 endif
 
@@ -47,32 +86,11 @@ endif
 
 
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # Bundle
-# #-----------------------------------------------------------------------------------------------------------------------
 
-# ifeq "$(call lp.bundle.is-enabled)" "true"
 
-# ifneq "$(call lp.bundle.get-targets)" ""
 
-# $(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
 
-# $(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
-# 	$(call lp.fn.get-command, bundle, Bundling...)
 
-# else
-
-# $(call lp.fn.declare-phony-targets, bundle, lp.target.bundle)
-
-# lp.target.bundle : $(call lp.bundle.get-prerequisites)
-#     ifeq "$(call lp.bundle.get-command)" "$(call lp.bundle.get-default-command)"
-# 		$(error No bundles have been defined. Call lp.bundle.add-bundle first)
-#     else
-# 		$(call lp.fn.get-command, bundle, Bundling...)
-#     endif
-# endif
-
-# endif
 
 # #-----------------------------------------------------------------------------------------------------------------------
 # # Format
