@@ -19,9 +19,9 @@ const COMMANDS = [
 
 export async function launchpad(argv: ReadonlyArray<string>) {
     try {
-        if (argv.some(arg => arg.match(/^--?h(elp)?$/))) {
+        if (argv.some((arg) => arg.match(/^--?h(elp)?$/))) {
             showHelp();
-        } else if (argv.some(arg => arg.match(/^--?v(ersion)?$/))) {
+        } else if (argv.some((arg) => arg.match(/^--?v(ersion)?$/))) {
             showVersion();
         } else {
             return await analyzeArgumentsAndExecuteCommand(argv);
@@ -75,8 +75,8 @@ async function analyzeArgumentsAndExecuteCommand(argv: ReadonlyArray<string>) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function showHelp() {
-    const commands = COMMANDS.map(array => `  ${array[0]}`);
-    ["", "  Usage: launchpad [command]", "", ...commands].forEach(line => console.log(line));
+    const commands = COMMANDS.map((array) => `  ${array[0]}`);
+    ["", "  Usage: launchpad [command]", "", ...commands].forEach((line) => console.log(line));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,8 +92,8 @@ function showVersion() {
 //----------------------------------------------------------------------------------------------------------------------
 
 function getHandler(command: string) {
-    const matchingCommands = COMMANDS.filter(array => array[0].trim().replace(/\s.*/, "") === command);
-    const [handler, ...rest] = matchingCommands.map(array => array[1]);
+    const matchingCommands = COMMANDS.filter((array) => array[0].trim().replace(/\s.*/, "") === command);
+    const [handler, ...rest] = matchingCommands.map((array) => array[1]);
     if (rest.length) {
         throw new Error(`INTERNAL ERROR: Found more than one command handler for ${command}`);
     } else {

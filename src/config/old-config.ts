@@ -39,7 +39,7 @@ export function loadConfigFile(configFile: Path, properties: Properties) {
     const errors = new Array<ErrorLine>();
     const fileContent = configFile.loadFileContents();
     const rawLines = fileContent.split(/\r?\n/).map((line, index) => ({ lineNumber: index + 1, content: line.trim() }));
-    const relevantLines = rawLines.filter(line => line.content.match(/^[^#]/));
+    const relevantLines = rawLines.filter((line) => line.content.match(/^[^#]/));
     const keyValues = splitLines(relevantLines, errors);
     const config = keyValues.reduce<OldConfig>((config, line) => reduceLine(properties, config, line, errors), {});
     return { config, errors };
@@ -81,7 +81,7 @@ function splitLine(line: Line) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function reduceLine(properties: Properties, config: OldConfig, line: SplitLine, errors: Array<ErrorLine>) {
-    const property = properties.filter(property => property.key === line.key)[0];
+    const property = properties.filter((property) => property.key === line.key)[0];
     if (property) {
         return property.parse(line, errors);
     } else {
@@ -145,7 +145,7 @@ export const parsePackageManager = enumParser(["npm", "pnpm", "yarn"] as const);
 function enumParser<T extends string>(allowedValues: ReadonlyArray<T>) {
     return (key: string, originalValue: string) => {
         const cleanedValue = originalValue.replace(/::pinned$/, "");
-        if (allowedValues.find(allowedValue => allowedValue === cleanedValue)) {
+        if (allowedValues.find((allowedValue) => allowedValue === cleanedValue)) {
             return { value: cleanedValue as T, pinned: cleanedValue !== originalValue };
         } else {
             throw new Error(`Invalid value ${cleanedValue} for ${key} (allowed values: ${allowedValues.join(", ")})`);

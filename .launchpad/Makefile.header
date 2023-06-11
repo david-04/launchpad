@@ -389,7 +389,7 @@ __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
 __LP_FORMAT_DEFAULT_AFTER_HOOKS         =
 __LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
 __LP_FORMAT_DEFAULT_COMMAND_prettier    =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-files))
-__LP_FORMAT_DEFAULT_COMMAND_rome        =rome format --write --skip-errors $(patsubst %, '%', $(call lp.format.get-files))
+__LP_FORMAT_DEFAULT_COMMAND_rome        =rome format --write --skip-errors --max-diagnostics=0 $(patsubst %, '%', $(call lp.format.get-files))
 __LP_FORMAT_DEFAULT_COMMAND             =$(__LP_FORMAT_DEFAULT_COMMAND_$(LP_SETTINGS_FORMATTER))
 __LP_FORMAT_EFFECTIVE_COMMAND           =$(call lp.format.get-default-command)
 __LP_FORMAT_DEFAULT_FILES               =

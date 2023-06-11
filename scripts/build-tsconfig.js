@@ -17,7 +17,7 @@ const INDENT = 4;
 //----------------------------------------------------------------------------------------------------------------------
 
 const [_node, _script, ...argv] = process.argv;
-const files = argv.sort().map(fileName => loadParseAndNormalizeTsconfigJson(SOURCE_PATH, fileName));
+const files = argv.sort().map((fileName) => loadParseAndNormalizeTsconfigJson(SOURCE_PATH, fileName));
 createTsconfigTemplateTs(TSCONFIG_TEMPLATES_TS, files);
 createTsconfigDefaultJsonFile(TSCONFIG_DEFAULT_JSON_OUT, files, TSCONFIG_DEFAULT_JSON_IN);
 
@@ -66,7 +66,7 @@ function normalizeTsconfig(json) {
     const compilerOptionsOut = {};
     Object.keys(compilerOptionsIn)
         .sort()
-        .forEach(key => (compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key])));
+        .forEach((key) => (compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key])));
     return { compilerOptions: compilerOptionsOut, include: ["../src/**/*.ts"] };
 }
 
@@ -91,7 +91,7 @@ function normalizeTsconfigValue(value) {
 
 function createTsconfigTemplateTs(outputPath, files) {
     const output = {};
-    files.forEach(file => (output[file.name] = file.json));
+    files.forEach((file) => (output[file.name] = file.json));
     const content = `export const TSCONFIG_JSON_TEMPLATES = ${JSON.stringify(output, undefined, INDENT)} as const;`;
     writeFileSync(outputPath, content);
 }
@@ -101,7 +101,7 @@ function createTsconfigTemplateTs(outputPath, files) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function createTsconfigDefaultJsonFile(outputPath, files, sourceFileName) {
-    const matchingFiles = files.filter(file => file.name === sourceFileName);
+    const matchingFiles = files.filter((file) => file.name === sourceFileName);
     if (1 === matchingFiles.length) {
         writeFileSync(outputPath, JSON.stringify(matchingFiles[0].json, undefined, INDENT));
     } else {
