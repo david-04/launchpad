@@ -76,7 +76,7 @@ ifneq "$(call lp.bundle.get-targets)" "" # ........................... bundling 
 $(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
 
 $(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
-	$(call lp.bundle.get-command-with-hooks, bundle, Bundling...)
+	$(call lp.bundle.get-command-with-hooks, Bundling...)
 
 else # ............................................................ bundling is enabled but no bundles have been defined
 

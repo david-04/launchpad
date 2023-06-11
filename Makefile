@@ -50,8 +50,7 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add-bundle, src/launchpad.ts, dist/launchpad-lib.min.js)
-$(call lp.bundle.add-bundle, src/debug.ts, dist/debug.min.js)
+$(call lp.bundle.add-bundle, src/launchpad.ts, dist/launchpad.mjs)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Format

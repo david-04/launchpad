@@ -36,12 +36,10 @@ export async function launchpad(argv: ReadonlyArray<string>) {
 // Postinstall entry point
 //----------------------------------------------------------------------------------------------------------------------
 
-export namespace launchpad {
-    export async function postinstall() {
-        const { projectRoot, configFile } = createPaths(process.env["INIT_CWD"]);
-        if (configFile.existsAndIsFile()) {
-            return await uplift([], projectRoot, configFile, true);
-        }
+export async function postinstall() {
+    const { projectRoot, configFile } = createPaths(process.env["INIT_CWD"]);
+    if (configFile.existsAndIsFile()) {
+        return await uplift([], projectRoot, configFile, true);
     }
 }
 
