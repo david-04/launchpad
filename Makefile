@@ -52,11 +52,13 @@ $(call lp.tsc.add-extra-prerequisites, $(TSCONFIG_TARGETS) $(UPDATE_VERSION_INFO
 $(call lp.bundle.add-bundle, src/launchpad.ts, dist/launchpad-lib.js)
 $(call lp.bundle.add-bundle, src/debug.ts, dist/debug.js)
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # Format
-# #-----------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------
+# Format
+#-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.format.exclude, resources/tsconfig/01-default/tsconfig.json)
+$(call lp.format.exclude, resources/tsconfig/01-default)
+$(call lp.format.exclude, resources/tsconfig/02-facets)
+$(call lp.format.exclude, src/resources/tsconfig-templates.ts)
 
 
 
