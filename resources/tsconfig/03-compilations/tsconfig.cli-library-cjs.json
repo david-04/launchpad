@@ -3,6 +3,6 @@
         "../02-facets/tsconfig.base.json",
         "../02-facets/tsconfig.runtime-node.json",
         "../02-facets/tsconfig.artifact-library.json",
-        "../02-facets/tsconfig.module-commonjs.json",
+        "../02-facets/tsconfig.module-commonjs.json"
     ]
 }
