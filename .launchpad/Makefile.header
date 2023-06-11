@@ -42,7 +42,8 @@ lp.fn.var.append-with-separator =$(if $(strip $(3)), \
                                       ) \
                                   )
 
-lp.fn.wildcard                  =$(patsubst %/,,$(wildcard $(patsubst %,%/,$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d)))))
+lp.fn.wildcard                  =$(call lp.fn.normalize.file-paths, $(patsubst %/,,$(wildcard $(patsubst %,%/,$(foreach d,$(wildcard $(1:=/*)),$(call lp.fn.wildcard,$d,$2) $(filter $(subst *,%,$2),$d))))))
+lp.fn.normalize.file-paths      =$(foreach path, $(1), $(patsubst %/,%,$(patsubst ./%,%,$(path))))
 
 lp.fn.if.equal                  =$(if $(patsubst $(strip $(1)),,$(strip $(2))),$(strip $(4)), \
                                  $(if $(patsubst $(strip $(2)),,$(strip $(1))),$(strip $(4)),$(strip $(3))))
@@ -242,9 +243,9 @@ lp.tsc.get-default-prerequisites        =$(sort $(strip $(__LP_TSC_DEFAULT_PRERE
 lp.tsc.get-prerequisites                =$(sort $(strip $(__LP_TSC_EFFECTIVE_PREREQUISITES)))
 lp.tsc.get-default-targets              =$(sort $(strip $(__LP_TSC_DEFAULT_TARGETS)))
 lp.tsc.get-targets                      =$(sort $(strip $(__LP_TSC_EFFECTIVE_TARGETS)))
-lp.tsc.get-default-before-hook          =$(strip $(__LP_TSC_DEFAULT_BEFORE_HOOKS))
+lp.tsc.get-default-before-hooks         =$(strip $(__LP_TSC_DEFAULT_BEFORE_HOOKS))
 lp.tsc.get-before-hooks                 =$(strip $(__LP_TSC_EFFECTIVE_BEFORE_HOOKS))
-lp.tsc.get-default-after-hook           =$(strip $(__LP_TSC_DEFAULT_AFTER_HOOKS))
+lp.tsc.get-default-after-hooks          =$(strip $(__LP_TSC_DEFAULT_AFTER_HOOKS))
 lp.tsc.get-after-hooks                  =$(strip $(__LP_TSC_EFFECTIVE_AFTER_HOOKS))
 lp.tsc.get-default-command              =$(if $(1), echo $(1) && )$(strip $(__LP_TSC_DEFAULT_COMMAND))
 lp.tsc.get-effective-command            =$(strip $(__LP_TSC_EFFECTIVE_COMMAND))
@@ -258,7 +259,7 @@ LP_TSC_TARGETS                          =$(call lp.tsc.get-targets)
 
 __LP_BUNDLE_ENABLED                     =$(if $(LP_SETTINGS_BUNDLER),true)
 __LP_BUNDLE_DEFAULT_PREREQUISITES       =$(call lp.tsc.get-prerequisites) $(__LP_MAKEFILES_AND_SETTINGS)
-__LP_BUNDLE_EFFECTIVE_PREREQUISITES     =$(__LP_BUNDLE_DEFAULT_PREREQUISITES)
+__LP_BUNDLE_EFFECTIVE_PREREQUISITES     =$(call lp.bundle.get-default-prerequisites)
 __LP_BUNDLE_DEFAULT_TARGETS             =
 __LP_BUNDLE_EFFECTIVE_TARGETS           =$(__LP_BUNDLE_DEFAULT_TARGETS)
 __LP_BUNDLE_DEFAULT_BEFORE_HOOKS        =
@@ -325,7 +326,8 @@ lp.bundle.add-bundle                    =$(call lp.fn.assert.param-not-empty, lp
                                          $(call lp.fn.var.append, __LP_BUNDLE_DEFAULT_TARGETS, \
                                                $(2) \
                                                $(if $(strip $(__LP_BUNDLER_DTS_BUNDLER)), $(patsubst %.js, %.d.ts, $(2))) \
-                                          )
+                                          ) \
+                                         $(call lp.format.exclude, $(2) $(patsubst %.js, %.d.ts, $(2)))
 
 lp.bundle.disable                       =$(call lp.fn.var.erase, __LP_BUNDLE_ENABLED)
 lp.bundle.add-extra-prerequisites       =$(call lp.fn.var.append, __LP_BUNDLE_EFFECTIVE_PREREQUISITES, $(1))
@@ -377,66 +379,73 @@ LP_BUNDLE_TARGETS                       =$(call lp.bundle.get-targets)
 
 
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # Format
-# #-----------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------
+# Format
+#-----------------------------------------------------------------------------------------------------------------------
 
-# __LP_FORMAT_ENABLED                     =true
-# __LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
-# __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
-# __LP_FORMAT_DEFAULT_AFTER_HOOKS         =
-# __LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
-# __LP_FORMAT_DEFAULT_COMMAND             =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-globs))
-# __LP_FORMAT_EFFECTIVE_COMMAND           =$(call lp.format.get-default-command)
-# __LP_FORMAT_DEFAULT_GLOBS               =. !node_modules $(patsubst %/, !%, $(filter-out ./ ../, $(wildcard .*/))) \
-#                                          $(foreach extension, js js.map d.ts, $(patsubst %.js, !%.$(extension), $(call lp.bundle.get-targets))) \
-#                                          $(wildcard *.lock *-lock.*)
-# __LP_FORMAT_EFFECTIVE_GLOBS             =$(if $(__LP_FORMAT_DISABLE_DEFAULT_GLOBS), , $(__LP_FORMAT_DEFAULT_GLOBS))
-# __LP_FORMAT_DISABLE_DEFAULT_GLOBS       =
+__LP_FORMAT_ENABLED                     =$(if $(LP_SETTINGS_FORMATTER),true)
+__LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
+__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
+__LP_FORMAT_DEFAULT_AFTER_HOOKS         =
+__LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
+__LP_FORMAT_DEFAULT_COMMAND_prettier    =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-files))
+__LP_FORMAT_DEFAULT_COMMAND_rome        =rome format --write --skip-errors $(patsubst %, '%', $(call lp.format.get-files))
+__LP_FORMAT_DEFAULT_COMMAND             =$(__LP_FORMAT_DEFAULT_COMMAND_$(LP_SETTINGS_FORMATTER))
+__LP_FORMAT_EFFECTIVE_COMMAND           =$(call lp.format.get-default-command)
+__LP_FORMAT_DEFAULT_FILES               =
+__LP_FORMAT_EFFECTIVE_FILES             =$(__LP_FORMAT_DEFAULT_FILES)
 
-# lp.format.disable                       =$(call lp.fn.var.erase, __LP_FORMAT_ENABLED)
-# lp.format.add-before-hook               =$(call lp.fn.var.append-with-separator, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
-# lp.format.overwrite-before-hooks        =$(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, $(1))
-# lp.format.add-after-hook                =$(call lp.fn.var.append-with-separator, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, &&, $(1))
-# lp.format.overwrite-after-hooks         =$(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, $(1))
-# lp.format.overwrite-command             =$(call lp.fn.assert.param-not-empty, lp.format.overwrite-command, $(1)) \
-#                                          $(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_COMMAND, $(1))
-# lp.format.disable-defaults              =$(call lp.fn.var.assign, __LP_FORMAT_DISABLE_DEFAULT_GLOBS, true)
-# lp.format.include-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.include-files) \
-#                                          $(if $(strip $(2)), \
-#                                              $(foreach directory, $(1),\
-#                                                  $(foreach glob, $(2), \
-#                                                      $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(directory)/**/$(glob)) \
-#                                                  ) \
-#                                              ), \
-#                                              $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(strip $(1))) \
-#                                          )
-# lp.format.exclude-files                 =$(call lp.fn.assert.not-empty, $(1), lp.format.exclude-files) \
-#                                          $(if $(strip $(2)), \
-#                                              $(foreach directory, $(1),\
-#                                                  $(foreach glob, $(2), \
-#                                                      $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, !$(directory)/**/$(glob)) \
-#                                                  ) \
-#                                              ), \
-#                                              $(call lp.fn.var.append, __LP_FORMAT_EFFECTIVE_GLOBS, $(patsubst %, !%, $(1))) \
-#                                          )
+__LP_FORMAT_ROOT_LEVEL_DIRECTORIES      =$(filter-out .launchpad .vscode .yarn node_modules,$(call lp.fn.normalize.file-paths, $(wildcard */)))
+__LP_FORMAT_EXTENSIONS_rome             =ts tsx js jsx json
+__LP_FORMAT_EXTENSIONS_prettier         =ts tsx js jsx json html htm css less sass
+__LP_FORMAT_EXTENSIONS                  =$(__LP_FORMAT_EXTENSIONS_$(LP_SETTINGS_FORMATTER))
 
-# lp.format.get-phony-targets             =format reformat
-# lp.format.get-name                      =Format
-# lp.format.get-description               =format sources with Prettier
-# lp.format.is-enabled                    =$(strip $(__LP_FORMAT_ENABLED))
-# lp.format.get-default-prerequisites     =<n/a>
-# lp.format.get-prerequisites             =<n/a>
-# lp.format.get-default-targets           =<n/a>
-# lp.format.get-targets                   =<n/a>
-# lp.format.get-default-before-hook       =$(strip $(__LP_FORMAT_DEFAULT_BEFORE_HOOKS))
-# lp.format.get-before-hooks              =$(strip $(__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS))
-# lp.format.get-default-after-hook        =$(strip $(__LP_FORMAT_DEFAULT_AFTER_HOOKS))
-# lp.format.get-after-hooks               =$(strip $(__LP_FORMAT_EFFECTIVE_AFTER_HOOKS))
-# lp.format.get-default-command           =$(if $(1), echo $(1) && )$(strip $(__LP_FORMAT_DEFAULT_COMMAND))
-# lp.format.get-effective-command         =$(strip $(__LP_FORMAT_EFFECTIVE_COMMAND))
-# lp.format.get-command-with-hooks        =$(call lp.fn.get-command, format, $(1))
-# lp.format.get-globs                     =$(strip $(__LP_FORMAT_EFFECTIVE_GLOBS))
+
+lp.format.to-wildcard                   =$(if $(strip $(1)), $(1), $(patsubst %, *.%, $(__LP_FORMAT_EXTENSIONS)))
+lp.format.extract-directories           =$(call lp.fn.normalize.file-paths, $(filter %/, $(wildcard $(patsubst %,%/,$(patsubst %/,%,$(1))))))
+lp.format.extract-files                 =$(filter-out $(call lp.format.extract-directories, $(1)), $(call lp.fn.normalize.file-paths, $(1)))
+lp.format.expand-files                  =$(if $(call lp.format.extract-directories, $(1)), $(call lp.fn.wildcard, $(1), $(call lp.format.to-wildcard, $(2)))) \
+                                         $(call lp.format.extract-files, $(1))
+lp.format.add-files-to                  =$(call lp.fn.var.append, $(1), $(filter-out  $($(strip $(1))), $(call lp.fn.normalize.file-paths, $(2))))
+lp.format.remove-files-from             =$(call lp.fn.var.assign, $(1), $(filter-out $(call lp.fn.normalize.file-paths, $(2)), $($(strip $(1)))))
+lp.format.overwrite-files-for           =$(call lp.fn.var.assign, $(1), $(call lp.fn.normalize.file-paths, $(2)))
+
+$(call lp.format.add-files-to,      __LP_FORMAT_DEFAULT_FILES, $(wildcard $(patsubst %,*.%,$(__LP_FORMAT_EXTENSIONS))))
+$(call lp.format.remove-files-from, __LP_FORMAT_DEFAULT_FILES, $(wildcard $(patsubst %,*.min.%,$(__LP_FORMAT_EXTENSIONS))))
+$(call lp.format.add-files-to,      __LP_FORMAT_DEFAULT_FILES, $(call lp.fn.wildcard, $(__LP_FORMAT_ROOT_LEVEL_DIRECTORIES), $(patsubst %,*.%,$(__LP_FORMAT_EXTENSIONS))))
+$(call lp.format.remove-files-from, __LP_FORMAT_DEFAULT_FILES, $(call lp.fn.wildcard, $(__LP_FORMAT_ROOT_LEVEL_DIRECTORIES), $(patsubst %,*.min.%,$(__LP_FORMAT_EXTENSIONS))))
+$(call lp.format.remove-files-from, __LP_FORMAT_DEFAULT_FILES, $(call lp.fn.wildcard, $(LP_SETTINGS_TSC_OUT_DIR) , *))
+
+lp.format.disable                       =$(call lp.fn.var.erase, __LP_FORMAT_ENABLED)
+lp.format.add-before-hook               =$(call lp.fn.var.append-with-separator, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
+lp.format.overwrite-before-hooks        =$(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, $(1))
+lp.format.add-after-hook                =$(call lp.fn.var.append-with-separator, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, &&, $(1))
+lp.format.overwrite-after-hooks         =$(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_AFTER_HOOKS, $(1))
+lp.format.overwrite-command             =$(call lp.fn.assert.param-not-empty, lp.format.overwrite-command, $(1)) \
+                                         $(call lp.fn.var.assign, __LP_FORMAT_EFFECTIVE_COMMAND, $(1))
+
+lp.format.include                       =$(call lp.format.add-files-to, __LP_FORMAT_EFFECTIVE_FILES, $(call lp.format.expand-files, $(1), $(2)))
+lp.format.include-only                  =$(call lp.fn.assert.param-not-empty, lp.format.include-only, $(1)) \
+                                         $(call lp.format.overwrite-files-for, __LP_FORMAT_EFFECTIVE_FILES, $(call lp.format.expand-files, $(1), $(2)))
+lp.format.exclude                       =$(call lp.format.remove-files-from, __LP_FORMAT_EFFECTIVE_FILES, $(call lp.format.expand-files, $(1), $(2)))
+
+lp.format.get-phony-targets             =format reformat
+lp.format.get-name                      =Format
+lp.format.get-description               =format sources with $(LP_SETTINGS_FORMATTER)
+lp.format.is-enabled                    =$(strip $(__LP_FORMAT_ENABLED))
+lp.format.get-default-prerequisites     =<n/a>
+lp.format.get-prerequisites             =<n/a>
+lp.format.get-default-targets           =<n/a>
+lp.format.get-targets                   =<n/a>
+lp.format.get-default-before-hook       =$(strip $(__LP_FORMAT_DEFAULT_BEFORE_HOOKS))
+lp.format.get-before-hooks              =$(strip $(__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS))
+lp.format.get-default-after-hook        =$(strip $(__LP_FORMAT_DEFAULT_AFTER_HOOKS))
+lp.format.get-after-hooks               =$(strip $(__LP_FORMAT_EFFECTIVE_AFTER_HOOKS))
+lp.format.get-default-command           =$(if $(1), echo $(1) && )$(strip $(__LP_FORMAT_DEFAULT_COMMAND))
+lp.format.get-effective-command         =$(strip $(__LP_FORMAT_EFFECTIVE_COMMAND))
+lp.format.get-command-with-hooks        =$(call lp.fn.get-command, format, $(1))
+lp.format.get-default-files             =$(sort $(strip $(__LP_FORMAT_DEFAULT_FILES)))
+lp.format.get-files                     =$(wildcard $(sort $(strip $(__LP_FORMAT_EFFECTIVE_FILES))))
 
 # #-----------------------------------------------------------------------------------------------------------------------
 # # Clean

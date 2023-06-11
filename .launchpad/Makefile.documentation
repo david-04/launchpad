@@ -26,8 +26,8 @@ $(call lp.tsc.add-after-hook             , pwd && ls ) # append commands to run 
 $(call lp.tsc.overwrite-after-hooks      , pwd && ls ) # overwrite any previsouly defined after-hook commands
 $(call lp.tsc.overwrite-command          , tsc -b    ) # overwrite the command itself
 
-$(call lp.tsc.get-command-with-hooks     , compile...) # get the command with all hooks (with an optional "echo")
-$(call lp.tsc.get-default-command        , compile...) # get the built-in command (with an optional "echo")
+$(call lp.tsc.get-command-with-hooks     , Compile...) # get the command with all hooks (with an optional "echo")
+$(call lp.tsc.get-default-command        , Compile...) # get the built-in command (with an optional "echo")
 
 $(LP_TSC_TARGETS)                                      # use as a prerequisite for targets that depend on "tsc"
 
@@ -57,7 +57,29 @@ $(call lp.bundle.add-after-hook          , pwd && ls ) # append commands to run 
 $(call lp.bundle.overwrite-after-hooks   , pwd && ls ) # overwrite any previsouly defined after-hook commands
 $(call lp.bundle.overwrite-command       , tsc -b    ) # overwrite the command itself
 
-$(call lp.bundle.get-command-with-hooks  , compile...) # get the command with all hooks (with an optional "echo")
-$(call lp.bundle.get-default-command     , compile...) # get the built-in command (with an optional "echo")
+$(call lp.bundle.get-command-with-hooks  , Bundle... ) # get the command with all hooks (with an optional "echo")
+$(call lp.bundle.get-default-command     , Bundle... ) # get the built-in command (with an optional "echo")
 
 $(LP_BUNDLE_TARGETS)                                   # use as a prerequisite for targets that depend on "bundle"
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Format
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.format.include, file1.json file2.ts        ) # add the given files
+$(call lp.format.include, src scripts resources      ) # add all files (of supported formats) in the given directories
+$(call lp.format.include, resources, *.json *.js     ) # add specific files in the given directories
+$(call lp.format.include, file.json src, *.ts *.tsx  ) # specific files and directory wildcards can be combined
+$(call lp.format.exclude, file.json src, *.ts *.tsx  ) # exclude the given files and directories from formatting
+$(call lp.format.include-only, file.json src, *.ts   ) # discard any default and previously added files
+
+$(call lp.format.disable                             ) # disable the "format" target ("lp.format" remains active)
+
+$(call lp.format.add-before-hook         , pwd && ls ) # append commands to run before formatting
+$(call lp.format.overwrite-before-hooks  , pwd && ls ) # overwrite any previsouly defined before-hook commands
+$(call lp.format.add-after-hook          , pwd && ls ) # append commands to run after formatting
+$(call lp.format.overwrite-after-hooks   , pwd && ls ) # overwrite any previsouly defined after-hook commands
+$(call lp.format.overwrite-command       , rome -w   ) # overwrite the command itself
+
+$(call lp.bundle.get-command-with-hooks  , Format... ) # get the command with all hooks (with an optional "echo")
+$(call lp.bundle.get-default-command     , Format... ) # get the built-in command (with an optional "echo")
