@@ -12,7 +12,15 @@ __LP_MAKEFILES_AND_SETTINGS    :=$(__LP_MAKEFILES) $(__LP_SETTINGS_CFG)
 __LP_TSCONFIG_JSON             :=tsconfig.json $(__LP_TSCONFIG_DEFAULT_JSON) $(wildcard tsconfig*.json)
 
 #-----------------------------------------------------------------------------------------------------------------------
-# General purpose constants
+#
+#    ######## ##     ## ##    ##  ######  ######## ####  #######  ##    ##  ######
+#    ##       ##     ## ###   ## ##    ##    ##     ##  ##     ## ###   ## ##    ##
+#    ##       ##     ## ####  ## ##          ##     ##  ##     ## ####  ## ##
+#    ######   ##     ## ## ## ## ##          ##     ##  ##     ## ## ## ##  ######
+#    ##       ##     ## ##  #### ##          ##     ##  ##     ## ##  ####       ##
+#    ##       ##     ## ##   ### ##    ##    ##     ##  ##     ## ##   ### ##    ##
+#    ##        #######  ##    ##  ######     ##    ####  #######  ##    ##  ######
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_EMPTY_STRING               =#
@@ -75,7 +83,49 @@ lp.fn.config.validate-enum      =$(call lp.fn.config.normalize.enum, $(1))\
                                  $(call lp.fn.config.normalize.disabled, $(1))
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Import, normalize and validate configuration
+# Functions for configuring and creating targets
+#-----------------------------------------------------------------------------------------------------------------------
+
+lp.fn.get-command           =$(strip $(if $(strip $(2)), echo "$(strip $(2))" && ) \
+                                 $(if $(call lp.$(strip $(1)).get-before-hooks), $(call lp.$(strip $(1)).get-before-hooks) &&) \
+                                 $(call lp.$(strip $(1)).get-effective-command) \
+                                 $(if $(call lp.$(strip $(1)).get-after-hooks), && $(call lp.$(strip $(1)).get-after-hooks)) \
+                             )
+
+lp.fn.declare-phony-targets =$(foreach target, \
+                                 $(call lp.$(strip $(1)).get-phony-targets), \
+                                 $(eval $(call lp.fn.declare-phony-target,$(target),$(call lp.$(strip $(1)).get-description),$(2))) \
+                              )
+
+define lp.fn.declare-phony-target
+$(if $(strip $(doc.target)), $(call doc.target,$(target), $(2)))
+#----
+.PHONY: lp.$(1) $(1)
+lp.$(1) $(1) : $(3);
+endef
+
+lp.fn.publicize-phony-targets=$(foreach target, \
+                                 $(call lp.$(strip $(1)).get-phony-targets), \
+                                 $(eval $(call lp.fn.publicize-phony-target,$(target),$(call lp.$(strip $(1)).get-description))) \
+                              )
+
+define lp.fn.publicize-phony-target
+$(if $(strip $(doc.target)), $(call doc.target,$(target), $(2)))
+#----
+.PHONY: $(1)
+$(1) : lp.$(1);
+endef
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#     ######   #######  ##    ## ######## ####  ######
+#    ##    ## ##     ## ###   ## ##        ##  ##    ##
+#    ##       ##     ## ####  ## ##        ##  ##
+#    ##       ##     ## ## ## ## ######    ##  ##   ####
+#    ##       ##     ## ##  #### ##        ##  ##    ##
+#    ##    ## ##     ## ##   ### ##        ##  ##    ##
+#     ######   #######  ##    ## ##       ####  ######
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 include $(__LP_SETTINGS_CFG)
@@ -123,41 +173,15 @@ ifeq "$(LP_SETTINGS_TSC_OUT_DIR)" ""
 endif
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Functions for configuring and creating targets
-#-----------------------------------------------------------------------------------------------------------------------
-
-lp.fn.get-command           =$(strip $(if $(strip $(2)), echo "$(strip $(2))" && ) \
-                                 $(if $(call lp.$(strip $(1)).get-before-hooks), $(call lp.$(strip $(1)).get-before-hooks) &&) \
-                                 $(call lp.$(strip $(1)).get-effective-command) \
-                                 $(if $(call lp.$(strip $(1)).get-after-hooks), && $(call lp.$(strip $(1)).get-after-hooks)) \
-                             )
-
-lp.fn.declare-phony-targets =$(foreach target, \
-                                 $(call lp.$(strip $(1)).get-phony-targets), \
-                                 $(eval $(call lp.fn.declare-phony-target,$(target),$(call lp.$(strip $(1)).get-description),$(2))) \
-                              )
-
-define lp.fn.declare-phony-target
-$(if $(strip $(doc.target)), $(call doc.target,$(target), $(2)))
-#----
-.PHONY: lp.$(1) $(1)
-lp.$(1) $(1) : $(3);
-endef
-
-lp.fn.publicize-phony-targets=$(foreach target, \
-                                 $(call lp.$(strip $(1)).get-phony-targets), \
-                                 $(eval $(call lp.fn.publicize-phony-target,$(target),$(call lp.$(strip $(1)).get-description))) \
-                              )
-
-define lp.fn.publicize-phony-target
-$(if $(strip $(doc.target)), $(call doc.target,$(target), $(2)))
-#----
-.PHONY: $(1)
-$(1) : lp.$(1);
-endef
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Help and diagnostics
+#
+#    ##     ## ######## ##       ########
+#    ##     ## ##       ##       ##     ##
+#    ##     ## ##       ##       ##     ##
+#    ######### ######   ##       ########
+#    ##     ## ##       ##       ##
+#    ##     ## ##       ##       ##
+#    ##     ## ######## ######## ##
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_HELP_ENABLED          =true
@@ -201,7 +225,15 @@ lp.$(strip $(1)).$(strip $(2)) $(strip $(2)).help $(if $(call lp.help.is-enabled
 endef
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Compile
+#
+#     ######   #######  ##     ## ########  #### ##       ########
+#    ##    ## ##     ## ###   ### ##     ##  ##  ##       ##
+#    ##       ##     ## #### #### ##     ##  ##  ##       ##
+#    ##       ##     ## ## ### ## ########   ##  ##       ######
+#    ##       ##     ## ##     ## ##         ##  ##       ##
+#    ##    ## ##     ## ##     ## ##         ##  ##       ##
+#     ######   #######  ##     ## ##        #### ######## ########
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_TSC_ENABLED                        =true
@@ -254,7 +286,15 @@ lp.tsc.get-command-with-hooks           =$(call lp.fn.get-command, tsc, $(1))
 LP_TSC_TARGETS                          =$(call lp.tsc.get-targets)
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Bundle
+#
+#    ########  ##     ## ##    ## ########  ##       ########
+#    ##     ## ##     ## ###   ## ##     ## ##       ##
+#    ##     ## ##     ## ####  ## ##     ## ##       ##
+#    ########  ##     ## ## ## ## ##     ## ##       ######
+#    ##     ## ##     ## ##  #### ##     ## ##       ##
+#    ##     ## ##     ## ##   ### ##     ## ##       ##
+#    ########   #######  ##    ## ########  ######## ########
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_BUNDLE_ENABLED                     =$(if $(LP_SETTINGS_BUNDLER),true)
@@ -372,15 +412,16 @@ lp.bundle.get-command-with-hooks        =$(call lp.fn.get-command, bundle, $(1))
 
 LP_BUNDLE_TARGETS                       =$(call lp.bundle.get-targets)
 
-
-
-
-
-
-
-
 #-----------------------------------------------------------------------------------------------------------------------
-# Format
+#
+#    ########  #######  ########  ##     ##    ###    ########
+#    ##       ##     ## ##     ## ###   ###   ## ##      ##
+#    ##       ##     ## ##     ## #### ####  ##   ##     ##
+#    ######   ##     ## ########  ## ### ## ##     ##    ##
+#    ##       ##     ## ##   ##   ##     ## #########    ##
+#    ##       ##     ## ##    ##  ##     ## ##     ##    ##
+#    ##        #######  ##     ## ##     ## ##     ##    ##
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_FORMAT_ENABLED                     =$(if $(LP_SETTINGS_FORMATTER),true)
@@ -434,9 +475,9 @@ lp.format.get-name                      =Format
 lp.format.get-description               =format sources with $(LP_SETTINGS_FORMATTER)
 lp.format.is-enabled                    =$(strip $(__LP_FORMAT_ENABLED))
 lp.format.get-default-prerequisites     =<n/a>
-lp.format.get-prerequisites             =<n/a>
+lp.format.get-prerequisites             =
 lp.format.get-default-targets           =<n/a>
-lp.format.get-targets                   =<n/a>
+lp.format.get-targets                   =
 lp.format.get-default-before-hook       =$(strip $(__LP_FORMAT_DEFAULT_BEFORE_HOOKS))
 lp.format.get-before-hooks              =$(strip $(__LP_FORMAT_EFFECTIVE_BEFORE_HOOKS))
 lp.format.get-default-after-hook        =$(strip $(__LP_FORMAT_DEFAULT_AFTER_HOOKS))
@@ -447,40 +488,53 @@ lp.format.get-command-with-hooks        =$(call lp.fn.get-command, format, $(1))
 lp.format.get-default-files             =$(sort $(strip $(__LP_FORMAT_DEFAULT_FILES)))
 lp.format.get-files                     =$(wildcard $(sort $(strip $(__LP_FORMAT_EFFECTIVE_FILES))))
 
-# #-----------------------------------------------------------------------------------------------------------------------
-# # Clean
-# #-----------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#     ######  ##       ########    ###    ##    ##
+#    ##    ## ##       ##         ## ##   ###   ##
+#    ##       ##       ##        ##   ##  ####  ##
+#    ##       ##       ######   ##     ## ## ## ##
+#    ##       ##       ##       ######### ##  ####
+#    ##    ## ##       ##       ##     ## ##   ###
+#     ######  ######## ######## ##     ## ##    ##
+#
+#-----------------------------------------------------------------------------------------------------------------------
 
-# __LP_CLEAN_ENABLED                      =true
-# __LP_CLEAN_DEFAULT_COMMAND              =rm -rf $(call lp.clean.get-files)
-# __LP_CLEAN_EFFECTIVE_COMMAND            =$(__LP_CLEAN_DEFAULT_COMMAND)
-# __LP_CLEAN_FILES                        =$(__LP_HOME_DIR)/.tsbuildinfo.tmp
+__LP_CLEAN_ENABLED                      =true
+__LP_CLEAN_DEFAULT_COMMAND              =rm -rf $(call lp.clean.get-files)
+__LP_CLEAN_EFFECTIVE_COMMAND            =$(__LP_CLEAN_DEFAULT_COMMAND)
+__LP_CLEAN_FILES                        =.launchpad/NON_EXISTENT_FILE
+__LP_CLEAN_DELETE_BUNDLES               =
 
-# lp.clean.disable                        =$(call lp.fn.var.erase, __LP_CLEAN_ENABLED)
-# lp.clean.overwrite-command              =$(call lp.fn.assert.param-not-empty, lp.clean.overwrite-command, $(1)) \
-#                                          $(call lp.fn.var.assign, __LP_CLEAN_EFFECTIVE_COMMAND, $(1))
-# lp.clean.remove-tsc-output-directory    =$(call lp.clean.add-files, $(LP_SETTINGS_TSC_OUT_DIR))
-# lp.clean.remove-bundle-output-directory =$(call lp.clean.add-files, $(LP_SETTINGS_BUNDLER_OUT_DIR))
-# lp.clean.remove-bundles                 =$(foreach file, $(call lp.bundle.get-bundle-names), \
-#                                              $(foreach extension, js js.map d.ts, \
-#                                                  $(call lp.clean.add-files, $(patsubst %.js, %.$(extension), $(file))) \
-#                                              ) \
-#                                          )
-# lp.clean.remove-files                   =$(call lp.fn.var.append, __LP_CLEAN_FILES, $(1))
+lp.clean.disable                        =$(call lp.fn.var.erase, __LP_CLEAN_ENABLED)
+lp.clean.overwrite-command              =$(call lp.fn.assert.param-not-empty, lp.clean.overwrite-command, $(1)) \
+                                         $(call lp.fn.var.assign, __LP_CLEAN_EFFECTIVE_COMMAND, $(1))
 
-# lp.clean.get-phony-targets              =clean
-# lp.clean.get-name                       =Clean
-# lp.clean.get-description                =delete temporary files
-# lp.clean.is-enabled                     =$(strip $(__LP_CLEAN_ENABLED))
-# lp.clean.get-default-prerequisites      =<n/a>
-# lp.clean.get-prerequisites              =<n/a>
-# lp.clean.get-default-targets            =<n/a>
-# lp.clean.get-targets                    =<n/a>
-# lp.clean.get-default-before-hooks       =<n/a>
-# lp.clean.get-before-hooks               =<n/a>
-# lp.clean.get-default-after-hooks        =<n/a>
-# lp.clean.get-after-hooks                =<n/a>
-# lp.clean.get-default-command            =$(if $(1), echo $(1) && )$(strip $(__LP_CLEAN_DEFAULT_COMMAND))
-# lp.clean.get-effective-command          =$(strip $(__LP_CLEAN_EFFECTIVE_COMMAND))
-# lp.clean.get-command-with-hooks         =$(call lp.fn.get-command, clean, $(1))
-# lp.clean.get-files                      =$(strip $(__LP_CLEAN_FILES))
+lp.clean.npm-packages                   =$(call lp.clean.files, node_modules)
+lp.clean.tsc-output                     =$(call lp.clean.files, $(if $(strip $(LP_SETTINGS_TSC_OUT_DIR)), $(LP_SETTINGS_TSC_OUT_DIR), $(__LP_TSC_BUILDINFO)))
+lp.clean.bundles                        =$(call lp.fn.var.assign, __LP_CLEAN_DELETE_BUNDLES, true)
+lp.clean.files                          =$(call lp.fn.var.append, __LP_CLEAN_FILES, $(1))
+
+lp.clean.get-phony-targets              =clean
+lp.clean.get-name                       =Clean
+lp.clean.get-description                =delete temporary files
+lp.clean.is-enabled                     =$(strip $(__LP_CLEAN_ENABLED))
+lp.clean.get-default-prerequisites      =<n/a>
+lp.clean.get-prerequisites              =
+lp.clean.get-default-targets            =<n/a>
+lp.clean.get-targets                    =
+lp.clean.get-default-before-hooks       =<n/a>
+lp.clean.get-before-hooks               =
+lp.clean.get-default-after-hooks        =<n/a>
+lp.clean.get-after-hooks                =
+lp.clean.get-default-command            =$(if $(1), echo $(1) && )$(strip $(__LP_CLEAN_DEFAULT_COMMAND))
+lp.clean.get-effective-command          =$(strip $(__LP_CLEAN_EFFECTIVE_COMMAND))
+lp.clean.get-command-with-hooks         =$(call lp.fn.get-command, clean, $(1))
+lp.clean.get-files                      =$(strip $(sort \
+                                             $(__LP_CLEAN_FILES) \
+                                             $(if $(__LP_CLEAN_DELETE_BUNDLES), \
+                                                  $(call lp.bundle.get-targets) \
+                                                  $(patsubst %.js, %.d.ts, $(call lp.bundle.get-targets)) \
+                                                  $(patsubst %.js, %.js.map, $(call lp.bundle.get-targets)) \
+                                              ) \
+                                          ))

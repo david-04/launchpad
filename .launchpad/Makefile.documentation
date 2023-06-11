@@ -83,3 +83,12 @@ $(call lp.format.overwrite-command       , rome -w   ) # overwrite the command i
 
 $(call lp.bundle.get-command-with-hooks  , Format... ) # get the command with all hooks (with an optional "echo")
 $(call lp.bundle.get-default-command     , Format... ) # get the built-in command (with an optional "echo")
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Clean
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.clean.npm-packages                         ) # delete node_modules
+$(call lp.clean.tsc-output                           ) # delete transpiled JavaScript files
+$(call lp.clean.bundles                              ) # delete bundles
+$(call lp.clean.files, output.log dist               ) # delete the given files and directories

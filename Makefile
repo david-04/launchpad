@@ -71,16 +71,14 @@ $(call lp.format.exclude, src/resources/tsconfig-templates.ts)
 # Uplift
 #-----------------------------------------------------------------------------------------------------------------------
 
-# not miplemented yet
+# not implemented yet
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Clean
 #-----------------------------------------------------------------------------------------------------------------------
 
-# # $(call lp.clean.add-bundles)
-# # $(call lp.clean.add-bundle-output-directory)
-# $(call lp.clean.add-tsc-output-directory)
-# $(call lp.clean.add-files, resources/tsconfig/tsconfig.*.json)
+$(call lp.clean.tsc-output)
+$(call lp.clean.bundles)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Run
