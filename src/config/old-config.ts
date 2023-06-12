@@ -7,15 +7,15 @@ import { Version } from "./version.js";
 
 export interface OldConfig {
     version?: ReturnType<typeof parseVersion>;
-    runtime?: ReturnType<typeof parseRuntime>;
     artifact?: ReturnType<typeof parseArtifact>;
+    runtime?: ReturnType<typeof parseRuntime>;
     module?: ReturnType<typeof parseModule>;
-    srcDir?: ReturnType<typeof parseSrcDir>;
-    tscOutDir?: ReturnType<typeof parseTscOutDir>;
-    bundlerOutDir?: ReturnType<typeof parseBundlerOutDir>;
     bundler?: ReturnType<typeof parseBundler>;
+    bundlerDts?: ReturnType<typeof parseBundlerDts>;
     formatter?: ReturnType<typeof parseFormatter>;
     packageManager?: ReturnType<typeof parsePackageManager>;
+    srcDir?: ReturnType<typeof parseSrcDir>;
+    tscOutDir?: ReturnType<typeof parseTscOutDir>;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ export function loadConfigFile(configFile: Path, properties: Properties) {
     const errors = new Array<ErrorLine>();
     const fileContent = configFile.loadFileContents();
     const rawLines = fileContent.split(/\r?\n/).map((line, index) => ({ lineNumber: index + 1, content: line.trim() }));
-    const relevantLines = rawLines.filter((line) => line.content.match(/^[^#]/));
+    const relevantLines = rawLines.filter(line => line.content.match(/^[^#]/));
     const keyValues = splitLines(relevantLines, errors);
     const config = keyValues.reduce<OldConfig>((config, line) => reduceLine(properties, config, line, errors), {});
     return { config, errors };
@@ -51,7 +51,7 @@ export function loadConfigFile(configFile: Path, properties: Properties) {
 
 function splitLines(lines: ReadonlyArray<Line>, errors: Array<ErrorLine>) {
     const result = new Array<SplitLine>();
-    for (const line of lines) {
+    for (const line of removeComments(lines)) {
         try {
             result.push(splitLine(line));
         } catch (error: unknown) {
@@ -59,6 +59,14 @@ function splitLines(lines: ReadonlyArray<Line>, errors: Array<ErrorLine>) {
         }
     }
     return result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Remove comments from the line
+//----------------------------------------------------------------------------------------------------------------------
+
+function removeComments(lines: ReadonlyArray<Line>) {
+    return lines.map(line => ({ ...line, content: line.content.replace(/#.*/, "").trim() }));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,9 +89,9 @@ function splitLine(line: Line) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function reduceLine(properties: Properties, config: OldConfig, line: SplitLine, errors: Array<ErrorLine>) {
-    const property = properties.filter((property) => property.key === line.key)[0];
+    const property = properties.filter(property => property.key === line.key)[0];
     if (property) {
-        return property.parse(line, errors);
+        return { ...config, ...property.parse(line, errors) };
     } else {
         errors.push({ ...line, error: `Unknown property ${line.key}` });
         return config;
@@ -135,10 +143,11 @@ function directoryParser(mode: "mandatory" | "optional") {
 // Enum parsers
 //----------------------------------------------------------------------------------------------------------------------
 
-export const parseRuntime = enumParser(["node", "web"] as const);
 export const parseArtifact = enumParser(["app", "lib"] as const);
+export const parseRuntime = enumParser(["node", "web"] as const);
 export const parseModule = enumParser(["cjs", "esm"] as const);
 export const parseBundler = enumParser(["none", "esbuild"] as const);
+export const parseBundlerDts = enumParser(["none", "dts-bundle-generator"] as const);
 export const parseFormatter = enumParser(["none", "prettier", "rome"] as const);
 export const parsePackageManager = enumParser(["npm", "pnpm", "yarn"] as const);
 

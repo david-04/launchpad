@@ -298,7 +298,7 @@ LP_TSC_TARGETS                          =$(call lp.tsc.get-targets)
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_BUNDLE_ENABLED                     =$(if $(LP_SETTINGS_BUNDLER),true)
-__LP_BUNDLE_DEFAULT_PREREQUISITES       =$(call lp.tsc.get-prerequisites) $(__LP_MAKEFILES_AND_SETTINGS)
+__LP_BUNDLE_DEFAULT_PREREQUISITES       =$(call lp.tsc.get-targets) $(__LP_MAKEFILES_AND_SETTINGS)
 __LP_BUNDLE_EFFECTIVE_PREREQUISITES     =$(call lp.bundle.get-default-prerequisites)
 __LP_BUNDLE_DEFAULT_TARGETS             =
 __LP_BUNDLE_EFFECTIVE_TARGETS           =$(__LP_BUNDLE_DEFAULT_TARGETS)
