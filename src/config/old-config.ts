@@ -23,12 +23,13 @@ export interface OldConfig {
 //----------------------------------------------------------------------------------------------------------------------
 
 type Line = { lineNumber: number; content: string };
-type ErrorLine = Line & { error: string };
+type ErrorLine = (Line & { error: string }) | { error: string };
 type SplitLine = Line & { key: string; value: string };
 
 type Properties = ReadonlyArray<{
     key: string;
     parse: (line: SplitLine, errors: Array<ErrorLine>) => OldConfig;
+    mandatory: boolean;
 }>;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -42,6 +43,7 @@ export function loadConfigFile(configFile: Path, properties: Properties) {
     const relevantLines = rawLines.filter(line => line.content.match(/^[^#]/));
     const keyValues = splitLines(relevantLines, errors);
     const config = keyValues.reduce<OldConfig>((config, line) => reduceLine(properties, config, line, errors), {});
+    checkMandatoryProperties(properties, keyValues, errors);
     return { config, errors };
 }
 
@@ -111,6 +113,18 @@ export function createParser<T>(parse: (key: string, value: string) => T, reduce
             return {};
         }
     };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Check if all mandatory properties are set
+//----------------------------------------------------------------------------------------------------------------------
+
+function checkMandatoryProperties(properties: Properties, keyValues: readonly SplitLine[], errors: ErrorLine[]) {
+    for (const property of properties) {
+        if (property.mandatory && !keyValues.find(item => item.key === property.key)) {
+            errors.push({ error: `Property ${property.key} is missing` });
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
