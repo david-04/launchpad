@@ -6,6 +6,7 @@ import { Version } from "./version.js";
 //----------------------------------------------------------------------------------------------------------------------
 
 export interface OldConfig {
+    projectName?: ReturnType<typeof parseProjectName>;
     version?: ReturnType<typeof parseVersion>;
     artifact?: ReturnType<typeof parseArtifact>;
     runtime?: ReturnType<typeof parseRuntime>;
@@ -37,14 +38,20 @@ type Properties = ReadonlyArray<{
 //----------------------------------------------------------------------------------------------------------------------
 
 export function loadConfigFile(configFile: Path, properties: Properties) {
-    const errors = new Array<ErrorLine>();
-    const fileContent = configFile.loadFileContents();
-    const rawLines = fileContent.split(/\r?\n/).map((line, index) => ({ lineNumber: index + 1, content: line.trim() }));
-    const relevantLines = rawLines.filter(line => line.content.match(/^[^#]/));
-    const keyValues = splitLines(relevantLines, errors);
-    const config = keyValues.reduce<OldConfig>((config, line) => reduceLine(properties, config, line, errors), {});
-    checkMandatoryProperties(properties, keyValues, errors);
-    return { config, errors };
+    if (configFile.existsAndIsFile()) {
+        const errors = new Array<ErrorLine>();
+        const fileContent = configFile.loadFileContents();
+        const rawLines = fileContent
+            .split(/\r?\n/)
+            .map((line, index) => ({ lineNumber: index + 1, content: line.trim() }));
+        const relevantLines = rawLines.filter(line => line.content.match(/^[^#]/));
+        const keyValues = splitLines(relevantLines, errors);
+        const config = keyValues.reduce<OldConfig>((config, line) => reduceLine(properties, config, line, errors), {});
+        checkMandatoryProperties(properties, keyValues, errors);
+        return { config, errors };
+    } else {
+        return undefined;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,14 +143,14 @@ export function parseVersion(_key: string, value: string) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Directory parsers
+// String and directory parsers
 //----------------------------------------------------------------------------------------------------------------------
 
-export const parseSrcDir = directoryParser("mandatory");
-export const parseTscOutDir = directoryParser("mandatory");
-export const parseBundlerOutDir = directoryParser("optional");
+export const parseProjectName = stringParser("mandatory");
+export const parseSrcDir = stringParser("mandatory");
+export const parseTscOutDir = stringParser("mandatory");
 
-function directoryParser(mode: "mandatory" | "optional") {
+function stringParser(mode: "mandatory" | "optional") {
     return (key: string, value: string) => {
         if (value || "optional" === mode) {
             return value;

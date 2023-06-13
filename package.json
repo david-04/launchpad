@@ -12,5 +12,9 @@
         "endOfLine": "lf",
         "trailingComma": "es5",
         "useTabs": false
+    },
+    "dependencies": {
+        "@types/prompts": "^2.4.4",
+        "prompts": "^2.4.2"
     }
 }

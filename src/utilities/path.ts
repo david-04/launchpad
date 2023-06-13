@@ -23,7 +23,7 @@ export class Path {
     private static normalize(path: string) {
         const normalized = normalize(resolve(path));
         return normalized.match(/^[a-z]:/i)
-            ? normalized.substring(0, 1).toUpperCase() + normalized.substring(1)
+            ? normalized.substring(0, 1).toUpperCase() + normalized.substring(1).replace(/\\/g, "/")
             : normalized;
     }
 

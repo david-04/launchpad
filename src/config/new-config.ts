@@ -5,7 +5,8 @@ import type { Version } from "./version.js";
 //----------------------------------------------------------------------------------------------------------------------
 
 export interface NewConfig {
-    version: Version;
+    projectName: ProjectName;
+    version: VersionProperty;
     artifact: Artifact;
     runtime: Runtime;
     module: Module;
@@ -13,8 +14,8 @@ export interface NewConfig {
     bundlerDts: BundlerDts;
     formatter: Formatter;
     packageManager: PackageManager;
-    SrcDir: SrcDir;
-    TscOutDir: string;
+    srcDir: SrcDir;
+    tscOutDir: TscOutDir;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -51,6 +52,7 @@ class EnumPropertyFactory<T extends string> extends PropertyFactory<T> {
 // Property factories and types
 //----------------------------------------------------------------------------------------------------------------------
 
+export const ProjectName = new NonEnumPropertyFactory<string>();
 export const VersionProperty = new NonEnumPropertyFactory<Version>();
 export const Artifact = new EnumPropertyFactory(["app", "lib"] as const);
 export const Runtime = new EnumPropertyFactory(["node", "ts-node", "web"] as const);
@@ -62,13 +64,25 @@ export const PackageManager = new EnumPropertyFactory(["npm", "pnpm", "yarn"] as
 export const SrcDir = new NonEnumPropertyFactory<string>();
 export const TscOutDir = new NonEnumPropertyFactory<string>();
 
-export type VersionProperty = (typeof Version)["of"];
-export type Artifact = (typeof Artifact)["pinned"];
-export type Runtime = (typeof Runtime)["pinned"];
-export type Module = (typeof Module)["pinned"];
-export type Bundler = (typeof Bundler)["pinned"];
-export type BundlerDts = (typeof BundlerDts)["pinned"];
-export type Formatter = (typeof Formatter)["pinned"];
-export type PackageManager = (typeof PackageManager)["pinned"];
-export type SrcDir = (typeof SrcDir)["of"];
-export type TscOutDir = (typeof TscOutDir)["of"];
+export type ProjectName = ReturnType<(typeof ProjectName)["of"]>;
+export type VersionProperty = ReturnType<(typeof VersionProperty)["of"]>;
+export type Artifact = ReturnType<(typeof Artifact)["pinned"]>;
+export type Runtime = ReturnType<(typeof Runtime)["pinned"]>;
+export type Module = ReturnType<(typeof Module)["pinned"]>;
+export type Bundler = ReturnType<(typeof Bundler)["pinned"]>;
+export type BundlerDts = ReturnType<(typeof BundlerDts)["pinned"]>;
+export type Formatter = ReturnType<(typeof Formatter)["pinned"]>;
+export type PackageManager = ReturnType<(typeof PackageManager)["pinned"]>;
+export type SrcDir = ReturnType<(typeof SrcDir)["of"]>;
+export type TscOutDir = ReturnType<(typeof TscOutDir)["of"]>;
+
+//----------------------------------------------------------------------------------------------------------------------
+// Create a selector to extract new config properties
+//----------------------------------------------------------------------------------------------------------------------
+
+export function createExtractor(extract: (config: NewConfig) => { stringValue: string; comment: string | undefined }) {
+    return (config: NewConfig) => {
+        const property = extract(config);
+        return { value: property.stringValue, comment: property.comment };
+    };
+}
