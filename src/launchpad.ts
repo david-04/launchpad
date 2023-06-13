@@ -62,13 +62,10 @@ async function findAndInvokeHandler(argument: string | undefined, options: Reado
         fail(`Invalid command: ${argument}\nTry launchpad --help for more information`);
     } else if (rest.length) {
         fail(`Found more than one handler for command ${argument}`);
-    } else if (options.length) {
-        fail(`Command ${argument} does not support command line options`);
     } else {
-        command;
         const projectRoot = new Path(command.getProjectRootDirectory());
         const configFile = getConfigFilePath(projectRoot);
-        return command.execute(projectRoot, configFile);
+        return command.execute(projectRoot, configFile, options);
     }
 }
 

@@ -1,5 +1,7 @@
 import type { Version } from "./version.js";
 
+export type Library = "@types/node";
+
 //----------------------------------------------------------------------------------------------------------------------
 // The new target configuration
 //----------------------------------------------------------------------------------------------------------------------
@@ -16,6 +18,7 @@ export interface NewConfig {
     packageManager: PackageManager;
     srcDir: SrcDir;
     tscOutDir: TscOutDir;
+    libraries: ReadonlyArray<Library>;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -37,7 +40,7 @@ class NonEnumPropertyFactory<T extends Version | string> extends PropertyFactory
 }
 
 class EnumPropertyFactory<T extends string> extends PropertyFactory<T> {
-    public constructor(private readonly allowedValues: ReadonlyArray<T>) {
+    public constructor(public readonly allowedValues: ReadonlyArray<T>) {
         super();
     }
 

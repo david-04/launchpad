@@ -24,7 +24,7 @@ export type TemplateConfig = Omit<{ [K in keyof NewConfig]: undefined | NewConfi
 // Project templates
 //----------------------------------------------------------------------------------------------------------------------
 
-const SHARED_PRESETS: Omit<TemplateConfig, "template" | "runtime" | "title" | "description"> = {
+const SHARED_PRESETS: Omit<TemplateConfig, "template" | "runtime" | "title" | "description" | "libraries"> = {
     artifact: Artifact.unpinned("app"),
     module: Module.unpinned("esm"),
     bundler: Bundler.unpinned("esbuild"),
@@ -37,25 +37,28 @@ const SHARED_PRESETS: Omit<TemplateConfig, "template" | "runtime" | "title" | "d
 
 export const TemplateConfig = {
     CLI: {
-        title: "Node CLI script",
+        title: "command-line script",
         description: undefined,
         ...SHARED_PRESETS,
         runtime: Runtime.unpinned("node"),
+        libraries: ["@types/node"],
     },
-    PREACT: {
-        ...SHARED_PRESETS,
-        title: "Plain web app",
-        description: undefined,
-        runtime: Runtime.unpinned("web"),
-    },
+    // PREACT: {
+    //     ...SHARED_PRESETS,
+    //     title: "Plain web app",
+    //     description: undefined,
+    //     runtime: Runtime.unpinned("web"),
+    //     libraries: ["preact"],
+    // },
     WEB: {
         ...SHARED_PRESETS,
-        title: "Preact web app",
+        title: "web app",
         description: undefined,
-        runtime: Runtime.unpinned("node"),
+        runtime: Runtime.unpinned("web"),
+        libraries: [],
     },
     CUSTOM: {
-        title: "Custom",
+        title: "custom",
         description: "Configure all options individually",
         artifact: undefined,
         runtime: undefined,
@@ -66,12 +69,13 @@ export const TemplateConfig = {
         packageManager: undefined,
         srcDir: undefined,
         tscOutDir: undefined,
+        libraries: undefined,
     },
 } as const satisfies { [index: string]: TemplateConfig };
 
 export const AllProjectTemplates = [
     TemplateConfig.CLI,
     TemplateConfig.WEB,
-    TemplateConfig.PREACT,
+    // TemplateConfig.PREACT,
     TemplateConfig.CUSTOM,
 ];

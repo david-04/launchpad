@@ -9,6 +9,7 @@ import {
     PackageManager,
     Runtime,
     VersionProperty,
+    type Library,
 } from "../../config/new-config.js";
 import type { OldConfig } from "../../config/old-config.js";
 import { AllProjectTemplates, type TemplateConfig } from "../../config/template-config.js";
@@ -37,10 +38,10 @@ export async function getNewConfig(projectRoot: Path, oldConfig: OldConfig | und
     const bundlerDts = templateConfig?.bundlerDts ?? (await getBundlerDts(oldConfig, bundler));
     const formatter = templateConfig?.formatter ?? (await getFormatter(oldConfig));
     const packageManager = templateConfig?.packageManager ?? (await getPackageManager(oldConfig));
-
-    // LP_SETTINGS_SRC_DIR         = src                       # mandatory
-    // LP_SETTINGS_TSC_OUT_DIR     = build                     # mandatory unless building a non-bundle app for ts-node
-
+    const srcDir = templateConfig?.srcDir ?? (await getSrcDir(oldConfig));
+    const tscOutDir = templateConfig?.srcDir ?? (await getTscOutDir(oldConfig));
+    const libraries = templateConfig?.libraries ?? (await getLibraries(runtime));
+    const installDevToolsLocally = await getInstallDevToolsLocally();
     return {
         version,
         projectName,
@@ -52,6 +53,10 @@ export async function getNewConfig(projectRoot: Path, oldConfig: OldConfig | und
         bundlerDts,
         formatter,
         packageManager,
+        srcDir,
+        tscOutDir,
+        libraries,
+        installDevToolsLocally,
     };
 }
 
@@ -87,8 +92,8 @@ async function getTemplateConfig(oldConfig: OldConfig | undefined) {
 
 async function getArtifact(oldConfig: OldConfig | undefined) {
     const choices = toChoice(
-        ["Application", undefined, Artifact.unpinned("app")],
-        ["Library", undefined, Artifact.unpinned("lib")]
+        ["application", undefined, Artifact.unpinned("app")],
+        ["library", undefined, Artifact.unpinned("lib")]
     );
     const initial = oldConfig?.artifact?.value === "lib" ? 1 : 0;
     return prompt<Artifact>({ type: "select", message: "Artifact", choices, initial });
@@ -102,7 +107,7 @@ async function getRuntime(oldConfig: OldConfig | undefined, artifact: Artifact) 
     const cliDescription = artifact.value === "app" ? "Command-line application" : "Library for command-line scripts";
     const webDescription = artifact.value === "app" ? "Web application" : "Browser library";
     const choices = toChoice(
-        ["node", cliDescription, Runtime.unpinned("node")],
+        ["cli", cliDescription, Runtime.unpinned("node")],
         ["web", webDescription, Runtime.unpinned("web")]
     );
     const initial = oldConfig?.runtime?.value === "web" ? 1 : 0;
@@ -115,8 +120,8 @@ async function getRuntime(oldConfig: OldConfig | undefined, artifact: Artifact) 
 
 async function getModule(oldConfig: OldConfig | undefined) {
     const choices = toChoice(
-        ["CommonJS", undefined, Module.unpinned("cjs")],
-        ["ECMAScript modules", undefined, Module.unpinned("esm")]
+        ["cjs", "CommonJS", Module.unpinned("cjs")],
+        ["esm", "ECMAScript modules", Module.unpinned("esm")]
     );
     const initial = oldConfig?.module?.value === "cjs" ? 0 : 1;
     return prompt<Module>({ type: "select", message: "Module type", choices, initial });
@@ -181,6 +186,73 @@ async function getPackageManager(oldConfig: OldConfig | undefined) {
     );
     const initial = findMatchingChoice(choices, oldConfig?.packageManager, 0);
     return prompt<Formatter>({ type: "select", message: "Package manager", choices, initial });
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Get the source directory
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getSrcDir(oldConfig: OldConfig | undefined) {
+    const message = "The path must be a valid relative path and not contain blanks or special characters";
+    return prompt<string>({
+        type: "text",
+        initial: oldConfig?.srcDir?.trim() || "src",
+        message: "Source directory",
+        format: input => input.trim().replace(/^\.\//g, "").replace(/\/+$/, "").replace(/\\/g, "/"),
+        validate: value => (!!value.match(/^[^:*?<> \s]+$/) && !value.match(/^(\/|[a-z]:)/i)) || message,
+    });
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Get the output directory for transpiled JavaScript files
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getTscOutDir(oldConfig: OldConfig | undefined) {
+    const message = "The path must be a valid relative path and not contain blanks or special characters";
+    return prompt<string>({
+        type: "text",
+        initial: oldConfig?.tscOutDir?.trim() || "build",
+        message: "tsc output directory",
+        format: input => input.trim().replace(/^\.\//g, "").replace(/\/+$/, "").replace(/\\/g, "/"),
+        validate: value => (!!value.match(/^[^:*?<> \s]+$/) && !value.match(/^(\/|[a-z]:)/i)) || message,
+    });
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Select libraries to install
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getLibraries(runtime: Runtime) {
+    const choices = toChoice([
+        "@types/node",
+        "Typings for Node.js",
+        "@types/node" satisfies Library,
+        runtime.value !== "web",
+    ]);
+    return prompt<ReadonlyArray<Library>>({
+        type: "multiselect",
+        message: "Libraries",
+        choices,
+        instructions: false,
+        hint: "Use [SPACE] to select/deselect",
+    });
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Select if development tools are to be installed locally
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getInstallDevToolsLocally() {
+    const choices = toChoice(
+        ["install locally", "Install compiler/bundler/formatter locally", true],
+        ["use globally installed", "Use globally installed compiler/bundler/formatter", true]
+    );
+    return prompt<boolean>({
+        type: "select",
+        message: "Dev dependencies",
+        choices,
+        initial: choices.length - 1,
+    });
 }
 
 //----------------------------------------------------------------------------------------------------------------------

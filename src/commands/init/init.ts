@@ -7,7 +7,7 @@ import { getNewConfig } from "./config-wizard.js";
 // Initialize a new project
 //----------------------------------------------------------------------------------------------------------------------
 
-export async function init(projectRoot: Path, configFile: Path) {
+export async function init(projectRoot: Path, configFile: Path, _options: ReadonlyArray<string>) {
     const oldConfig = loadConfigFile(configFile, CONFIG_PROPERTIES)?.config;
     const newConfig = await getNewConfig(projectRoot, oldConfig);
     console.log(newConfig);
