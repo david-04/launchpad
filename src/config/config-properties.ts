@@ -20,15 +20,15 @@ import {
 
 export const CONFIG_PROPERTIES = [
     {
-        key: "LP_SETTINGS_PROJECT_NAME",
-        parse: createParser(parseProjectName, projectName => ({ projectName })),
-        extract: createExtractor(config => config.projectName),
-        mandatory: true,
-    },
-    {
         key: "LP_SETTINGS_VERSION",
         parse: createParser(parseVersion, version => ({ version })),
         extract: createExtractor(config => config.version),
+        mandatory: true,
+    },
+    {
+        key: "LP_SETTINGS_PROJECT_NAME",
+        parse: createParser(parseProjectName, projectName => ({ projectName })),
+        extract: createExtractor(config => config.projectName),
         mandatory: true,
     },
     {

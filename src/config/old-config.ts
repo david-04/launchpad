@@ -167,9 +167,9 @@ function stringParser(mode: "mandatory" | "optional") {
 export const parseArtifact = enumParser(["app", "lib"] as const);
 export const parseRuntime = enumParser(["node", "web"] as const);
 export const parseModule = enumParser(["cjs", "esm"] as const);
-export const parseBundler = enumParser(["none", "esbuild"] as const);
-export const parseBundlerDts = enumParser(["none", "dts-bundle-generator"] as const);
-export const parseFormatter = enumParser(["none", "prettier", "rome"] as const);
+export const parseBundler = enumParser(["disabled", "esbuild"] as const);
+export const parseBundlerDts = enumParser(["disabled", "dts-bundle-generator"] as const);
+export const parseFormatter = enumParser(["disabled", "prettier", "rome"] as const);
 export const parsePackageManager = enumParser(["npm", "pnpm", "yarn"] as const);
 
 function enumParser<T extends string>(allowedValues: ReadonlyArray<T>) {

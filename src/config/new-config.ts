@@ -42,7 +42,7 @@ class EnumPropertyFactory<T extends string> extends PropertyFactory<T> {
     }
 
     public pinned(value: T) {
-        return this.create(value, false, this.allowedValues.join(", "));
+        return this.create(value, true, this.allowedValues.join(", "));
     }
 
     public unpinned(value: T) {

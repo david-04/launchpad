@@ -28,7 +28,7 @@ const SHARED_PRESETS: Omit<TemplateConfig, "template" | "runtime" | "title" | "d
     artifact: Artifact.unpinned("app"),
     module: Module.unpinned("esm"),
     bundler: Bundler.unpinned("esbuild"),
-    bundlerDts: BundlerDts.unpinned("dts-bundle-generator"),
+    bundlerDts: BundlerDts.unpinned("disabled"),
     formatter: Formatter.unpinned("prettier"),
     packageManager: PackageManager.unpinned("yarn"),
     srcDir: SrcDir.of("src"),
