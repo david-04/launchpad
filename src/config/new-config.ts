@@ -23,6 +23,8 @@ export interface NewConfig {
 //----------------------------------------------------------------------------------------------------------------------
 
 class PropertyFactory<T> {
+    public constructor() {}
+
     protected create(value: T, pinned: boolean, comment?: string) {
         return { comment, value, pinned, stringValue: `${value}`.trim() + (pinned ? "::pinned" : "") } as const;
     }
