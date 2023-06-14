@@ -1,5 +1,4 @@
-import { CONFIG_PROPERTIES } from "../../config/config-properties.js";
-import { loadConfigFile } from "../../config/old-config.js";
+import { loadConfigFile } from "../../config/load-config.js";
 import type { Path } from "../../utilities/path.js";
 import { getNewConfig } from "./config-wizard.js";
 
@@ -8,7 +7,7 @@ import { getNewConfig } from "./config-wizard.js";
 //----------------------------------------------------------------------------------------------------------------------
 
 export async function init(projectRoot: Path, configFile: Path, _options: ReadonlyArray<string>) {
-    const oldConfig = loadConfigFile(configFile, CONFIG_PROPERTIES)?.config;
-    const newConfig = await getNewConfig(projectRoot, oldConfig);
-    console.log(newConfig);
+    const oldConfig = loadConfigFile(configFile);
+    console.log(oldConfig);
+    /*const newConfig =*/ await getNewConfig(projectRoot, oldConfig?.config);
 }
