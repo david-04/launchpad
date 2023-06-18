@@ -1,7 +1,7 @@
 import type { AddError, ConfigFileProperty } from "./config-data-types.js";
 import {
     createNonPinnableEnumProperty,
-    createProperty,
+    createPinnableEnumProperty,
     createStringProperty,
     createVersionProperty,
 } from "./config-descriptor-factories.js";
@@ -12,6 +12,7 @@ import { createDirectoryParser, parseProjectName } from "./config-parsers.js";
 //----------------------------------------------------------------------------------------------------------------------
 
 export const CurrentConfigProperties = {
+    //
     //------------------------------------------------------------------------------------------------------------------
     // Version number
     //------------------------------------------------------------------------------------------------------------------
@@ -106,25 +107,69 @@ export const CurrentConfigProperties = {
     // Bundler
     //------------------------------------------------------------------------------------------------------------------
 
-    bundler: createProperty(),
+    bundler: createPinnableEnumProperty({
+        configFile: {
+            currentKey: "LP_SETTINGS_BUNDLER",
+            newConfigObjectName: "bundler",
+        },
+        commandLine: {
+            option: "--bundler",
+            description: "the bundler",
+        },
+        currentValues: [["esbuild"], ["disabled", "don't use bundling"]] as const,
+        obsoleteValues: [] as const,
+    }),
 
     //------------------------------------------------------------------------------------------------------------------
     // DTS Bundler
     //------------------------------------------------------------------------------------------------------------------
 
-    dtsBundler: createProperty(),
+    dtsBundler: createPinnableEnumProperty({
+        configFile: {
+            currentKey: "LP_SETTINGS_BUNDLER_DTS",
+            newConfigObjectName: "dtsBundler",
+        },
+        commandLine: {
+            option: "--dts-bundler",
+            description: "the declaration bundler for d.ts files",
+        },
+        currentValues: [["dts-bundle-generator"], ["disabled", "don't bundle declaration files"]] as const,
+        obsoleteValues: [] as const,
+    }),
 
     //------------------------------------------------------------------------------------------------------------------
     // Formatter
     //------------------------------------------------------------------------------------------------------------------
 
-    formatter: createProperty(),
+    formatter: createPinnableEnumProperty({
+        configFile: {
+            currentKey: "LP_SETTINGS_FORMATTER",
+            newConfigObjectName: "formatter",
+        },
+        commandLine: {
+            option: "--formatter",
+            description: "the code formatter",
+        },
+        currentValues: [["prettier"], ["rome"], ["disabled", "don't format sources"]] as const,
+        obsoleteValues: [] as const,
+    }),
 
     //------------------------------------------------------------------------------------------------------------------
     // Package manager
     //------------------------------------------------------------------------------------------------------------------
 
-    packageManager: createProperty(),
+    packageManager: createPinnableEnumProperty({
+        configFile: {
+            currentKey: "LP_SETTINGS_PACKAGE_MANAGER",
+            newConfigObjectName: "packageManager",
+        },
+        commandLine: {
+            option: "--package-manager",
+            description: "the Node package manager",
+        },
+        currentValues: [["npm"], ["pnpm"], ["yarn"]] as const,
+        obsoleteValues: [] as const,
+    }),
 
     //------------------------------------------------------------------------------------------------------------------
     // Source directory

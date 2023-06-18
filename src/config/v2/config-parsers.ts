@@ -1,3 +1,5 @@
+import { PINNED_SUFFIX } from "../../utilities/constants.js";
+import type { ConfigError } from "./config-data-types.js";
 import { Version } from "./version-number.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,11 +62,25 @@ export function parseVersion(value: string) {
 // Create a parser for non-pinnable enum values
 //----------------------------------------------------------------------------------------------------------------------
 
-export function createNonPinnableEnumParser<T>(allowedValues: ReadonlyArray<T>) {
+export function createNonPinnableEnumParser<T extends string>(allowedValues: ReadonlyArray<T>) {
     return (value: string) => {
         return allowedValues.some(allowed => allowed === value)
             ? (value as T)
             : error(`"${value}" is not a valid value (allowed: ${allowedValues.join(",")})`);
+    };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Create a parser for pinnable enum values
+//----------------------------------------------------------------------------------------------------------------------
+
+export function createPinnableEnumParser<T extends string>(allowedValues: ReadonlyArray<T>) {
+    const parser = createNonPinnableEnumParser(allowedValues);
+    return (value: string) => {
+        const trimmed = value.trim();
+        const pinned = trimmed.endsWith(PINNED_SUFFIX);
+        const unpinned = parser(pinned ? trimmed.substring(0, PINNED_SUFFIX.length) : trimmed);
+        return "string" === typeof unpinned ? { value: unpinned, pinned } : (unpinned as ConfigError);
     };
 }
 

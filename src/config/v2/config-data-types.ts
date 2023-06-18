@@ -43,6 +43,6 @@ export type CommandLineInfo = {
 //----------------------------------------------------------------------------------------------------------------------
 
 export type PinnableEnumValue<T> = {
-    value: T,
-    pinned: boolean
-}
+    value: T;
+    pinned: boolean;
+};

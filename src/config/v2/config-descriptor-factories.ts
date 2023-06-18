@@ -1,11 +1,13 @@
+import { DEFAULT_ENUM, PINNED_SUFFIX } from "../../utilities/constants.js";
 import type {
     AddError,
     CommandLineInfo,
     ConfigError,
     ConfigFileProperties,
+    PinnableEnumValue,
     SerializationDetails,
 } from "./config-data-types.js";
-import { createNonPinnableEnumParser, parseVersion } from "./config-parsers.js";
+import { createNonPinnableEnumParser, createPinnableEnumParser, parseVersion } from "./config-parsers.js";
 import type { Version } from "./version-number.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -40,34 +42,13 @@ type CommandLineDescriptor = {
 type CommandLineDescriptorWithPlaceholder = CommandLineDescriptor & { readonly placeholder: string };
 
 //----------------------------------------------------------------------------------------------------------------------
-// Temp
-//----------------------------------------------------------------------------------------------------------------------
-
-export function createProperty() {
-    return {
-        matchesConfigFileKey: (_key: string) => true as boolean,
-        matchesCommandLineOption: (_key: string) => true as boolean,
-        parseOldValue: (_properties: ConfigFileProperties, _addError: AddError) => "",
-        parseNewValue: (_value: string) => "",
-        serialize: (_data: unknown) => undefined as undefined | SerializationDetails,
-        commandLineInfo: undefined as undefined | CommandLineInfo,
-    };
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Create a pinnable enum property descriptor
-//----------------------------------------------------------------------------------------------------------------------
-
-export function createPinnableEnumProperty() {}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Create a non-pinnable enum property descriptor
+// Non-pinnable enums
 //----------------------------------------------------------------------------------------------------------------------
 
 type NonPinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
     readonly configFile?: ConfigFileDescriptor<KEY>;
     readonly commandLine?: CommandLineDescriptor;
-    readonly currentValues: ReadonlyArray<readonly [CURRENT, string]>;
+    readonly currentValues: ReadonlyArray<readonly [CURRENT, string?]>;
     readonly obsoleteValues: ReadonlyArray<OBSOLETE>;
 };
 
@@ -94,7 +75,45 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Create a string property descriptor
+// Pinnable enums
+//----------------------------------------------------------------------------------------------------------------------
+
+type PinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
+    readonly configFile?: ConfigFileDescriptor<KEY>;
+    readonly commandLine?: CommandLineDescriptor;
+    readonly currentValues: ReadonlyArray<readonly [CURRENT, string?]>;
+    readonly obsoleteValues: ReadonlyArray<OBSOLETE>;
+};
+
+export function createPinnableEnumProperty<KEY extends string, CURRENT extends string, OBSOLETE extends string>(
+    property: PinnableEnumPropertyDescriptor<KEY, CURRENT, OBSOLETE>
+) {
+    type ALL = CURRENT | OBSOLETE;
+    const allValues = [...property.currentValues.map(value => value[0]), ...property.obsoleteValues];
+    const currentValuesWithDefault = [DEFAULT_ENUM, ...property.currentValues];
+    const commandLineInfo = createCommandLineInfo(property.commandLine, `[${currentValuesWithDefault.join(" | ")}]`);
+    const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
+    const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
+    const parseOldValue = createOldValueParser<PinnableEnumValue<ALL>>(
+        matchesConfigFileKey,
+        createPinnableEnumParser(allValues)
+    );
+    const parseNewValue = createPinnableEnumParser(property.currentValues.map(value => value[0]));
+    const render = (prop: PinnableEnumValue<CURRENT>) => [prop.value, prop.pinned ? PINNED_SUFFIX : ""].join("");
+    const serialize = createSerializer<PinnableEnumValue<CURRENT>, KEY>(property.configFile, render);
+    const descriptor = {
+        commandLineInfo,
+        matchesCommandLineOption,
+        matchesConfigFileKey,
+        parseOldValue,
+        parseNewValue,
+        serialize,
+    } as const satisfies AssembledDescriptor<PinnableEnumValue<ALL>, PinnableEnumValue<CURRENT>, KEY>;
+    return { ...descriptor, options: property.currentValues };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// String properties
 //----------------------------------------------------------------------------------------------------------------------
 
 type StringPropertyDescriptor<KEY extends string> = {
@@ -122,7 +141,7 @@ export function createStringProperty<KEY extends string>(property: StringPropert
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Create a version number property descriptor
+// Version number
 //----------------------------------------------------------------------------------------------------------------------
 
 type VersionPropertyDescriptor<KEY extends string> = { readonly configFile: CurrentConfigFileDescriptor<KEY> };
