@@ -57,6 +57,18 @@ export function parseVersion(value: string) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Create a parser for non-pinnable enum values
+//----------------------------------------------------------------------------------------------------------------------
+
+export function createNonPinnableEnumParser<T>(allowedValues: ReadonlyArray<T>) {
+    return (value: string) => {
+        return allowedValues.some(allowed => allowed === value)
+            ? (value as T)
+            : error(`"${value}" is not a valid value (allowed: ${allowedValues.join(",")})`);
+    };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Wrap an error message into an error
 //----------------------------------------------------------------------------------------------------------------------
 

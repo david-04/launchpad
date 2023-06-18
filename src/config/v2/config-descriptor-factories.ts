@@ -5,7 +5,7 @@ import type {
     ConfigFileProperties,
     SerializationDetails,
 } from "./config-data-types.js";
-import { parseVersion } from "./config-parsers.js";
+import { createNonPinnableEnumParser, parseVersion } from "./config-parsers.js";
 import type { Version } from "./version-number.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,15 +64,44 @@ export function createPinnableEnumProperty() {}
 // Create a non-pinnable enum property descriptor
 //----------------------------------------------------------------------------------------------------------------------
 
+type NonPinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
+    readonly configFile?: ConfigFileDescriptor<KEY>;
+    readonly commandLine?: CommandLineDescriptor;
+    readonly currentValues: ReadonlyArray<readonly [CURRENT, string]>;
+    readonly obsoleteValues: ReadonlyArray<OBSOLETE>;
+};
+
+export function createNonPinnableEnumProperty<KEY extends string, CURRENT extends string, OBSOLETE extends string>(
+    property: NonPinnableEnumPropertyDescriptor<KEY, CURRENT, OBSOLETE>
+) {
+    type ALL = CURRENT | OBSOLETE;
+    const allValues = [...property.currentValues.map(value => value[0]), ...property.obsoleteValues];
+    const commandLineInfo = createCommandLineInfo(property.commandLine, `[${property.currentValues.join(" | ")}]`);
+    const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
+    const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
+    const parseOldValue = createOldValueParser<ALL>(matchesConfigFileKey, createNonPinnableEnumParser(allValues));
+    const parseNewValue = createNonPinnableEnumParser(property.currentValues.map(value => value[0]));
+    const serialize = createSerializer<CURRENT, KEY>(property.configFile, (value: CURRENT) => value);
+    const descriptor = {
+        commandLineInfo,
+        matchesCommandLineOption,
+        matchesConfigFileKey,
+        parseOldValue,
+        parseNewValue,
+        serialize,
+    } as const satisfies AssembledDescriptor<ALL, CURRENT, KEY>;
+    return { ...descriptor, options: property.currentValues };
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // Create a string property descriptor
 //----------------------------------------------------------------------------------------------------------------------
 
 type StringPropertyDescriptor<KEY extends string> = {
-    configFile?: ConfigFileDescriptor<KEY>;
-    commandLine?: CommandLineDescriptorWithPlaceholder;
-    parseOldValue: (value: string) => string | ConfigError;
-    parseNewValue: (value: string) => string | ConfigError;
+    readonly configFile?: ConfigFileDescriptor<KEY>;
+    readonly commandLine?: CommandLineDescriptorWithPlaceholder;
+    readonly parseOldValue: (value: string) => string | ConfigError;
+    readonly parseNewValue: (value: string) => string | ConfigError;
 };
 
 export function createStringProperty<KEY extends string>(property: StringPropertyDescriptor<KEY>) {
@@ -96,7 +125,7 @@ export function createStringProperty<KEY extends string>(property: StringPropert
 // Create a version number property descriptor
 //----------------------------------------------------------------------------------------------------------------------
 
-type VersionPropertyDescriptor<KEY extends string> = { configFile: CurrentConfigFileDescriptor<KEY> };
+type VersionPropertyDescriptor<KEY extends string> = { readonly configFile: CurrentConfigFileDescriptor<KEY> };
 
 export function createVersionProperty<KEY extends string>(property: VersionPropertyDescriptor<KEY>) {
     const commandLineInfo = undefined;

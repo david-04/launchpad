@@ -37,3 +37,12 @@ export type CommandLineInfo = {
     readonly placeholder: string;
     readonly description: string;
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+// Pinnable enum values
+//----------------------------------------------------------------------------------------------------------------------
+
+export type PinnableEnumValue<T> = {
+    value: T,
+    pinned: boolean
+}

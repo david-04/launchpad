@@ -1,5 +1,10 @@
 import type { AddError, ConfigFileProperty } from "./config-data-types.js";
-import { createProperty, createStringProperty, createVersionProperty } from "./config-descriptor-factories.js";
+import {
+    createNonPinnableEnumProperty,
+    createProperty,
+    createStringProperty,
+    createVersionProperty,
+} from "./config-descriptor-factories.js";
 import { createDirectoryParser, parseProjectName } from "./config-parsers.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -40,19 +45,62 @@ export const CurrentConfigProperties = {
     // Artifact
     //------------------------------------------------------------------------------------------------------------------
 
-    artifact: createProperty(),
+    artifact: createNonPinnableEnumProperty({
+        configFile: {
+            currentKey: "LP_SETTINGS_ARTIFACT",
+            newConfigObjectName: "artifact",
+        },
+        commandLine: {
+            option: "--artifact",
+            description: "the module type",
+        },
+        currentValues: [
+            ["app", "a stand-alone application"],
+            ["lib", "a library with typings"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
 
     //------------------------------------------------------------------------------------------------------------------
     // Runtime
     //------------------------------------------------------------------------------------------------------------------
 
-    runtime: createProperty(),
+    runtime: createNonPinnableEnumProperty({
+        configFile: {
+            currentKey: "LP_SETTINGS_RUNTIME",
+            newConfigObjectName: "runtime",
+        },
+        commandLine: {
+            option: "--runtime",
+            description: "the runtime engine/environment",
+        },
+        currentValues: [
+            ["node", "command line (compiled to JavaScript)"],
+            ["ts-node", "command line (run TypeScript without compiling)"],
+            ["web", "run in browser"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
 
     //------------------------------------------------------------------------------------------------------------------
     // Module
     //------------------------------------------------------------------------------------------------------------------
 
-    module: createProperty(),
+    module: createNonPinnableEnumProperty({
+        configFile: {
+            currentKey: "LP_SETTINGS_MODULE",
+            newConfigObjectName: "module",
+        },
+        commandLine: {
+            option: "--module",
+            description: "the module type",
+        },
+        currentValues: [
+            ["cjs", "CommonJS"],
+            ["esm", "ECMAScript modules"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
 
     //------------------------------------------------------------------------------------------------------------------
     // Bundler
