@@ -1,4 +1,4 @@
-import type { Path } from "../../utilities/path.js";
+import type { Path } from "../utilities/path.js";
 import type {
     AddError,
     ConfigError,

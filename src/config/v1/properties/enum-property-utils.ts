@@ -2,7 +2,7 @@ import {
     DEFAULT_ENUM as DEFAULT,
     DISABLED_ENUM as DISABLED,
     PINNED_SUFFIX as PINNED,
-} from "../../utilities/constants.js";
+} from "../../../utilities/constants.js";
 import type { ConfigPropertyDescriptor as ConfigPropertyDescriptor } from "./property-descriptor.js";
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { DEFAULT_ENUM, PINNED_SUFFIX } from "../../utilities/constants.js";
+import { DEFAULT_ENUM, PINNED_SUFFIX } from "../utilities/constants.js";
 import type {
     AddError,
     CommandLineInfo,

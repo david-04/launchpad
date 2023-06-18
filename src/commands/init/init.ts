@@ -1,4 +1,4 @@
-import { loadConfigFile } from "../../config/load-config.js";
+import { loadConfigFile } from "../../config/v1/load-config.js";
 import type { Path } from "../../utilities/path.js";
 import { getNewConfig } from "./config-wizard.js";
 

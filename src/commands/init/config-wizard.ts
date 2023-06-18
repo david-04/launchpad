@@ -1,6 +1,6 @@
 // import { exit } from "process";
 // import prompts, { type Choice, type PromptObject } from "prompts";
-import type { OldConfig } from "../../config/old-config.js";
+import type { OldConfig } from "../../config/v1/old-config.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import type { Path } from "../../utilities/path.js";
 

@@ -1,4 +1,4 @@
-import type { AddError, ConfigFileProperty } from "./config-data-types.js";
+import type { AddError, ConfigError, ConfigFileProperty } from "./config-data-types.js";
 import {
     createNonPinnableEnumProperty,
     createPinnableEnumProperty,
@@ -276,8 +276,9 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, _addEr
 export type OldPartialConfig = ReturnType<typeof assembleConfig>;
 export type OldConfig = ReturnType<typeof validateConfig>;
 
-type NewConfigType<T extends keyof typeof CurrentConfigProperties> = ReturnType<
-    (typeof CurrentConfigProperties)[T]["parseNewValue"]
+type NewConfigType<T extends keyof typeof CurrentConfigProperties> = Exclude<
+    ReturnType<(typeof CurrentConfigProperties)[T]["parseNewValue"]>,
+    ConfigError
 >;
 
 export type NewConfig = {

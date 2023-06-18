@@ -1,4 +1,4 @@
-import { PINNED_SUFFIX } from "../../utilities/constants.js";
+import { PINNED_SUFFIX } from "../utilities/constants.js";
 import type { ConfigError } from "./config-data-types.js";
 import { Version } from "./version-number.js";
 

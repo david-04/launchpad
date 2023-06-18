@@ -1,4 +1,4 @@
-import type { Errorless } from "../../utilities/utility-types.js";
+import type { Errorless } from "../../../utilities/utility-types.js";
 import { createEnum } from "./enum-property-utils.js";
 
 //----------------------------------------------------------------------------------------------------------------------

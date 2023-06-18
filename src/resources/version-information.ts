@@ -1,4 +1,4 @@
-import { Version } from "../config/properties/version-property-descriptor.js";
+import { Version } from "../config/v1/properties/version-property-descriptor.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Version information
