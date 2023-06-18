@@ -37,6 +37,10 @@ export function loadConfigFile(configFile: Path) {
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Process a single line
+//----------------------------------------------------------------------------------------------------------------------
+
 function processLine(line: string, onError: Consumer, onKeyProcessed: Consumer): OldConfig | undefined {
     const trimmed = line.replace(/#.*/, "").trim();
     if (trimmed) {
@@ -55,14 +59,13 @@ function processLine(line: string, onError: Consumer, onKeyProcessed: Consumer):
 
 function splitLine(line: string, onError: Consumer) {
     const index = line.indexOf("=");
-    if (0 <= index) {
+    if (0 < index) {
         const key = line.substring(0, index).trim();
-        if (key) {
-            return { key, value: line.substring(index + 1).trim() } as const;
-        }
+        return { key, value: line.substring(index + 1).trim() } as const;
+    } else {
+        onError("The line is not in key=value format");
+        return undefined;
     }
-    onError("The line is not in key=value format");
-    return undefined;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

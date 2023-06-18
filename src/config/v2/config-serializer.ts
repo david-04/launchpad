@@ -1,0 +1,31 @@
+import type { NewConfig } from "../new-config.js";
+import type { SerializationDetails } from "./config-data-types.js";
+import { ConfigProperties } from "./config-properties.js";
+
+//----------------------------------------------------------------------------------------------------------------------
+// Serialize properties
+//----------------------------------------------------------------------------------------------------------------------
+
+export function serializeConfig(config: NewConfig) {
+    const header = [
+        "#-----------------------------------------------------------------------------------------------------------------------",
+        "# This is a generated generated file. Do not edit. To make changes, run: launchpad init",
+        "#-----------------------------------------------------------------------------------------------------------------------",
+    ];
+    const properties = ConfigProperties.all.map(property => property.serialize(config));
+    const maxKeyLength = properties.reduce((max, property) => Math.max(max, property?.key.length ?? 0), 0);
+    const maxValueLength = properties.reduce((max, property) => Math.max(max, property?.value.length ?? 0), 0);
+    const lines = properties.map(property => (property ? formatProperty(property, maxKeyLength, maxValueLength) : ""));
+    return [...header, "", ...lines.filter(line => line)].join("\n");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Serialize a single property
+//----------------------------------------------------------------------------------------------------------------------
+
+function formatProperty(property: SerializationDetails, maxKeyLength: number, maxValueLength: number) {
+    const key = property.key.padEnd(maxKeyLength);
+    const value = property.value.padEnd(maxValueLength);
+    const comment = property.comment ? ` # {property.comment}` : "";
+    return `${key} = ${value} ${comment}`;
+}
