@@ -19,7 +19,7 @@ type AssembledDescriptor<OLD, NEW, KEY extends string> = {
     readonly matchesConfigFileKey: (key: string) => boolean;
     readonly matchesCommandLineOption: (key: string) => boolean;
     readonly parseOldValue: (properties: ConfigFileProperties, addError: AddError) => OLD | undefined;
-    readonly parseNewValue: (value: string) => NEW | ConfigError;
+    readonly parseNewValue: (value: string, source: string) => NEW | ConfigError;
     readonly serialize: (data: Record<KEY, NEW>) => undefined | SerializationDetails;
 };
 
@@ -31,7 +31,6 @@ type CurrentConfigFileDescriptor<KEY extends string> = {
 };
 
 type ObsoleteConfigFileDescriptor = { obsoleteKeys: ReadonlyArray<string> };
-
 type ConfigFileDescriptor<KEY extends string> = CurrentConfigFileDescriptor<KEY> | ObsoleteConfigFileDescriptor;
 
 type CommandLineDescriptor = {
@@ -119,8 +118,8 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
 type StringPropertyDescriptor<KEY extends string> = {
     readonly configFile?: ConfigFileDescriptor<KEY>;
     readonly commandLine?: CommandLineDescriptorWithPlaceholder;
-    readonly parseOldValue: (value: string) => string | ConfigError;
-    readonly parseNewValue: (value: string) => string | ConfigError;
+    readonly parseOldValue: (value: string, source: string | undefined) => string | ConfigError;
+    readonly parseNewValue: (value: string, source: string | undefined) => string | ConfigError;
 };
 
 export function createStringProperty<KEY extends string>(property: StringPropertyDescriptor<KEY>) {
@@ -189,7 +188,8 @@ function createCommandLineOptionMatcher(descriptor: CommandLineDescriptor | unde
 
 function createConfigFileKeyMatcher<KEY extends string>(descriptor: ConfigFileDescriptor<KEY> | undefined) {
     if (descriptor) {
-        const activeKey = "current" in descriptor ? [descriptor.current] : [];
+        const name: keyof CurrentConfigFileDescriptor<KEY> = "currentKey";
+        const activeKey = name in descriptor ? [descriptor[name]] : [];
         const allKeys = [...activeKey, ...(descriptor.obsoleteKeys ?? [])];
         return (key: string) => allKeys.some(currentKey => currentKey === key);
     } else {
@@ -203,14 +203,14 @@ function createConfigFileKeyMatcher<KEY extends string>(descriptor: ConfigFileDe
 
 function createOldValueParser<OLD>(
     matchesConfigFileKey: (key: string) => boolean,
-    parse: (value: string) => OLD | ConfigError
+    parse: (value: string, source: string | undefined) => OLD | ConfigError
 ) {
     return (properties: ConfigFileProperties, addError: AddError) => {
         const property = properties.filter(property => matchesConfigFileKey(property.key)).pop();
         if (property) {
-            const value = parse(property.value);
+            const value = parse(property.value, property.key);
             if (value && "object" === typeof value && "error" in value) {
-                addError(value.error);
+                addError(property.formatError(value.error));
             } else {
                 return value;
             }

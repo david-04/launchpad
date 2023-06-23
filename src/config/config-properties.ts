@@ -228,7 +228,7 @@ export const ConfigProperties = { ...AllConfigProperties, all } as const;
 
 export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, addError: AddError) {
     function parseOldValue(key: keyof typeof CurrentConfigProperties) {
-        CurrentConfigProperties[key].parseOldValue(properties, addError);
+        return CurrentConfigProperties[key].parseOldValue(properties, addError);
     }
     return {
         version: parseOldValue("version"),

@@ -21,7 +21,7 @@ export function loadConfigFile(configFile: Path) {
             .loadFileContents()
             .split(/\r?\n/)
             .map(line => ({ line }))
-            .map((item, index) => ({ ...item, ...createErrorHandlers(configFile, index, errors) }))
+            .map((item, index) => ({ ...item, ...createErrorHandlers(index, errors) }))
             .forEach(item => processLine(item.line, item.formatError, item.addError, addProperty));
         return parseConfig(properties);
     } else {
@@ -33,8 +33,8 @@ export function loadConfigFile(configFile: Path) {
 // Create an error handler that can format and store error messages related to a specific configuration file line
 //----------------------------------------------------------------------------------------------------------------------
 
-function createErrorHandlers(configFile: Path, index: number, errors: Array<ConfigError>) {
-    const formatError = createFormatErrorHandler(configFile, index);
+function createErrorHandlers(index: number, errors: Array<ConfigError>) {
+    const formatError = createFormatErrorHandler(index);
     const addError = createAddErrorHandler(formatError, errors);
     return { formatError, addError };
 }
@@ -43,9 +43,8 @@ function createErrorHandlers(configFile: Path, index: number, errors: Array<Conf
 // Create a line-specific error message formatter
 //----------------------------------------------------------------------------------------------------------------------
 
-function createFormatErrorHandler(configFile: Path, index: number) {
-    const filename = configFile.path.replace(/^.*\/\.launchpad/, ".launchpad/");
-    return (message: string) => `Error in ${filename} line ${index + 1}: ${message}:\n${message}`;
+function createFormatErrorHandler(index: number) {
+    return (message: string) => `Line ${index + 1}: ${message}`;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,4 @@
-import {
-    DEFAULT_ENUM as DEFAULT,
-    DISABLED_ENUM as DISABLED,
-    PINNED_SUFFIX as PINNED,
-} from "../../../utilities/constants.js";
+import { DEFAULT_ENUM, DISABLED_ENUM, PINNED_SUFFIX } from "../../../utilities/constants.js";
 import type { ConfigPropertyDescriptor as ConfigPropertyDescriptor } from "./property-descriptor.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,12 +64,12 @@ function createPinnableNewValueParser<CURRENT extends string>(
 ) {
     return (value: string) => {
         const trimmed = value.trim();
-        if (trimmed === DEFAULT) {
+        if (trimmed === DEFAULT_ENUM) {
             return toEnumValue(defaultValue, false);
         }
         const validated = findEnumValue(allowedValues, trimmed);
         if (undefined === validated) {
-            const list = [DEFAULT, ...allowedValues].join(", ");
+            const list = [DEFAULT_ENUM, ...allowedValues].join(", ");
             return { error: `Invalid ${propertyType} "${trimmed}" (allowed values: ${list})` };
         } else {
             return toEnumValue(validated, true);
@@ -90,7 +86,7 @@ function createPinnableOldValueParser<ALL extends string>(propertyKey: string, a
         const { trimmed, pinned } = destructurePinnableValue(value);
         const validated = findEnumValue(allowedValues, trimmed);
         if (undefined === validated) {
-            const list = [DEFAULT, ...allowedValues].join(", ");
+            const list = [DEFAULT_ENUM, ...allowedValues].join(", ");
             return { error: `Invalid value for property ${propertyKey}: "${trimmed}" (allowed values: ${list})` };
         } else {
             return toEnumValue(validated, pinned);
@@ -110,7 +106,7 @@ function createNonPinnableNewValueParser<CURRENT extends string>(
         const trimmed = value.trim();
         const validated = findEnumValue(allowedValues, trimmed);
         if (undefined === validated) {
-            const list = [DEFAULT, ...allowedValues].join(", ");
+            const list = [DEFAULT_ENUM, ...allowedValues].join(", ");
             return { error: `Invalid ${propertyType} "${trimmed}" (allowed values: ${list})` };
         } else {
             return validated;
@@ -155,8 +151,8 @@ function findEnumValue<T extends string>(allowedValues: ReadonlyArray<T>, value:
 
 function destructurePinnableValue(value: string) {
     const trimmed = value.trim();
-    return trimmed.endsWith(PINNED)
-        ? { trimmed: trimmed.substring(0, trimmed.length - PINNED.length).trim(), pinned: true }
+    return trimmed.endsWith(PINNED_SUFFIX)
+        ? { trimmed: trimmed.substring(0, trimmed.length - PINNED_SUFFIX.length).trim(), pinned: true }
         : { trimmed, pinned: false };
 }
 
@@ -168,6 +164,6 @@ function toEnumValue<T extends string>(value: T, pinned: boolean) {
     return {
         value,
         pinned: pinned,
-        render: () => (!pinned || value === DISABLED ? value : `${value}${PINNED}`),
+        render: () => (!pinned || value === DISABLED_ENUM ? value : `${value}${PINNED_SUFFIX}`),
     };
 }
