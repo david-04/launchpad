@@ -100,7 +100,7 @@ export const CurrentConfigProperties = {
     module: createNonPinnableEnumProperty({
         name: "module type",
         configFile: {
-            currentKey: "LP_SETTINGS_MODULE",
+            currentKey: "LP_SETTINGS_MODULE_SYSTEM",
             newConfigObjectName: "module",
         },
         commandLine: {
