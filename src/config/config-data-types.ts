@@ -6,6 +6,12 @@ export type ConfigError = { error: string };
 export type FormatError = (message: string) => string;
 export type AddError = (message: string) => void;
 
+export class ValidationError extends Error {
+    public constructor(message: string) {
+        super(message);
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // Key-value pairs imported from the configuration file
 //----------------------------------------------------------------------------------------------------------------------

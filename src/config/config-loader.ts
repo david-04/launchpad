@@ -1,11 +1,5 @@
 import type { Path } from "../utilities/path.js";
-import type {
-    AddError,
-    ConfigError,
-    ConfigFileProperty,
-    FormatError,
-    ConfigFileProperties,
-} from "./config-data-types.js";
+import type { AddError, ConfigFileProperty, FormatError, ConfigFileProperties } from "./config-data-types.js";
 import { ConfigProperties, assembleConfig, validateConfig } from "./config-properties.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -16,14 +10,14 @@ export function loadConfigFile(configFile: Path) {
     if (configFile.existsAndIsFile()) {
         const properties = new Array<ConfigFileProperty>();
         const addProperty = createAddPropertyHandler(properties);
-        const errors = new Array<ConfigError>();
+        const errors = new Array<string>();
         configFile
             .loadFileContents()
             .split(/\r?\n/)
             .map(line => ({ line }))
             .map((item, index) => ({ ...item, ...createErrorHandlers(index, errors) }))
             .forEach(item => processLine(item.line, item.formatError, item.addError, addProperty));
-        return parseConfig(properties);
+        return parseConfig(properties, errors);
     } else {
         return undefined;
     }
@@ -33,7 +27,7 @@ export function loadConfigFile(configFile: Path) {
 // Create an error handler that can format and store error messages related to a specific configuration file line
 //----------------------------------------------------------------------------------------------------------------------
 
-function createErrorHandlers(index: number, errors: Array<ConfigError>) {
+function createErrorHandlers(index: number, errors: Array<string>) {
     const formatError = createFormatErrorHandler(index);
     const addError = createAddErrorHandler(formatError, errors);
     return { formatError, addError };
@@ -51,9 +45,9 @@ function createFormatErrorHandler(index: number) {
 // Create a handler to store formatted error messages
 //----------------------------------------------------------------------------------------------------------------------
 
-function createAddErrorHandler(format: FormatError, errors: Array<ConfigError>) {
+function createAddErrorHandler(format: FormatError, errors: Array<string>) {
     return (message: string) => {
-        errors.push({ error: format(message) });
+        errors.push(format(message));
     };
 }
 
@@ -105,12 +99,11 @@ function splitLine(line: string, addError: AddError) {
 // Convert a set of properties to a config object
 //----------------------------------------------------------------------------------------------------------------------
 
-function parseConfig(properties: ConfigFileProperties) {
-    const errors = new Array<ConfigError>();
-    const addError = (message: string) => errors.push({ error: message });
+function parseConfig(properties: ConfigFileProperties, errors: Array<string>) {
+    const addError = (message: string) => errors.push(message);
     validatePropertyKeys(properties, addError);
     const partial = assembleConfig(properties, addError);
-    const validated = errors.length ? undefined : validateConfig(partial, addError);
+    const validated = validateConfig(partial, addError);
     return { partial, validated, errors: errors.length ? errors : undefined };
 }
 
@@ -121,7 +114,7 @@ function parseConfig(properties: ConfigFileProperties) {
 function validatePropertyKeys(properties: ConfigFileProperties, addError: AddError) {
     for (const configFileProperty of properties) {
         if (!ConfigProperties.all.some(property => property.matchesConfigFileKey(configFileProperty.key))) {
-            addError(configFileProperty.formatError(`Unknown property: ${configFileProperty.key}`));
+            addError(configFileProperty.formatError(`Unknown config property "${configFileProperty.key}"`));
         }
     }
 }

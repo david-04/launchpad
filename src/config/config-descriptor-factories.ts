@@ -1,11 +1,12 @@
 import { DEFAULT_ENUM, PINNED_SUFFIX } from "../utilities/constants.js";
-import type {
-    AddError,
-    CommandLineInfo,
-    ConfigError,
-    ConfigFileProperties,
-    PinnableEnumValue,
-    SerializationDetails,
+import {
+    ValidationError,
+    type AddError,
+    type CommandLineInfo,
+    type ConfigError,
+    type ConfigFileProperties,
+    type PinnableEnumValue,
+    type SerializationDetails,
 } from "./config-data-types.js";
 import { createNonPinnableEnumParser, createPinnableEnumParser, parseVersion } from "./config-parsers.js";
 import type { Version } from "./version-number.js";
@@ -21,6 +22,7 @@ type AssembledDescriptor<OLD, NEW, KEY extends string> = {
     readonly parseOldValue: (properties: ConfigFileProperties, addError: AddError) => OLD | undefined;
     readonly parseNewValue: (value: string, source: string) => NEW | ConfigError;
     readonly serialize: (data: Record<KEY, NEW>) => undefined | SerializationDetails;
+    readonly assertOldValuePresent: (value: OLD | undefined) => Exclude<OLD, undefined>;
 };
 
 type CurrentConfigFileDescriptor<KEY extends string> = {
@@ -45,6 +47,7 @@ type CommandLineDescriptorWithPlaceholder = CommandLineDescriptor & { readonly p
 //----------------------------------------------------------------------------------------------------------------------
 
 type NonPinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
+    readonly name: string;
     readonly configFile?: ConfigFileDescriptor<KEY>;
     readonly commandLine?: CommandLineDescriptor;
     readonly currentValues: ReadonlyArray<readonly [CURRENT, string?]>;
@@ -62,6 +65,7 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
     const parseOldValue = createOldValueParser<ALL>(matchesConfigFileKey, createNonPinnableEnumParser(allValues));
     const parseNewValue = createNonPinnableEnumParser(property.currentValues.map(value => value[0]));
     const serialize = createSerializer<CURRENT, KEY>(property.configFile, (value: CURRENT) => value);
+    const assertOldValuePresent = createAssertPresentHandler<KEY, ALL>(property.name, property.configFile);
     const descriptor = {
         commandLineInfo,
         matchesCommandLineOption,
@@ -69,6 +73,7 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
         parseOldValue,
         parseNewValue,
         serialize,
+        assertOldValuePresent,
     } as const satisfies AssembledDescriptor<ALL, CURRENT, KEY>;
     return { ...descriptor, options: property.currentValues };
 }
@@ -78,6 +83,7 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
 //----------------------------------------------------------------------------------------------------------------------
 
 type PinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
+    readonly name: string;
     readonly configFile?: ConfigFileDescriptor<KEY>;
     readonly commandLine?: CommandLineDescriptor;
     readonly currentValues: ReadonlyArray<readonly [CURRENT, string?]>;
@@ -100,6 +106,10 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
     const parseNewValue = createPinnableEnumParser(property.currentValues.map(value => value[0]));
     const render = (prop: PinnableEnumValue<CURRENT>) => [prop.value, prop.pinned ? PINNED_SUFFIX : ""].join("");
     const serialize = createSerializer<PinnableEnumValue<CURRENT>, KEY>(property.configFile, render);
+    const assertOldValuePresent = createAssertPresentHandler<KEY, PinnableEnumValue<ALL>>(
+        property.name,
+        property.configFile
+    );
     const descriptor = {
         commandLineInfo,
         matchesCommandLineOption,
@@ -107,6 +117,7 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
         parseOldValue,
         parseNewValue,
         serialize,
+        assertOldValuePresent,
     } as const satisfies AssembledDescriptor<PinnableEnumValue<ALL>, PinnableEnumValue<CURRENT>, KEY>;
     return { ...descriptor, options: property.currentValues };
 }
@@ -116,6 +127,7 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
 //----------------------------------------------------------------------------------------------------------------------
 
 type StringPropertyDescriptor<KEY extends string> = {
+    readonly name: string;
     readonly configFile?: ConfigFileDescriptor<KEY>;
     readonly commandLine?: CommandLineDescriptorWithPlaceholder;
     readonly parseOldValue: (value: string, source: string | undefined) => string | ConfigError;
@@ -129,6 +141,7 @@ export function createStringProperty<KEY extends string>(property: StringPropert
     const parseOldValue = createOldValueParser<string>(matchesConfigFileKey, property.parseOldValue);
     const parseNewValue = property.parseNewValue;
     const serialize = createSerializer<string, KEY>(property.configFile, (value: string) => value);
+    const assertOldValuePresent = createAssertPresentHandler<KEY, string>(property.name, property.configFile);
     return {
         commandLineInfo,
         matchesCommandLineOption,
@@ -136,6 +149,7 @@ export function createStringProperty<KEY extends string>(property: StringPropert
         parseOldValue,
         parseNewValue,
         serialize,
+        assertOldValuePresent,
     } as const satisfies AssembledDescriptor<string, string, KEY>;
 }
 
@@ -143,7 +157,10 @@ export function createStringProperty<KEY extends string>(property: StringPropert
 // Version number
 //----------------------------------------------------------------------------------------------------------------------
 
-type VersionPropertyDescriptor<KEY extends string> = { readonly configFile: CurrentConfigFileDescriptor<KEY> };
+type VersionPropertyDescriptor<KEY extends string> = {
+    readonly name: string;
+    readonly configFile: CurrentConfigFileDescriptor<KEY>;
+};
 
 export function createVersionProperty<KEY extends string>(property: VersionPropertyDescriptor<KEY>) {
     const commandLineInfo = undefined;
@@ -152,6 +169,7 @@ export function createVersionProperty<KEY extends string>(property: VersionPrope
     const parseOldValue = createOldValueParser<Version>(matchesConfigFileKey, parseVersion);
     const parseNewValue = parseVersion;
     const serialize = createSerializer<Version, KEY>(property.configFile, (value: Version) => value.render());
+    const assertOldValuePresent = createAssertPresentHandler<KEY, Version>(property.name, property.configFile);
     return {
         commandLineInfo,
         matchesCommandLineOption,
@@ -159,6 +177,7 @@ export function createVersionProperty<KEY extends string>(property: VersionPrope
         parseOldValue,
         parseNewValue,
         serialize,
+        assertOldValuePresent,
     } as const satisfies AssembledDescriptor<Version, Version, KEY>;
 }
 
@@ -236,5 +255,25 @@ function createSerializer<NEW, KEY extends string>(
         } else {
             return undefined;
         }
+    };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Create a reference to a config file
+//----------------------------------------------------------------------------------------------------------------------
+
+function createAssertPresentHandler<KEY extends string, OLD>(
+    propertyName: string,
+    configFileDescriptor: ConfigFileDescriptor<KEY> | undefined
+) {
+    return (value: OLD | undefined) => {
+        if (undefined === value) {
+            if (configFileDescriptor && "currentKey" in configFileDescriptor) {
+                throw new ValidationError(`Config property ${configFileDescriptor.currentKey} is missing`);
+            } else {
+                throw new ValidationError(`The ${propertyName} is missing`);
+            }
+        }
+        return value as Exclude<OLD, undefined>;
     };
 }

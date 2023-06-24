@@ -1,4 +1,4 @@
-import type { AddError, ConfigError, ConfigFileProperty } from "./config-data-types.js";
+import { ValidationError, type AddError, type ConfigError, type ConfigFileProperty } from "./config-data-types.js";
 import {
     createNonPinnableEnumProperty,
     createPinnableEnumProperty,
@@ -18,6 +18,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     version: createVersionProperty({
+        name: "version number",
         configFile: {
             currentKey: "LP_SETTINGS_VERSION",
             newConfigObjectName: "version",
@@ -29,6 +30,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     projectName: createStringProperty({
+        name: "project name",
         configFile: {
             currentKey: "LP_SETTINGS_PROJECT_NAME",
             newConfigObjectName: "projectName",
@@ -47,6 +49,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     artifact: createNonPinnableEnumProperty({
+        name: "artifact",
         configFile: {
             currentKey: "LP_SETTINGS_ARTIFACT",
             newConfigObjectName: "artifact",
@@ -67,6 +70,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     runtime: createNonPinnableEnumProperty({
+        name: "runtime environment",
         configFile: {
             currentKey: "LP_SETTINGS_RUNTIME",
             newConfigObjectName: "runtime",
@@ -88,6 +92,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     module: createNonPinnableEnumProperty({
+        name: "module type",
         configFile: {
             currentKey: "LP_SETTINGS_MODULE",
             newConfigObjectName: "module",
@@ -108,6 +113,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     bundler: createPinnableEnumProperty({
+        name: "bundler",
         configFile: {
             currentKey: "LP_SETTINGS_BUNDLER",
             newConfigObjectName: "bundler",
@@ -125,6 +131,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     dtsBundler: createPinnableEnumProperty({
+        name: "d.ts bundler",
         configFile: {
             currentKey: "LP_SETTINGS_BUNDLER_DTS",
             newConfigObjectName: "dtsBundler",
@@ -142,6 +149,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     formatter: createPinnableEnumProperty({
+        name: "formatter",
         configFile: {
             currentKey: "LP_SETTINGS_FORMATTER",
             newConfigObjectName: "formatter",
@@ -159,6 +167,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     packageManager: createPinnableEnumProperty({
+        name: "package manager",
         configFile: {
             currentKey: "LP_SETTINGS_PACKAGE_MANAGER",
             newConfigObjectName: "packageManager",
@@ -176,6 +185,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     srcDir: createStringProperty({
+        name: "source directory",
         configFile: {
             currentKey: "LP_SETTINGS_SRC_DIR",
             newConfigObjectName: "srcDir",
@@ -194,6 +204,7 @@ export const CurrentConfigProperties = {
     //------------------------------------------------------------------------------------------------------------------
 
     tscOutDir: createStringProperty({
+        name: "TypeScript output directory",
         configFile: {
             currentKey: "LP_SETTINGS_TSC_OUT_DIR",
             newConfigObjectName: "tscOutDir",
@@ -227,21 +238,18 @@ export const ConfigProperties = { ...AllConfigProperties, all } as const;
 //----------------------------------------------------------------------------------------------------------------------
 
 export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, addError: AddError) {
-    function parseOldValue(key: keyof typeof CurrentConfigProperties) {
-        return CurrentConfigProperties[key].parseOldValue(properties, addError);
-    }
     return {
-        version: parseOldValue("version"),
-        projectName: parseOldValue("projectName"),
-        artifact: parseOldValue("artifact"),
-        runtime: parseOldValue("runtime"),
-        module: parseOldValue("module"),
-        bundler: parseOldValue("bundler"),
-        dtsBundler: parseOldValue("dtsBundler"),
-        formatter: parseOldValue("formatter"),
-        packageManager: parseOldValue("packageManager"),
-        srcDir: parseOldValue("srcDir"),
-        tscOutDir: parseOldValue("tscOutDir"),
+        version: ConfigProperties.version.parseOldValue(properties, addError),
+        projectName: ConfigProperties.projectName.parseOldValue(properties, addError),
+        artifact: ConfigProperties.artifact.parseOldValue(properties, addError),
+        runtime: ConfigProperties.runtime.parseOldValue(properties, addError),
+        module: ConfigProperties.module.parseOldValue(properties, addError),
+        bundler: ConfigProperties.bundler.parseOldValue(properties, addError),
+        dtsBundler: ConfigProperties.dtsBundler.parseOldValue(properties, addError),
+        formatter: ConfigProperties.formatter.parseOldValue(properties, addError),
+        packageManager: ConfigProperties.packageManager.parseOldValue(properties, addError),
+        srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
+        tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
     } as const satisfies { [K in keyof typeof CurrentConfigProperties]: unknown };
 }
 
@@ -249,22 +257,27 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
 // Create a validated config that has all mandatory properties
 //----------------------------------------------------------------------------------------------------------------------
 
-export function validateConfig(config: ReturnType<typeof assembleConfig>, _addError: AddError) {
+export function validateConfig(config: ReturnType<typeof assembleConfig>, addError: AddError) {
     try {
         return {
-            version: config.version,
-            projectName: config.projectName,
-            artifact: config.artifact,
-            runtime: config.runtime,
-            module: config.module,
-            bundler: config.bundler,
-            dtsBundler: config.dtsBundler,
-            formatter: config.formatter,
-            packageManager: config.packageManager,
-            srcDir: config.srcDir,
-            tscOutDir: config.tscOutDir,
+            version: ConfigProperties.version.assertOldValuePresent(config.version),
+            projectName: ConfigProperties.projectName.assertOldValuePresent(config.projectName),
+            artifact: ConfigProperties.artifact.assertOldValuePresent(config.artifact),
+            runtime: ConfigProperties.runtime.assertOldValuePresent(config.runtime),
+            module: ConfigProperties.module.assertOldValuePresent(config.module),
+            bundler: ConfigProperties.bundler.assertOldValuePresent(config.bundler),
+            dtsBundler: ConfigProperties.dtsBundler.assertOldValuePresent(config.dtsBundler),
+            formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
+            packageManager: ConfigProperties.packageManager.assertOldValuePresent(config.packageManager),
+            srcDir: ConfigProperties.srcDir.assertOldValuePresent(config.srcDir),
+            tscOutDir: ConfigProperties.tscOutDir.assertOldValuePresent(config.tscOutDir),
         } as const satisfies typeof config;
     } catch (error: unknown) {
+        if (error instanceof ValidationError) {
+            addError(error.message);
+        } else {
+            throw error;
+        }
         return undefined;
     }
 }
