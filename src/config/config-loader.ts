@@ -1,6 +1,7 @@
 import type { Path } from "../utilities/path.js";
-import type { AddError, ConfigFileProperty, FormatError, ConfigFileProperties } from "./config-data-types.js";
-import { ConfigProperties, assembleConfig, validateConfig } from "./config-properties.js";
+import type { AddError, ConfigFileProperties, ConfigFileProperty, FormatError } from "./config-data-types.js";
+import { assembleConfig, validateConfig } from "./config-objects.js";
+import { ConfigProperties } from "./config-properties.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Load the config file

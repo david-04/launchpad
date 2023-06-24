@@ -1,11 +1,12 @@
 import { exit } from "process";
 import prompts, { type Choice, type PromptObject } from "prompts";
-import type { ParsedConfig } from "../../config/config-loader.js";
-import { ConfigProperties, type CommandLineConfig, type OldPartialConfig } from "../../config/config-properties.js";
-import { VERSION_NUMBER } from "../../resources/version-information.js";
-import type { Path } from "../../utilities/path.js";
-import { DEFAULT_ENUM } from "../../utilities/constants.js";
 import type { ConfigError } from "../../config/config-data-types.js";
+import type { ParsedConfig } from "../../config/config-loader.js";
+import type { CommandLineConfig, OldPartialConfig } from "../../config/config-objects.js";
+import { ConfigProperties } from "../../config/config-properties.js";
+import { VERSION_NUMBER } from "../../resources/version-information.js";
+import { DEFAULT_ENUM } from "../../utilities/constants.js";
+import type { Path } from "../../utilities/path.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types

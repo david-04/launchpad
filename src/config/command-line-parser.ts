@@ -1,5 +1,5 @@
 import { fail } from "../utilities/fail.js";
-import { assembleConfigFromCommandLineOptions } from "./config-properties.js";
+import { assembleConfigFromCommandLineOptions } from "./config-objects.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Extract command line options
