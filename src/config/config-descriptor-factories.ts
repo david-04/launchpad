@@ -20,7 +20,6 @@ import type { Version } from "./version-number.js";
 type AssembledDescriptor<OLD, NEW, KEY extends string> = {
     readonly commandLineInfo: undefined | CommandLineInfo;
     readonly matchesConfigFileKey: (key: string) => boolean;
-    readonly matchesCommandLineOption: (key: string) => boolean;
     readonly parseOldValue: (properties: ConfigFileProperties, addError: AddError) => OLD | undefined;
     readonly parseNewValue: (value: string, source: string) => NEW | ConfigError;
     readonly parseFromCommandLine: (options: CommandLineOptions) => NEW | undefined | typeof DEFAULT_ENUM;
@@ -66,7 +65,6 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
     const currentValuesWithDefault = [DEFAULT_ENUM, ...currentValues];
     const commandLineInfo = createCommandLineInfo(property.commandLine, `[${currentValuesWithDefault.join(" | ")}]`);
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
-    const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
     const parseOldValue = createOldValueParser<ALL>(matchesConfigFileKey, createNonPinnableEnumParser(allValues));
     const parseNewValue = createNonPinnableEnumParser(currentValues);
     const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
@@ -74,7 +72,6 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
     const assertOldValuePresent = createAssertPresentHandler<KEY, ALL>(property.name, property.configFile);
     const descriptor = {
         commandLineInfo,
-        matchesCommandLineOption,
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
@@ -106,7 +103,6 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
     const currentValuesWithDefault = [DEFAULT_ENUM, ...currentValues];
     const commandLineInfo = createCommandLineInfo(property.commandLine, `[${currentValuesWithDefault.join(" | ")}]`);
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
-    const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
     const parseOldValue = createOldValueParser<PinnableEnumValue<ALL>>(
         matchesConfigFileKey,
         createPinnableEnumParser(allValues)
@@ -121,7 +117,6 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
     );
     const descriptor = {
         commandLineInfo,
-        matchesCommandLineOption,
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
@@ -148,7 +143,6 @@ export function createStringProperty<KEY extends string>(property: StringPropert
     const placeholder = property.commandLine ? `[${property.commandLine?.placeholder} | default]` : undefined;
     const commandLineInfo = createCommandLineInfo(property.commandLine, placeholder);
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
-    const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
     const parseOldValue = createOldValueParser<string>(matchesConfigFileKey, property.parseOldValue);
     const parseNewValue = property.parseNewValue;
     const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
@@ -156,7 +150,6 @@ export function createStringProperty<KEY extends string>(property: StringPropert
     const assertOldValuePresent = createAssertPresentHandler<KEY, string>(property.name, property.configFile);
     return {
         commandLineInfo,
-        matchesCommandLineOption,
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
@@ -178,7 +171,6 @@ type VersionPropertyDescriptor<KEY extends string> = {
 export function createVersionProperty<KEY extends string>(property: VersionPropertyDescriptor<KEY>) {
     const commandLineInfo = undefined;
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
-    const matchesCommandLineOption = createCommandLineOptionMatcher(undefined);
     const parseOldValue = createOldValueParser<Version>(matchesConfigFileKey, parseVersion);
     const parseNewValue = parseVersion;
     const parseFromCommandLine = createCommandLineParser(undefined, parseNewValue);
@@ -186,7 +178,6 @@ export function createVersionProperty<KEY extends string>(property: VersionPrope
     const assertOldValuePresent = createAssertPresentHandler<KEY, Version>(property.name, property.configFile);
     return {
         commandLineInfo,
-        matchesCommandLineOption,
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
@@ -209,14 +200,6 @@ function createCommandLineInfo(descriptor: CommandLineDescriptor | undefined, pl
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Create a command line option matcher
-//----------------------------------------------------------------------------------------------------------------------
-
-function createCommandLineOptionMatcher(descriptor: CommandLineDescriptor | undefined) {
-    return (option: string) => (descriptor ? option === descriptor.option : false);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 // Create a config file key matcher
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -227,7 +210,7 @@ function createConfigFileKeyMatcher<KEY extends string>(descriptor: ConfigFileDe
         const allKeys = [...activeKey, ...(descriptor.obsoleteKeys ?? [])];
         return (key: string) => allKeys.some(currentKey => currentKey === key);
     } else {
-        return (_key: string) => false;
+        return () => false;
     }
 }
 
