@@ -1,6 +1,7 @@
-// import { exit } from "process";
-// import prompts, { type Choice, type PromptObject } from "prompts";
-import type { OldPartialConfig } from "../../config/config-properties.js";
+import { exit } from "process";
+import prompts, { type Choice, type PromptObject } from "prompts";
+import type { ParsedConfig } from "../../config/config-loader.js";
+import type { CommandLineConfig } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import type { Path } from "../../utilities/path.js";
 
@@ -14,7 +15,12 @@ import type { Path } from "../../utilities/path.js";
 // Acquire the new configuration
 //----------------------------------------------------------------------------------------------------------------------
 
-export async function getNewConfig(_projectRoot: Path, _oldConfig: OldPartialConfig | undefined) {
+export async function getNewConfig(
+    _projectRoot: Path,
+    parsedConfig: ParsedConfig | undefined,
+    _commandLineConfig: CommandLineConfig
+) {
+    const oldConfig = await extractOldConfig(parsedConfig);
     const version = VERSION_NUMBER;
     // const projectName = await getProjectName(projectRoot, oldConfig);
     // const artifact = await getArtifact(oldConfig);
@@ -28,7 +34,7 @@ export async function getNewConfig(_projectRoot: Path, _oldConfig: OldPartialCon
     // const tscOutDir = await getTscOutDir(oldConfig);
     // const libraries = await getLibraries(runtime);
     // const installDevToolsLocally = await getInstallDevToolsLocally();
-    console.log(version);
+    console.log(oldConfig);
     return {
         version,
         // projectName,
@@ -45,6 +51,32 @@ export async function getNewConfig(_projectRoot: Path, _oldConfig: OldPartialCon
         // libraries,
         // installDevToolsLocally,
     };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Extract the old configuration and confirm any errors that might have occurred
+//----------------------------------------------------------------------------------------------------------------------
+
+async function extractOldConfig(parsedConfig: ParsedConfig | undefined) {
+    if (parsedConfig) {
+        const { partial, errors } = parsedConfig;
+        if (errors && errors.length) {
+            console.log(`Invalid configuration in ${parsedConfig.configFile}:`);
+            errors.forEach(error => console.log(1 < errors.length ? `- ${error}` : error));
+            console.log("");
+            const choices = toChoice(
+                ["yes", "Reconfigure the project anyway", true],
+                ["no", "Abort the configuration wizard", false]
+            );
+            const message = "Proceed despite errors?";
+            if (!(await prompt<boolean>({ type: "select", hint: " ", message, choices, initial: 0 }))) {
+                exit(1);
+            }
+        }
+        return partial;
+    } else {
+        return undefined;
+    }
 }
 
 // //----------------------------------------------------------------------------------------------------------------------
@@ -242,13 +274,13 @@ export async function getNewConfig(_projectRoot: Path, _oldConfig: OldPartialCon
 //     });
 // }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Convert a drop-down value to an option
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Convert a drop-down value to an option
+//----------------------------------------------------------------------------------------------------------------------
 
-// function toChoice<T>(...options: ReadonlyArray<[string, string | undefined, T, boolean?]>): Choice[] {
-//     return options.map(option => ({ title: option[0], description: option[1], value: option[2], selected: option[3] }));
-// }
+function toChoice<T>(...options: ReadonlyArray<[string, string | undefined, T, boolean?]>): Choice[] {
+    return options.map(option => ({ title: option[0], description: option[1], value: option[2], selected: option[3] }));
+}
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Get the index of the most suitable choice
@@ -274,10 +306,10 @@ export async function getNewConfig(_projectRoot: Path, _oldConfig: OldPartialCon
 //     return defaultIndex;
 // }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Prompt wrapper that exits if the returned value is "undefined"                     https://github.com/terkelg/prompts
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Prompt wrapper that exits if the returned value is "undefined"                     https://github.com/terkelg/prompts
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function prompt<T>(options: Omit<PromptObject<string>, "name">): Promise<T> {
-//     return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1);
-// }
+async function prompt<T>(options: Omit<PromptObject<string>, "name">): Promise<T> {
+    return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1);
+}

@@ -17,7 +17,7 @@ export function loadConfigFile(configFile: Path) {
             .map(line => ({ line }))
             .map((item, index) => ({ ...item, ...createErrorHandlers(index, errors) }))
             .forEach(item => processLine(item.line, item.formatError, item.addError, addProperty));
-        return parseConfig(properties, errors);
+        return parseConfig(configFile, properties, errors);
     } else {
         return undefined;
     }
@@ -99,13 +99,16 @@ function splitLine(line: string, addError: AddError) {
 // Convert a set of properties to a config object
 //----------------------------------------------------------------------------------------------------------------------
 
-function parseConfig(properties: ConfigFileProperties, errors: Array<string>) {
+function parseConfig(configFilePath: Path, properties: ConfigFileProperties, errors: Array<string>) {
     const addError = (message: string) => errors.push(message);
     validatePropertyKeys(properties, addError);
     const partial = assembleConfig(properties, addError);
-    const validated = validateConfig(partial, addError);
-    return { partial, validated, errors: errors.length ? errors : undefined };
+    const validated = errors.length ? undefined : validateConfig(partial, addError);
+    const configFile = configFilePath.path.replace(/.*\/\.launchpad\//, ".launchpad/");
+    return { configFile, partial, validated, errors: errors.length ? errors : undefined };
 }
+
+export type ParsedConfig = ReturnType<typeof parseConfig>;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Check if there are any unknown properties

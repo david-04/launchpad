@@ -1,16 +1,15 @@
 import { parseCommandLineOptions } from "../../config/command-line-parser.js";
 import { loadConfigFile } from "../../config/config-loader.js";
 import type { Path } from "../../utilities/path.js";
+import { getNewConfig } from "./config-wizard.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Initialize a new project
 //----------------------------------------------------------------------------------------------------------------------
 
-export async function init(_projectRoot: Path, configFile: Path, options: ReadonlyArray<string>) {
-    const oldConfig = loadConfigFile(configFile);
-    const commandLine = parseCommandLineOptions(options);
-
-    return { oldConfig, commandLine };
-
-    /*const newConfig = await getNewConfig(_projectRoot, oldConfig?.partial);*/
+export async function init(projectRoot: Path, configFile: Path, options: ReadonlyArray<string>) {
+    const parsedConfig = loadConfigFile(configFile);
+    const commandLineConfig = parseCommandLineOptions(options);
+    const newConfig = await getNewConfig(projectRoot, parsedConfig, commandLineConfig);
+    console.log({ parsedConfig, commandLineConfig, newConfig });
 }
