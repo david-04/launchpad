@@ -1,9 +1,11 @@
 import { exit } from "process";
 import prompts, { type Choice, type PromptObject } from "prompts";
 import type { ParsedConfig } from "../../config/config-loader.js";
-import type { CommandLineConfig } from "../../config/config-properties.js";
+import { ConfigProperties, type CommandLineConfig, type OldPartialConfig } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import type { Path } from "../../utilities/path.js";
+import { DEFAULT_ENUM } from "../../utilities/constants.js";
+import type { ConfigError } from "../../config/config-data-types.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
@@ -11,18 +13,23 @@ import type { Path } from "../../utilities/path.js";
 
 // type EnumProperty = { readonly value: string; readonly pinned: boolean };
 
+type Presets = {
+    oldConfig: OldPartialConfig | undefined;
+    commandLineConfig: CommandLineConfig;
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Acquire the new configuration
 //----------------------------------------------------------------------------------------------------------------------
 
 export async function getNewConfig(
-    _projectRoot: Path,
+    projectRoot: Path,
     parsedConfig: ParsedConfig | undefined,
-    _commandLineConfig: CommandLineConfig
+    commandLineConfig: CommandLineConfig
 ) {
-    const oldConfig = await extractOldConfig(parsedConfig);
+    const presets = { oldConfig: await extractOldConfig(parsedConfig), commandLineConfig };
     const version = VERSION_NUMBER;
-    // const projectName = await getProjectName(projectRoot, oldConfig);
+    const projectName = await getProjectName(presets, projectRoot);
     // const artifact = await getArtifact(oldConfig);
     // const runtime = await getRuntime(oldConfig, artifact);
     // const module = await getModule(oldConfig);
@@ -34,10 +41,9 @@ export async function getNewConfig(
     // const tscOutDir = await getTscOutDir(oldConfig);
     // const libraries = await getLibraries(runtime);
     // const installDevToolsLocally = await getInstallDevToolsLocally();
-    console.log(oldConfig);
     return {
         version,
-        // projectName,
+        projectName,
         // templateConfig,
         // artifact,
         // runtime,
@@ -79,20 +85,24 @@ async function extractOldConfig(parsedConfig: ParsedConfig | undefined) {
     }
 }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the project's name
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Select the project's name
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getProjectName(projectRoot: Path, oldConfig?: OldConfig) {
-//     const message = 'The name must not be empty nor contain blanks or reserved characters like ":", "\\" or "/"';
-//     return prompt<string>({
-//         type: "text",
-//         initial: oldConfig?.projectName?.trim() || projectRoot.path.replace(/.*\//, "").trim(),
-//         message: "Project name",
-//         format: input => input.trim(),
-//         validate: value => !!value.match(/^[^:\\/<> \s]+$/) || message,
-//     });
-// }
+async function getProjectName(presets: Presets, projectRoot: Path) {
+    const defaultName = presets.oldConfig?.projectName?.trim() || projectRoot.path.replace(/.*\//, "").trim();
+    const preselectedName = presets.commandLineConfig.projectName;
+    if (undefined !== preselectedName) {
+        return DEFAULT_ENUM === preselectedName ? defaultName : preselectedName;
+    }
+    return prompt<string>({
+        type: "text",
+        initial: defaultName,
+        message: "Project name",
+        format: input => input.trim(),
+        validate: toValidator(ConfigProperties.projectName.parseNewValue),
+    });
+}
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select a project template
@@ -312,4 +322,11 @@ function toChoice<T>(...options: ReadonlyArray<[string, string | undefined, T, b
 
 async function prompt<T>(options: Omit<PromptObject<string>, "name">): Promise<T> {
     return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1);
+}
+
+function toValidator(parseNewValue: (value: string, source: string | undefined) => string | ConfigError) {
+    return (value: string) => {
+        const result = parseNewValue(value, undefined);
+        return result && "object" === typeof result && "error" in result ? result.error : true;
+    };
 }
