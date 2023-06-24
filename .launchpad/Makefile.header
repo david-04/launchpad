@@ -133,8 +133,11 @@ include $(__LP_SETTINGS_CFG)
 LP_SETTINGS_ARTIFACT_ENUMS="app" or "lib"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_ARTIFACT)
 
-LP_SETTINGS_RUNTIME_ENUMS="node", "ts-node" or "web"
+LP_SETTINGS_RUNTIME_ENUMS="cli", "node", "ts-node" or "web"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_RUNTIME)
+ifeq "$(LP_SETTINGS_RUNTIME_ENUMS)" "cli"
+LP_SETTINGS_RUNTIME_ENUMS=node
+endif
 
 LP_SETTINGS_MODULE_SYSTEM_ENUMS="cjs" or "esm"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_MODULE_SYSTEM)

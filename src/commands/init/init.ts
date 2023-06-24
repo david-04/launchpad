@@ -11,5 +11,5 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
     const parsedConfig = loadConfigFile(configFile);
     const commandLineConfig = parseCommandLineOptions(options);
     const newConfig = await getNewConfig(projectRoot, parsedConfig, commandLineConfig);
-    console.log({ parsedConfig, commandLineConfig, newConfig });
+    console.log(newConfig);
 }

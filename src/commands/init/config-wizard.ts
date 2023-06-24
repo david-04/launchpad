@@ -2,7 +2,7 @@ import { exit } from "process";
 import prompts, { type Choice, type PromptObject } from "prompts";
 import type { ConfigError } from "../../config/config-data-types.js";
 import type { ParsedConfig } from "../../config/config-loader.js";
-import type { CommandLineConfig, OldPartialConfig } from "../../config/config-objects.js";
+import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import { ConfigProperties } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import { DEFAULT_ENUM } from "../../utilities/constants.js";
@@ -19,6 +19,9 @@ type Presets = {
     commandLineConfig: CommandLineConfig;
 };
 
+type ChoiceOption<T> = readonly [string, string | undefined, T, boolean?];
+type ChoiceOptions<T> = ReadonlyArray<ChoiceOption<T>>;
+
 //----------------------------------------------------------------------------------------------------------------------
 // Acquire the new configuration
 //----------------------------------------------------------------------------------------------------------------------
@@ -31,8 +34,8 @@ export async function getNewConfig(
     const presets = { oldConfig: await extractOldConfig(parsedConfig), commandLineConfig };
     const version = VERSION_NUMBER;
     const projectName = await getProjectName(presets, projectRoot);
-    // const artifact = await getArtifact(oldConfig);
-    // const runtime = await getRuntime(oldConfig, artifact);
+    const artifact = await getArtifact(presets);
+    const runtime = await getRuntime(presets);
     // const module = await getModule(oldConfig);
     // const bundler = await getBundler(oldConfig);
     // const bundlerDts = await getBundlerDts(oldConfig, bundler);
@@ -45,8 +48,8 @@ export async function getNewConfig(
     return {
         version,
         projectName,
-        // artifact,
-        // runtime,
+        artifact,
+        runtime,
         // module,
         // bundler,
         // bundlerDts,
@@ -70,10 +73,10 @@ async function extractOldConfig(parsedConfig: ParsedConfig | undefined) {
             console.log(`Invalid configuration in ${parsedConfig.configFile}:`);
             errors.forEach(error => console.log(1 < errors.length ? `- ${error}` : error));
             console.log("");
-            const choices = toChoice(
+            const choices = toChoice([
                 ["yes", "Reconfigure the project anyway", true],
-                ["no", "Abort the configuration wizard", false]
-            );
+                ["no", "Abort the configuration wizard", false],
+            ]);
             const message = "Proceed despite errors?";
             if (!(await prompt<boolean>({ type: "select", hint: " ", message, choices, initial: 0 }))) {
                 exit(1);
@@ -104,33 +107,43 @@ async function getProjectName(presets: Presets, projectRoot: Path) {
     });
 }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the artifact type
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Select the artifact type
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getArtifact(oldConfig: OldConfig | undefined) {
-//     const choices = toChoice(
-//         ["application", undefined, Artifact.unpinned("app")],
-//         ["library", undefined, Artifact.unpinned("lib")]
-//     );
-//     const initial = oldConfig?.artifact?.value === "lib" ? 1 : 0;
-//     return prompt<Artifact>({ type: "select", message: "Artifact", choices, initial });
-// }
+async function getArtifact(presets: Presets) {
+    type T = NewConfig["artifact"];
+    const defaultValue: T = "app";
+    const presetValue = presets.commandLineConfig.artifact;
+    const oldValue = presets.oldConfig?.artifact;
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
+    } else {
+        const options = ConfigProperties.artifact.options.map(array => [...array, array[0]] as const);
+        const choices = toChoice(options);
+        const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
+        return prompt<T>({ type: "select", message: "Artifact", choices, initial });
+    }
+}
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the runtime
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Select the runtime
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getRuntime(oldConfig: OldConfig | undefined, artifact: Artifact) {
-//     const cliDescription = artifact.value === "app" ? "Command-line application" : "Library for command-line scripts";
-//     const webDescription = artifact.value === "app" ? "Web application" : "Browser library";
-//     const choices = toChoice(
-//         ["cli", cliDescription, Runtime.unpinned("node")],
-//         ["web", webDescription, Runtime.unpinned("web")]
-//     );
-//     const initial = oldConfig?.runtime?.value === "web" ? 1 : 0;
-//     return prompt<Runtime>({ type: "select", message: "Runtime", choices, initial });
-// }
+async function getRuntime(presets: Presets) {
+    type T = NewConfig["runtime"];
+    const defaultValue: T = "cli";
+    const presetValue = presets.commandLineConfig.runtime;
+    const oldValue = presets.oldConfig?.runtime;
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
+    } else {
+        const options = ConfigProperties.runtime.options.map(array => [...array, array[0]] as const);
+        const choices = toChoice(options);
+        const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
+        return prompt<T>({ type: "select", message: "Runtime", choices, initial });
+    }
+}
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select the module type
@@ -273,14 +286,6 @@ async function getProjectName(presets: Presets, projectRoot: Path) {
 //     });
 // }
 
-//----------------------------------------------------------------------------------------------------------------------
-// Convert a drop-down value to an option
-//----------------------------------------------------------------------------------------------------------------------
-
-function toChoice<T>(...options: ReadonlyArray<[string, string | undefined, T, boolean?]>): Choice[] {
-    return options.map(option => ({ title: option[0], description: option[1], value: option[2], selected: option[3] }));
-}
-
 // //----------------------------------------------------------------------------------------------------------------------
 // // Get the index of the most suitable choice
 // //----------------------------------------------------------------------------------------------------------------------
@@ -306,6 +311,17 @@ function toChoice<T>(...options: ReadonlyArray<[string, string | undefined, T, b
 // }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Convert a parser function into a validator
+//----------------------------------------------------------------------------------------------------------------------
+
+function toValidator(parseNewValue: (value: string, source: string | undefined) => string | ConfigError) {
+    return (value: string) => {
+        const result = parseNewValue(value, undefined);
+        return result && "object" === typeof result && "error" in result ? result.error : true;
+    };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Prompt wrapper that exits if the returned value is "undefined"                     https://github.com/terkelg/prompts
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -313,9 +329,27 @@ async function prompt<T>(options: Omit<PromptObject<string>, "name">): Promise<T
     return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1);
 }
 
-function toValidator(parseNewValue: (value: string, source: string | undefined) => string | ConfigError) {
-    return (value: string) => {
-        const result = parseNewValue(value, undefined);
-        return result && "object" === typeof result && "error" in result ? result.error : true;
-    };
+//----------------------------------------------------------------------------------------------------------------------
+// Convert a drop-down value to an option
+//----------------------------------------------------------------------------------------------------------------------
+
+function toChoice<T>(options: ChoiceOptions<T>): Choice[] {
+    return options.map(option => ({ title: option[0], description: option[1], value: option[2], selected: option[3] }));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Find
+//----------------------------------------------------------------------------------------------------------------------
+
+function findNonPinnableMatchingChoice(
+    choices: ChoiceOptions<string>,
+    ...selectedValues: ReadonlyArray<string | undefined>
+) {
+    for (const selectedValue of selectedValues) {
+        const index = choices.findIndex(choice => choice[0] === selectedValue);
+        if (0 <= index) {
+            return index;
+        }
+    }
+    return 0;
 }

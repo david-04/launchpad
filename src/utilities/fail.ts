@@ -22,7 +22,7 @@ export function fail(message: string): never {
 
 export function formatError(error?: unknown) {
     if (error instanceof FriendlyError) {
-        return `ERROR: ${error.message}`;
+        return error.message;
     } else if (error instanceof Error) {
         return error;
     } else {

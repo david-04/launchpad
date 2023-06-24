@@ -79,9 +79,10 @@ const CURRENT_CONFIG_PROPERTIES = {
             description: "the runtime environment",
         },
         currentValues: [
-            ["node", "command line (compiled to JavaScript)"],
-            ["ts-node", "command line (run TypeScript without compiling)"],
-            ["web", "run in browser"],
+            ["cli", "currently node, might change during future uplifts"],
+            ["node", "command line (pre-compiled to JavaScript)"],
+            ["ts-node", "command line (compile on-the-fly when executing)"],
+            ["web", "web browser"],
         ] as const,
         obsoleteValues: [] as const,
     }),
