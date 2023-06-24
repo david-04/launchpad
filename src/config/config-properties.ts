@@ -1,4 +1,10 @@
-import { ValidationError, type AddError, type ConfigError, type ConfigFileProperty } from "./config-data-types.js";
+import {
+    ValidationError,
+    type AddError,
+    type ConfigError,
+    type ConfigFileProperty,
+    type CommandLineOptions,
+} from "./config-data-types.js";
 import {
     createNonPinnableEnumProperty,
     createPinnableEnumProperty,
@@ -234,7 +240,7 @@ const all = Object.keys(AllConfigProperties).map(key => AllConfigProperties[key 
 export const ConfigProperties = { ...AllConfigProperties, all } as const;
 
 //----------------------------------------------------------------------------------------------------------------------
-// Parse configuration properties into a
+// Parse available configuration properties into an old config object
 //----------------------------------------------------------------------------------------------------------------------
 
 export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, addError: AddError) {
@@ -296,7 +302,7 @@ type NewConfigType<T extends keyof typeof CurrentConfigProperties> = Exclude<
 
 export type NewConfig = {
     version: NewConfigType<"version">;
-    projectName: NewConfigType<"artifact">;
+    projectName: NewConfigType<"projectName">;
     artifact: NewConfigType<"artifact">;
     runtime: NewConfigType<"runtime">;
     module: NewConfigType<"module">;
@@ -307,3 +313,24 @@ export type NewConfig = {
     srcDir: NewConfigType<"srcDir">;
     tscOutDir: NewConfigType<"tscOutDir">;
 };
+
+export type CommandLineConfig = ReturnType<typeof assembleConfigFromCommandLineOptions>;
+
+//----------------------------------------------------------------------------------------------------------------------
+// Parse configuration properties into an old config object
+//----------------------------------------------------------------------------------------------------------------------
+
+export function assembleConfigFromCommandLineOptions(properties: CommandLineOptions) {
+    return {
+        projectName: ConfigProperties.projectName.parseFromCommandLine(properties),
+        artifact: ConfigProperties.artifact.parseFromCommandLine(properties),
+        runtime: ConfigProperties.runtime.parseFromCommandLine(properties),
+        module: ConfigProperties.module.parseFromCommandLine(properties),
+        bundler: ConfigProperties.bundler.parseFromCommandLine(properties),
+        dtsBundler: ConfigProperties.dtsBundler.parseFromCommandLine(properties),
+        formatter: ConfigProperties.formatter.parseFromCommandLine(properties),
+        packageManager: ConfigProperties.packageManager.parseFromCommandLine(properties),
+        srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
+        tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
+    } as const satisfies Omit<{ [K in keyof NewConfig]: NewConfig[K] | undefined | "default" }, "version">;
+}

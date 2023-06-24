@@ -13,6 +13,17 @@ export class ValidationError extends Error {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Key-value pairs extracted from the command line
+//----------------------------------------------------------------------------------------------------------------------
+
+export type CommandLineOption = {
+    readonly key: string;
+    readonly value: string;
+}
+
+export type CommandLineOptions = ReadonlyArray<CommandLineOption>;
+
+//----------------------------------------------------------------------------------------------------------------------
 // Key-value pairs imported from the configuration file
 //----------------------------------------------------------------------------------------------------------------------
 

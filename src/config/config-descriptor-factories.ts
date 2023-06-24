@@ -1,4 +1,5 @@
 import { DEFAULT_ENUM, PINNED_SUFFIX } from "../utilities/constants.js";
+import { fail } from "../utilities/fail.js";
 import {
     ValidationError,
     type AddError,
@@ -7,6 +8,7 @@ import {
     type ConfigFileProperties,
     type PinnableEnumValue,
     type SerializationDetails,
+    type CommandLineOptions,
 } from "./config-data-types.js";
 import { createNonPinnableEnumParser, createPinnableEnumParser, parseVersion } from "./config-parsers.js";
 import type { Version } from "./version-number.js";
@@ -21,6 +23,7 @@ type AssembledDescriptor<OLD, NEW, KEY extends string> = {
     readonly matchesCommandLineOption: (key: string) => boolean;
     readonly parseOldValue: (properties: ConfigFileProperties, addError: AddError) => OLD | undefined;
     readonly parseNewValue: (value: string, source: string) => NEW | ConfigError;
+    readonly parseFromCommandLine: (options: CommandLineOptions) => NEW | undefined | typeof DEFAULT_ENUM;
     readonly serialize: (data: Record<KEY, NEW>) => undefined | SerializationDetails;
     readonly assertOldValuePresent: (value: OLD | undefined) => Exclude<OLD, undefined>;
 };
@@ -64,6 +67,7 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
     const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
     const parseOldValue = createOldValueParser<ALL>(matchesConfigFileKey, createNonPinnableEnumParser(allValues));
     const parseNewValue = createNonPinnableEnumParser(property.currentValues.map(value => value[0]));
+    const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
     const serialize = createSerializer<CURRENT, KEY>(property.configFile, (value: CURRENT) => value);
     const assertOldValuePresent = createAssertPresentHandler<KEY, ALL>(property.name, property.configFile);
     const descriptor = {
@@ -72,6 +76,7 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
+        parseFromCommandLine,
         serialize,
         assertOldValuePresent,
     } as const satisfies AssembledDescriptor<ALL, CURRENT, KEY>;
@@ -104,6 +109,7 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
         createPinnableEnumParser(allValues)
     );
     const parseNewValue = createPinnableEnumParser(property.currentValues.map(value => value[0]));
+    const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
     const render = (prop: PinnableEnumValue<CURRENT>) => [prop.value, prop.pinned ? PINNED_SUFFIX : ""].join("");
     const serialize = createSerializer<PinnableEnumValue<CURRENT>, KEY>(property.configFile, render);
     const assertOldValuePresent = createAssertPresentHandler<KEY, PinnableEnumValue<ALL>>(
@@ -116,6 +122,7 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
+        parseFromCommandLine,
         serialize,
         assertOldValuePresent,
     } as const satisfies AssembledDescriptor<PinnableEnumValue<ALL>, PinnableEnumValue<CURRENT>, KEY>;
@@ -140,6 +147,7 @@ export function createStringProperty<KEY extends string>(property: StringPropert
     const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
     const parseOldValue = createOldValueParser<string>(matchesConfigFileKey, property.parseOldValue);
     const parseNewValue = property.parseNewValue;
+    const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
     const serialize = createSerializer<string, KEY>(property.configFile, (value: string) => value);
     const assertOldValuePresent = createAssertPresentHandler<KEY, string>(property.name, property.configFile);
     return {
@@ -148,6 +156,7 @@ export function createStringProperty<KEY extends string>(property: StringPropert
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
+        parseFromCommandLine,
         serialize,
         assertOldValuePresent,
     } as const satisfies AssembledDescriptor<string, string, KEY>;
@@ -168,6 +177,7 @@ export function createVersionProperty<KEY extends string>(property: VersionPrope
     const matchesCommandLineOption = createCommandLineOptionMatcher(undefined);
     const parseOldValue = createOldValueParser<Version>(matchesConfigFileKey, parseVersion);
     const parseNewValue = parseVersion;
+    const parseFromCommandLine = createCommandLineParser(undefined, parseNewValue);
     const serialize = createSerializer<Version, KEY>(property.configFile, (value: Version) => value.render());
     const assertOldValuePresent = createAssertPresentHandler<KEY, Version>(property.name, property.configFile);
     return {
@@ -176,6 +186,7 @@ export function createVersionProperty<KEY extends string>(property: VersionPrope
         matchesConfigFileKey,
         parseOldValue,
         parseNewValue,
+        parseFromCommandLine,
         serialize,
         assertOldValuePresent,
     } as const satisfies AssembledDescriptor<Version, Version, KEY>;
@@ -275,5 +286,33 @@ function createAssertPresentHandler<KEY extends string, OLD>(
             }
         }
         return value as Exclude<OLD, undefined>;
+    };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Create a command line parser for a given option
+//----------------------------------------------------------------------------------------------------------------------
+
+function createCommandLineParser<T>(
+    commandLineDescriptor: CommandLineDescriptor | undefined,
+    parse: (value: string, source: string | undefined) => T | { readonly error: string }
+): (options: CommandLineOptions) => Exclude<T, ConfigError> | undefined | typeof DEFAULT_ENUM {
+    return (options: CommandLineOptions) => {
+        for (let index = options.length - 1; 0 <= index; index--) {
+            const option = options[index]!;
+            if (option.key === commandLineDescriptor?.option) {
+                if (DEFAULT_ENUM === option.value) {
+                    return DEFAULT_ENUM;
+                } else {
+                    const value = parse(option.value, `command line option ${option.key}`);
+                    if (value && "object" === typeof value && "error" in value) {
+                        fail(value.error);
+                    } else {
+                        return value as Exclude<T, ConfigError>;
+                    }
+                }
+            }
+        }
+        return undefined;
     };
 }
