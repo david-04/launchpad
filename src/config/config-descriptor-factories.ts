@@ -61,12 +61,14 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
     property: NonPinnableEnumPropertyDescriptor<KEY, CURRENT, OBSOLETE>
 ) {
     type ALL = CURRENT | OBSOLETE;
-    const allValues = [...property.currentValues.map(value => value[0]), ...property.obsoleteValues];
-    const commandLineInfo = createCommandLineInfo(property.commandLine, `[${property.currentValues.join(" | ")}]`);
+    const currentValues = property.currentValues.map(value => value[0]);
+    const allValues = [...currentValues, ...property.obsoleteValues];
+    const currentValuesWithDefault = [DEFAULT_ENUM, ...currentValues];
+    const commandLineInfo = createCommandLineInfo(property.commandLine, `[${currentValuesWithDefault.join(" | ")}]`);
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
     const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
     const parseOldValue = createOldValueParser<ALL>(matchesConfigFileKey, createNonPinnableEnumParser(allValues));
-    const parseNewValue = createNonPinnableEnumParser(property.currentValues.map(value => value[0]));
+    const parseNewValue = createNonPinnableEnumParser(currentValues);
     const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
     const serialize = createSerializer<CURRENT, KEY>(property.configFile, (value: CURRENT) => value);
     const assertOldValuePresent = createAssertPresentHandler<KEY, ALL>(property.name, property.configFile);
@@ -99,8 +101,9 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
     property: PinnableEnumPropertyDescriptor<KEY, CURRENT, OBSOLETE>
 ) {
     type ALL = CURRENT | OBSOLETE;
-    const allValues = [...property.currentValues.map(value => value[0]), ...property.obsoleteValues];
-    const currentValuesWithDefault = [DEFAULT_ENUM, ...property.currentValues];
+    const currentValues = property.currentValues.map(value => value[0]);
+    const allValues = [...currentValues, ...property.obsoleteValues];
+    const currentValuesWithDefault = [DEFAULT_ENUM, ...currentValues];
     const commandLineInfo = createCommandLineInfo(property.commandLine, `[${currentValuesWithDefault.join(" | ")}]`);
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
     const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
@@ -108,7 +111,7 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
         matchesConfigFileKey,
         createPinnableEnumParser(allValues)
     );
-    const parseNewValue = createPinnableEnumParser(property.currentValues.map(value => value[0]));
+    const parseNewValue = createPinnableEnumParser(currentValues);
     const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
     const render = (prop: PinnableEnumValue<CURRENT>) => [prop.value, prop.pinned ? PINNED_SUFFIX : ""].join("");
     const serialize = createSerializer<PinnableEnumValue<CURRENT>, KEY>(property.configFile, render);
@@ -142,7 +145,8 @@ type StringPropertyDescriptor<KEY extends string> = {
 };
 
 export function createStringProperty<KEY extends string>(property: StringPropertyDescriptor<KEY>) {
-    const commandLineInfo = createCommandLineInfo(property.commandLine, property.commandLine?.placeholder);
+    const placeholder = property.commandLine ? `[${property.commandLine?.placeholder} | default]` : undefined;
+    const commandLineInfo = createCommandLineInfo(property.commandLine, placeholder);
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
     const matchesCommandLineOption = createCommandLineOptionMatcher(property.commandLine);
     const parseOldValue = createOldValueParser<string>(matchesConfigFileKey, property.parseOldValue);

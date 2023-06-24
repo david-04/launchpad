@@ -1,6 +1,7 @@
 import { init } from "./commands/init/init.js";
 import { postinstall } from "./commands/postinstall/postinstall.js";
 import { uplift } from "./commands/uplift/uplift.js";
+import { CurrentConfigProperties } from "./config/config-properties.js";
 import { VERSION_NUMBER } from "./resources/version-information.js";
 import { fail, formatError } from "./utilities/fail.js";
 import { Path, getConfigFilePath } from "./utilities/path.js";
@@ -12,7 +13,7 @@ import { Path, getConfigFilePath } from "./utilities/path.js";
 const COMMANDS = [
     {
         name: "init",
-        help: "init .......... initialize a new project",
+        help: "init .......... initialize a new project or re-configure an existing one",
         getProjectRootDirectory: () => process.cwd(),
         execute: init,
     },
@@ -24,7 +25,7 @@ const COMMANDS = [
     },
     {
         name: "uplift",
-        help: "uplift ........ uplift the current project",
+        help: "uplift ........ upgrade all dependencies (including launchpad) to the latest version ",
         getProjectRootDirectory: () => process.cwd(),
         execute: uplift,
     },
@@ -77,8 +78,39 @@ function showHelp() {
     const commands = COMMANDS.map(command => command.help)
         .filter(help => help.trim())
         .map(help => `  ${help}`);
-    ["", "  Usage: launchpad [command]", "", ...commands].forEach(line => console.log(line));
+    const options = getConfigProperties();
+    const helpMessage = [
+        "",
+        "  Usage: launchpad [COMMAND] [OPTIONS]",
+        "",
+        "  [COMMAND]",
+        "",
+        ...commands,
+        "",
+        "  [OPTIONS]",
+        "",
+        ...options.map(option => `  ${option}`),
+    ];
+    helpMessage.forEach(line => console.log(line));
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// Get the command line options for specifying configuration properties
+//----------------------------------------------------------------------------------------------------------------------
+
+function getConfigProperties() {
+    const properties = Object.keys(CurrentConfigProperties)
+        .map(key => CurrentConfigProperties[key as keyof typeof CurrentConfigProperties])
+        .map(property => property.commandLineInfo)
+        .filter(<T>(property: T): property is Exclude<T, undefined> => !!property)
+        .map(property => ({
+            parameter: `${property.option}=${property.placeholder}`,
+            description: property.description,
+        }));
+    const maxPropertyLength = properties.reduce((max, property) => Math.max(max, property.parameter.length), 0);
+    return properties.map(property => `${property.parameter.padEnd(maxPropertyLength)}   ${property.description}`);
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Show the version number

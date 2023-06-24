@@ -43,7 +43,7 @@ export const CurrentConfigProperties = {
         },
         commandLine: {
             option: "--project-name",
-            placeholder: "[<NAME> | default]",
+            placeholder: "<NAME>",
             description: "name of the main module",
         },
         parseOldValue: parseProjectName,
@@ -62,7 +62,7 @@ export const CurrentConfigProperties = {
         },
         commandLine: {
             option: "--artifact",
-            description: "the module type",
+            description: "the project's artifact",
         },
         currentValues: [
             ["app", "a stand-alone application"],
@@ -83,7 +83,7 @@ export const CurrentConfigProperties = {
         },
         commandLine: {
             option: "--runtime",
-            description: "the runtime engine/environment",
+            description: "the runtime environment",
         },
         currentValues: [
             ["node", "command line (compiled to JavaScript)"],
@@ -104,7 +104,7 @@ export const CurrentConfigProperties = {
             newConfigObjectName: "module",
         },
         commandLine: {
-            option: "--module",
+            option: "--module-type",
             description: "the module type",
         },
         currentValues: [
