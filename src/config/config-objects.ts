@@ -5,7 +5,7 @@ import {
     type ConfigError,
     type ConfigFileProperty,
 } from "./config-data-types.js";
-import { ConfigProperties, CurrentConfigProperties } from "./config-properties.js";
+import { ConfigProperties } from "./config-properties.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Parse available configuration properties into an old config object
@@ -24,7 +24,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         packageManager: ConfigProperties.packageManager.parseOldValue(properties, addError),
         srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
         tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
-    } as const satisfies { [K in keyof typeof CurrentConfigProperties]: unknown };
+    } as const satisfies { [K in keyof typeof ConfigProperties.current]: unknown };
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,8 +63,8 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
 export type OldPartialConfig = ReturnType<typeof assembleConfig>;
 export type OldConfig = ReturnType<typeof validateConfig>;
 
-type NewConfigType<T extends keyof typeof CurrentConfigProperties> = Exclude<
-    ReturnType<(typeof CurrentConfigProperties)[T]["parseNewValue"]>,
+type NewConfigType<T extends keyof typeof ConfigProperties.current> = Exclude<
+    ReturnType<(typeof ConfigProperties.current)[T]["parseNewValue"]>,
     ConfigError
 >;
 

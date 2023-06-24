@@ -10,7 +10,7 @@ import { createDirectoryParser, parseProjectName } from "./config-parsers.js";
 // Current configuration properties
 //----------------------------------------------------------------------------------------------------------------------
 
-export const CurrentConfigProperties = {
+const CURRENT_CONFIG_PROPERTIES = {
     //
     //------------------------------------------------------------------------------------------------------------------
     // Version number
@@ -222,12 +222,24 @@ export const CurrentConfigProperties = {
 // Obsolete configuration properties
 //----------------------------------------------------------------------------------------------------------------------
 
-export const ObsoleteConfigProperties = {} as const;
+const OBSOLETE_CONFIG_PROPERTIES = {} as const;
 
 //----------------------------------------------------------------------------------------------------------------------
-// Merge current and obsolete configuration properties
+// Create compilations of the configuration properties
 //----------------------------------------------------------------------------------------------------------------------
 
-const AllConfigProperties = { ...CurrentConfigProperties, ...ObsoleteConfigProperties } as const;
-const all = Object.keys(AllConfigProperties).map(key => AllConfigProperties[key as keyof typeof AllConfigProperties]);
-export const ConfigProperties = { ...AllConfigProperties, all } as const;
+const ALL_CONFIG_PROPERTIES = { ...CURRENT_CONFIG_PROPERTIES, ...OBSOLETE_CONFIG_PROPERTIES } as const;
+
+const toArray = <T extends object>(properties: T) => Object.keys(properties).map(key => properties[key as keyof T]);
+
+export const ConfigProperties = {
+    ...ALL_CONFIG_PROPERTIES,
+    all: ALL_CONFIG_PROPERTIES,
+    current: CURRENT_CONFIG_PROPERTIES,
+    obsolete: OBSOLETE_CONFIG_PROPERTIES,
+    arrays: {
+        all: toArray(ALL_CONFIG_PROPERTIES),
+        current: toArray(CURRENT_CONFIG_PROPERTIES),
+        obsolete: toArray(OBSOLETE_CONFIG_PROPERTIES),
+    },
+} as const;

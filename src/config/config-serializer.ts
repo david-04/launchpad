@@ -12,7 +12,7 @@ export function serializeConfig(config: NewConfig) {
         "# This is a generated generated file. Do not edit. To make changes, run: launchpad init",
         "#-----------------------------------------------------------------------------------------------------------------------",
     ];
-    const properties = ConfigProperties.all.map(property => property.serialize(config));
+    const properties = ConfigProperties.arrays.all.map(property => property.serialize(config));
     const maxKeyLength = properties.reduce((max, property) => Math.max(max, property?.key.length ?? 0), 0);
     const maxValueLength = properties.reduce((max, property) => Math.max(max, property?.value.length ?? 0), 0);
     const lines = properties.map(property => (property ? formatProperty(property, maxKeyLength, maxValueLength) : ""));

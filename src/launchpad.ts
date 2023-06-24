@@ -1,7 +1,7 @@
 import { init } from "./commands/init/init.js";
 import { postinstall } from "./commands/postinstall/postinstall.js";
 import { uplift } from "./commands/uplift/uplift.js";
-import { CurrentConfigProperties } from "./config/config-properties.js";
+import { ConfigProperties } from "./config/config-properties.js";
 import { VERSION_NUMBER } from "./resources/version-information.js";
 import { fail, formatError } from "./utilities/fail.js";
 import { Path, getConfigFilePath } from "./utilities/path.js";
@@ -39,7 +39,7 @@ export async function launchpad(argv: ReadonlyArray<string>) {
     try {
         if (argv.some(arg => arg.match(/^--?h(elp)?$/))) {
             return showHelp();
-        } else if (argv.some(arg => arg.match(/^--?v(ersion)?$/))) {
+        } else if (argv.some(arg => arg.match(/^--?(v|version)$/))) {
             return showVersion();
         } else {
             const [command, ...options] = argv.map(item => item.trim());
@@ -99,8 +99,7 @@ function showHelp() {
 //----------------------------------------------------------------------------------------------------------------------
 
 function getConfigProperties() {
-    const properties = Object.keys(CurrentConfigProperties)
-        .map(key => CurrentConfigProperties[key as keyof typeof CurrentConfigProperties])
+    const properties = ConfigProperties.arrays.current
         .map(property => property.commandLineInfo)
         .filter(<T>(property: T): property is Exclude<T, undefined> => !!property)
         .map(property => ({
@@ -110,7 +109,6 @@ function getConfigProperties() {
     const maxPropertyLength = properties.reduce((max, property) => Math.max(max, property.parameter.length), 0);
     return properties.map(property => `${property.parameter.padEnd(maxPropertyLength)}   ${property.description}`);
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // Show the version number
