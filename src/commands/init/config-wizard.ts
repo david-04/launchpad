@@ -1,6 +1,6 @@
 // import { exit } from "process";
 // import prompts, { type Choice, type PromptObject } from "prompts";
-import type { OldConfig } from "../../config/v1/old-config.js";
+import type { OldPartialConfig } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import type { Path } from "../../utilities/path.js";
 
@@ -14,7 +14,7 @@ import type { Path } from "../../utilities/path.js";
 // Acquire the new configuration
 //----------------------------------------------------------------------------------------------------------------------
 
-export async function getNewConfig(_projectRoot: Path, _oldConfig: OldConfig | undefined) {
+export async function getNewConfig(_projectRoot: Path, _oldConfig: OldPartialConfig | undefined) {
     const version = VERSION_NUMBER;
     // const projectName = await getProjectName(projectRoot, oldConfig);
     // const artifact = await getArtifact(oldConfig);
