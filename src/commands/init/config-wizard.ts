@@ -44,7 +44,6 @@ export async function getNewConfig(
     return {
         version,
         projectName,
-        // templateConfig,
         // artifact,
         // runtime,
         // module,
@@ -103,17 +102,6 @@ async function getProjectName(presets: Presets, projectRoot: Path) {
         validate: toValidator(ConfigProperties.projectName.parseNewValue),
     });
 }
-
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select a project template
-// //----------------------------------------------------------------------------------------------------------------------
-
-// async function getTemplateConfig(oldConfig: OldConfig | undefined) {
-//     const toOption = (value: TemplateConfig) => ({ value, title: value.title, description: value.description });
-//     const choices = AllProjectTemplates.map(toOption);
-//     const initial = oldConfig ? choices.length - 1 : 0;
-//     return prompt<TemplateConfig>({ type: "select", message: "Project type", choices, initial });
-// }
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select the artifact type
