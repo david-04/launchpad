@@ -143,8 +143,8 @@ LP_SETTINGS_BUNDLER_ENUMS="disabled" or "esbuild"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_BUNDLER)
 
 __LP_DEFAULT_DTS_BUNDLER=dts-bundle-generator
-LP_SETTINGS_BUNDLER_DTS_ENUMS="disabled" or "$(__LP_DEFAULT_DTS_BUNDLER)"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_BUNDLER_DTS)
+LP_SETTINGS_DTS_BUNDLER_ENUMS="disabled" or "$(__LP_DEFAULT_DTS_BUNDLER)"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_DTS_BUNDLER)
 
 LP_SETTINGS_FORMATTER_ENUMS="disabled", "prettier" or "rome"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_FORMATTER)
@@ -158,8 +158,8 @@ $(call lp.fn.config.assert.not-empty, LP_SETTINGS_SRC_DIR)
 $(call lp.fn.config.normalize.string, LP_SETTINGS_TSC_OUT_DIR)
 
 ifeq "$(LP_SETTINGS_BUNDLER)" ""
-    ifneq "$(LP_SETTINGS_BUNDLER_DTS)" ""
-        $(call lp.fn.config.fail, LP_SETTINGS_BUNDLER_DTS must be "disabled" when LP_SETTINGS_BUNDLER is "disabled" as well)
+    ifneq "$(LP_SETTINGS_DTS_BUNDLER)" ""
+        $(call lp.fn.config.fail, LP_SETTINGS_DTS_BUNDLER must be "disabled" when LP_SETTINGS_BUNDLER is "disabled" as well)
     endif
 endif
 
@@ -167,8 +167,8 @@ ifeq "$(LP_SETTINGS_TSC_OUT_DIR)" ""
     ifneq "$(LP_SETTINGS_RUNTIME)" "ts-node"
         $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty when LP_SETTINGS_RUNTIME is "$(LP_SETTINGS_RUNTIME)")
     endif
-    ifneq "$(LP_SETTINGS_BUNDLER_DTS)" ""
-        $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty unless LP_SETTINGS_BUNDLER_DTS is "disabled")
+    ifneq "$(LP_SETTINGS_DTS_BUNDLER)" ""
+        $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty unless LP_SETTINGS_DTS_BUNDLER is "disabled")
     endif
 endif
 
@@ -313,7 +313,7 @@ __LP_BUNDLE_EFFECTIVE_COMMAND           =$(call lp.bundle.get-default-command)
 __LP_BUNDLE_COUNT                       =
 __LP_BUNDLE_SOURCE_MAPS_ENABLED         =$(call lp.bundle.is-enabled)
 __LP_BUNDLE_INLINE_SOURCES_ENABLED      =$(call lp.fn.if.equal, $(LP_SETTINGS_ARTIFACT), app, false, true)
-__LP_BUNDLE_DTS_BUNDLER                 =$(LP_SETTINGS_BUNDLER_DTS)
+__LP_BUNDLE_DTS_BUNDLER                 =$(LP_SETTINGS_DTS_BUNDLER)
 
 lp.bundle.append-command.any            =$(call lp.fn.var.append-with-separator, \
                                               $(strip $(1)), &&, $(strip $(2)) \
@@ -344,7 +344,7 @@ lp.bundle.append-command.eslint         =$(call lp.bundle.append-command.any, $(
                                               --log-level=error \
                                           )
 lp.bundle.append-command.dts            =$(call lp.bundle.append-command.any, $(1), \
-                                              $(if $(strip $(__LP_BUNDLER_DTS_BUNDLER)), \
+                                              $(if $(strip $(__LP_BUNDLE_DTS_BUNDLER)), \
                                                    dts-bundle-generator \
                                                        "$(strip $(2))" \
                                                        -o "$(strip $(patsubst %.js, %.d.ts, $(3)))" \
@@ -365,7 +365,7 @@ lp.bundle.add-bundle                    =$(call lp.fn.assert.param-not-empty, lp
                                          $(call lp.bundle.append-command, $(1), $(2)) \
                                          $(call lp.fn.var.append, __LP_BUNDLE_DEFAULT_TARGETS, \
                                                $(2) \
-                                               $(if $(strip $(__LP_BUNDLER_DTS_BUNDLER)), $(patsubst %.js, %.d.ts, $(2))) \
+                                               $(if $(strip $(__LP_BUNDLE_DTS_BUNDLER)), $(patsubst %.js, %.d.ts, $(2))) \
                                           ) \
                                          $(call lp.format.exclude, $(2) $(patsubst %.js, %.d.ts, $(2)))
 
@@ -387,7 +387,7 @@ lp.bundle.enable-source-maps            =$(call lp.fn.var.assign, __LP_BUNDLE_SO
 lp.bundle.disable-source-maps           =$(call lp.fn.var.erase, __LP_BUNDLE_SOURCE_MAPS_ENABLED) $(call lp.bundle.disable-inline-sources)
 lp.bundle.enable-inline-sources         =$(call lp.fn.var.assign, __LP_BUNDLE_INLINE_SOURCES_ENABLED, true) $(call lp.bundle.enable-source-maps)
 lp.bundle.disable-inline-sources        =$(call lp.fn.var.erase, __LP_BUNDLE_INLINE_SOURCES_ENABLED)
-lp.bundle.enabled-dts                   =$(call lp.fn.var.assign, __LP_BUNDLER_DTS_BUNDLER, $(if $(LP_SETTINGS_BUNDLER_DTS), $(LP_SETTINGS_BUNDLER_DTS), $(__LP_DEFAULT_DTS_BUNDLER)))
+lp.bundle.enabled-dts                   =$(call lp.fn.var.assign, __LP_BUNDLER_DTS_BUNDLER, $(if $(LP_SETTINGS_DTS_BUNDLER), $(LP_SETTINGS_DTS_BUNDLER), $(__LP_DEFAULT_DTS_BUNDLER)))
 lp.bundle.disable-dts                   =$(call lp.fn.var.erase, __LP_BUNDLE_DTS_BUNDLER)
 
 lp.bundle.get-phony-targets             =bundle

@@ -139,7 +139,7 @@ export const CurrentConfigProperties = {
     dtsBundler: createPinnableEnumProperty({
         name: "d.ts bundler",
         configFile: {
-            currentKey: "LP_SETTINGS_BUNDLER_DTS",
+            currentKey: "LP_SETTINGS_DTS_BUNDLER",
             newConfigObjectName: "dtsBundler",
         },
         commandLine: {
