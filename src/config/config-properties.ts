@@ -92,14 +92,14 @@ const CURRENT_CONFIG_PROPERTIES = {
     //------------------------------------------------------------------------------------------------------------------
 
     module: createNonPinnableEnumProperty({
-        name: "module type",
+        name: "module system",
         configFile: {
             currentKey: "LP_SETTINGS_MODULE_SYSTEM",
             newConfigObjectName: "module",
         },
         commandLine: {
-            option: "--module-type",
-            description: "the module type",
+            option: "--module-system",
+            description: "the target module system",
         },
         currentValues: [
             ["cjs", "CommonJS"],

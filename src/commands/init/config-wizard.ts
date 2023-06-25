@@ -36,7 +36,7 @@ export async function getNewConfig(
     const projectName = await getProjectName(presets, projectRoot);
     const artifact = await getArtifact(presets);
     const runtime = await getRuntime(presets);
-    // const module = await getModule(oldConfig);
+    const module = await getModule(presets);
     // const bundler = await getBundler(oldConfig);
     // const bundlerDts = await getBundlerDts(oldConfig, bundler);
     // const formatter = await getFormatter(oldConfig);
@@ -50,7 +50,7 @@ export async function getNewConfig(
         projectName,
         artifact,
         runtime,
-        // module,
+        module,
         // bundler,
         // bundlerDts,
         // formatter,
@@ -114,7 +114,7 @@ async function getProjectName(presets: Presets, projectRoot: Path) {
 async function getArtifact(presets: Presets) {
     type T = NewConfig["artifact"];
     const defaultValue: T = "app";
-    const presetValue = presets.commandLineConfig.artifact;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.artifact;
     const oldValue = presets.oldConfig?.artifact;
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
@@ -133,7 +133,7 @@ async function getArtifact(presets: Presets) {
 async function getRuntime(presets: Presets) {
     type T = NewConfig["runtime"];
     const defaultValue: T = "cli";
-    const presetValue = presets.commandLineConfig.runtime;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.runtime;
     const oldValue = presets.oldConfig?.runtime;
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
@@ -145,18 +145,25 @@ async function getRuntime(presets: Presets) {
     }
 }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the module type
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Select the module system
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getModule(oldConfig: OldConfig | undefined) {
-//     const choices = toChoice(
-//         ["cjs", "CommonJS", Module.unpinned("cjs")],
-//         ["esm", "ECMAScript modules", Module.unpinned("esm")]
-//     );
-//     const initial = oldConfig?.module?.value === "cjs" ? 0 : 1;
-//     return prompt<Module>({ type: "select", message: "Module type", choices, initial });
-// }
+async function getModule(presets: Presets) {
+    console.log(presets);
+    type T = NewConfig["module"];
+    const defaultValue: T = "esm";
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.module;
+    const oldValue = presets.oldConfig?.module;
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
+    } else {
+        const options = ConfigProperties.module.options.map(array => [...array, array[0]] as const);
+        const choices = toChoice(options);
+        const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
+        return prompt<T>({ type: "select", message: "Module system", choices, initial });
+    }
+}
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select the bundler
