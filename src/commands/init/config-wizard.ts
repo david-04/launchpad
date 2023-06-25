@@ -40,7 +40,7 @@ export async function getNewConfig(
     const bundler = await getBundler(presets);
     const dtsBundler = await getDtsBundler(presets, bundler);
     const formatter = await getFormatter(presets);
-    // const packageManager = await getPackageManager(oldConfig);
+    const packageManager = await getPackageManager(presets);
     // const srcDir = await getSrcDir(oldConfig);
     // const tscOutDir = await getTscOutDir(oldConfig);
     // const libraries = await getLibraries(runtime);
@@ -54,7 +54,7 @@ export async function getNewConfig(
         bundler,
         dtsBundler,
         formatter,
-        // packageManager,
+        packageManager,
         // srcDir,
         // tscOutDir,
         // libraries,
@@ -240,37 +240,29 @@ async function getFormatter(presets: Presets) {
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Select the package manager
+//----------------------------------------------------------------------------------------------------------------------
 
+async function getPackageManager(presets: Presets) {
+    const FIELD = "packageManager";
+    type T = NewConfig[typeof FIELD];
+    const defaultValue: T = unpinned("npm");
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+    } else {
+        const options: ChoiceOptions<T> = [
+            createDefaultOption(defaultValue.value),
+            ...ConfigProperties[FIELD].options.map(array => [...array, pinned(array[0])] as const),
+        ];
+        const choices = toChoice(options);
+        const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);
+        return prompt<T>({ type: "select", message: "Formatter", choices, initial });
+    }
+}
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the formatter
-// //----------------------------------------------------------------------------------------------------------------------
-
-// async function getFormatter(oldConfig: OldConfig | undefined) {
-//     const choices = toChoice(
-//         ["default", "Prettier", Formatter.unpinned("prettier")],
-//         ["Prettier", undefined, Formatter.pinned("prettier")],
-//         ["Rome", undefined, Formatter.pinned("rome")],
-//         ["disabled", "Don't use a formatter", Formatter.unpinned("disabled")]
-//     );
-//     const initial = findMatchingChoice(choices, oldConfig?.formatter, 0);
-//     return prompt<Formatter>({ type: "select", message: "Formatter", choices, initial });
-// }
-
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the package manager
-// //----------------------------------------------------------------------------------------------------------------------
-
-// async function getPackageManager(oldConfig: OldConfig | undefined) {
-//     const choices = toChoice(
-//         ["default", "yarn", PackageManager.unpinned("yarn")],
-//         ["npm", undefined, PackageManager.pinned("npm")],
-//         ["pnpm", undefined, PackageManager.pinned("pnpm")],
-//         ["yarn", undefined, PackageManager.pinned("yarn")]
-//     );
-//     const initial = findMatchingChoice(choices, oldConfig?.packageManager, 0);
-//     return prompt<Formatter>({ type: "select", message: "Package manager", choices, initial });
-// }
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Get the source directory
