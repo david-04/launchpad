@@ -112,14 +112,15 @@ async function getProjectName(presets: Presets, projectRoot: Path) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getArtifact(presets: Presets) {
-    type T = NewConfig["artifact"];
+    const FIELD = "artifact";
+    type T = NewConfig[typeof FIELD];
     const defaultValue: T = "app";
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.artifact;
-    const oldValue = presets.oldConfig?.artifact;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
     } else {
-        const options = ConfigProperties.artifact.options.map(array => [...array, array[0]] as const);
+        const options = ConfigProperties[FIELD].options.map(array => [...array, array[0]] as const);
         const choices = toChoice(options);
         const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
         return prompt<T>({ type: "select", message: "Artifact", choices, initial });
@@ -131,14 +132,15 @@ async function getArtifact(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getRuntime(presets: Presets) {
-    type T = NewConfig["runtime"];
+    const FIELD = "runtime";
+    type T = NewConfig[typeof FIELD];
     const defaultValue: T = "cli";
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.runtime;
-    const oldValue = presets.oldConfig?.runtime;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
     } else {
-        const options = ConfigProperties.runtime.options.map(array => [...array, array[0]] as const);
+        const options = ConfigProperties[FIELD].options.map(array => [...array, array[0]] as const);
         const choices = toChoice(options);
         const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
         return prompt<T>({ type: "select", message: "Runtime", choices, initial });
@@ -150,14 +152,15 @@ async function getRuntime(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getModule(presets: Presets) {
-    type T = NewConfig["module"];
+    const FIELD = "module";
+    type T = NewConfig[typeof FIELD];
     const defaultValue: T = "esm";
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.module;
-    const oldValue = presets.oldConfig?.module;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
     } else {
-        const options = ConfigProperties.module.options.map(array => [...array, array[0]] as const);
+        const options = ConfigProperties[FIELD].options.map(array => [...array, array[0]] as const);
         const choices = toChoice(options);
         const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
         return prompt<T>({ type: "select", message: "Module system", choices, initial });
@@ -169,17 +172,18 @@ async function getModule(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getBundler(presets: Presets) {
-    type T = NewConfig["bundler"];
+    const FIELD = "bundler";
+    type T = NewConfig[typeof FIELD];
     const defaultValue: T = unpinned("esbuild");
     const preselectedValue: T = pinned("disabled");
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.bundler;
-    const oldValue = presets.oldConfig?.bundler;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
-            ...ConfigProperties.bundler.options.map(array => [...array, pinned(array[0])] as const),
+            ...ConfigProperties[FIELD].options.map(array => [...array, pinned(array[0])] as const),
         ];
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, preselectedValue);
@@ -192,19 +196,20 @@ async function getBundler(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
-    type T = NewConfig["dtsBundler"];
+    const FIELD = "dtsBundler";
+    type T = NewConfig[typeof FIELD];
     if ("disabled" === bundler.value) {
         return pinned("disabled");
     }
     const defaultValue: T = unpinned("dts-bundle-generator");
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.dtsBundler;
-    const oldValue = presets.oldConfig?.dtsBundler;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
-            ...ConfigProperties.dtsBundler.options.map(array => [...array, pinned(array[0])] as const),
+            ...ConfigProperties[FIELD].options.map(array => [...array, pinned(array[0])] as const),
         ];
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);
@@ -217,16 +222,17 @@ async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getFormatter(presets: Presets) {
-    type T = NewConfig["formatter"];
+    const FIELD = "formatter";
+    type T = NewConfig[typeof FIELD];
     const defaultValue: T = unpinned("prettier");
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.formatter;
-    const oldValue = presets.oldConfig?.formatter;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
-            ...ConfigProperties.formatter.options.map(array => [...array, pinned(array[0])] as const),
+            ...ConfigProperties[FIELD].options.map(array => [...array, pinned(array[0])] as const),
         ];
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);
