@@ -1,12 +1,21 @@
 import { exit } from "process";
-import prompts, { type Choice, type PromptObject } from "prompts";
-import { pinned, unpinned, type ConfigError, type PinnableEnumValue } from "../../config/config-data-types.js";
+import { pinned, unpinned } from "../../config/config-data-types.js";
 import type { ParsedConfig } from "../../config/config-loader.js";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import { ConfigProperties } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
-import { DEFAULT_ENUM, defaultMightChange } from "../../utilities/constants.js";
+import { DEFAULT_ENUM } from "../../utilities/constants.js";
 import type { Path } from "../../utilities/path.js";
+import {
+    createDefaultOption,
+    findNonPinnableMatchingChoice,
+    findPinnableMatchingChoice,
+    prompt,
+    toChoice,
+    toPinned,
+    toValidator,
+    type ChoiceOptions,
+} from "./config-wizard-utils.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
@@ -18,9 +27,6 @@ type Presets = {
     oldConfig: OldPartialConfig | undefined;
     commandLineConfig: CommandLineConfig;
 };
-
-type ChoiceOption<T> = readonly [string, string | undefined, T, boolean?];
-type ChoiceOptions<T> = ReadonlyArray<ChoiceOption<T>>;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Acquire the new configuration
@@ -263,7 +269,6 @@ async function getPackageManager(presets: Presets) {
     }
 }
 
-
 // //----------------------------------------------------------------------------------------------------------------------
 // // Get the source directory
 // //----------------------------------------------------------------------------------------------------------------------
@@ -330,114 +335,3 @@ async function getPackageManager(presets: Presets) {
 //         initial: choices.length - 1,
 //     });
 // }
-
-// //----------------------------------------------------------------------------------------------------------------------
-// // Get the index of the most suitable choice
-// //----------------------------------------------------------------------------------------------------------------------
-
-// function findMatchingChoice(
-//     choices: ReadonlyArray<{ value?: EnumProperty }>,
-//     oldConfig: EnumProperty | undefined,
-//     defaultIndex: number
-// ) {
-//     for (let index = 0; index < choices.length; index++) {
-//         const choice = choices[index]?.value;
-//         if (choice?.value === oldConfig?.value && true === choice?.pinned && true === oldConfig?.pinned) {
-//             return index;
-//         }
-//     }
-//     for (let index = 0; index < choices.length; index++) {
-//         const choice = choices[index]?.value;
-//         if (choice?.value === oldConfig?.value) {
-//             return index;
-//         }
-//     }
-//     return defaultIndex;
-// }
-
-//----------------------------------------------------------------------------------------------------------------------
-// Convert
-//----------------------------------------------------------------------------------------------------------------------
-
-function toPinned<T>(value: PinnableEnumValue<T>) {
-    return { value: value.value, pinned: true };
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Convert a parser function into a validator
-//----------------------------------------------------------------------------------------------------------------------
-
-function toValidator(parseNewValue: (value: string, source: string | undefined) => string | ConfigError) {
-    return (value: string) => {
-        const result = parseNewValue(value, undefined);
-        return result && "object" === typeof result && "error" in result ? result.error : true;
-    };
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Create a "default" option that currently resolves to the given value
-//----------------------------------------------------------------------------------------------------------------------
-
-function createDefaultOption<T extends string>(value: T) {
-    return ["default", defaultMightChange(value), unpinned(value)] as const;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Prompt wrapper that exits if the returned value is "undefined"                     https://github.com/terkelg/prompts
-//----------------------------------------------------------------------------------------------------------------------
-
-async function prompt<T>(options: Omit<PromptObject<string>, "name">): Promise<T> {
-    return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Convert a drop-down value to an option
-//----------------------------------------------------------------------------------------------------------------------
-
-function toChoice<T>(options: ChoiceOptions<T>): Choice[] {
-    return options.map(option => ({ title: option[0], description: option[1], value: option[2], selected: option[3] }));
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Find the best initial choice for a non-pinnable enum
-//----------------------------------------------------------------------------------------------------------------------
-
-function findNonPinnableMatchingChoice<T extends string>(
-    choices: ChoiceOptions<T>,
-    ...selectedValues: ReadonlyArray<T | undefined>
-) {
-    for (const selectedValue of selectedValues) {
-        const index = choices.findIndex(choice => choice[0] === selectedValue);
-        if (0 <= index) {
-            return index;
-        }
-    }
-    return 0;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Find the best initial choice for a pinnable enum
-//----------------------------------------------------------------------------------------------------------------------
-
-function findPinnableMatchingChoice<T extends string>(
-    choices: ChoiceOptions<PinnableEnumValue<T>>,
-    ...selectedValues: ReadonlyArray<PinnableEnumValue<T> | undefined>
-) {
-    console.log(choices);
-    console.log(selectedValues);
-    for (const selectedValue of selectedValues) {
-        if (selectedValue) {
-            const index1 = choices.findIndex(
-                choice => choice[2].pinned === selectedValue.pinned && choice[2].value === selectedValue.value
-            );
-            if (0 <= index1) {
-                return index1;
-            }
-            const index2 = choices.findIndex(choice => choice[2].value === selectedValue.value);
-            if (0 <= index2) {
-                return index2;
-            }
-        }
-    }
-    return 0;
-}
