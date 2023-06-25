@@ -38,7 +38,7 @@ export async function getNewConfig(
     const runtime = await getRuntime(presets);
     const module = await getModule(presets);
     const bundler = await getBundler(presets);
-    // const bundlerDts = await getBundlerDts(oldConfig, bundler);
+    const dtsBundler = await getDtsBundler(presets, bundler);
     // const formatter = await getFormatter(oldConfig);
     // const packageManager = await getPackageManager(oldConfig);
     // const srcDir = await getSrcDir(oldConfig);
@@ -52,7 +52,7 @@ export async function getNewConfig(
         runtime,
         module,
         bundler,
-        // bundlerDts,
+        dtsBundler,
         // formatter,
         // packageManager,
         // srcDir,
@@ -184,6 +184,31 @@ async function getBundler(presets: Presets) {
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, preselectedValue);
         return prompt<T>({ type: "select", message: "Bundler", choices, initial });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Select the DTS bundler
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
+    type T = NewConfig["dtsBundler"];
+    if ("disabled" === bundler.value) {
+        return pinned("disabled");
+    }
+    const defaultValue: T = unpinned("dts-bundle-generator");
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.dtsBundler;
+    const oldValue = presets.oldConfig?.dtsBundler;
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+    } else {
+        const options: ChoiceOptions<T> = [
+            createDefaultOption(defaultValue.value),
+            ...ConfigProperties.dtsBundler.options.map(array => [...array, pinned(array[0])] as const),
+        ];
+        const choices = toChoice(options);
+        const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);
+        return prompt<T>({ type: "select", message: "DTS bundler", choices, initial });
     }
 }
 
