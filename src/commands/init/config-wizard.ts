@@ -37,7 +37,7 @@ export async function getNewConfig(
     parsedConfig: ParsedConfig | undefined,
     commandLineConfig: CommandLineConfig
 ) {
-    const presets = { oldConfig: await extractOldConfig(parsedConfig), commandLineConfig };
+    const presets = { oldConfig: await getOldConfig(parsedConfig), commandLineConfig };
     const version = VERSION_NUMBER;
     const projectName = await getProjectName(presets, projectRoot);
     const artifact = await getArtifact(presets);
@@ -47,8 +47,8 @@ export async function getNewConfig(
     const dtsBundler = await getDtsBundler(presets, bundler);
     const formatter = await getFormatter(presets);
     const packageManager = await getPackageManager(presets);
-    // const srcDir = await getSrcDir(oldConfig);
-    // const tscOutDir = await getTscOutDir(oldConfig);
+    const srcDir = await getSrcDir(presets);
+    const tscOutDir = await getTscOutDir(presets, runtime, bundler, dtsBundler);
     // const libraries = await getLibraries(runtime);
     // const installDevToolsLocally = await getInstallDevToolsLocally();
     return {
@@ -61,8 +61,8 @@ export async function getNewConfig(
         dtsBundler,
         formatter,
         packageManager,
-        // srcDir,
-        // tscOutDir,
+        srcDir,
+        tscOutDir,
         // libraries,
         // installDevToolsLocally,
     };
@@ -72,7 +72,7 @@ export async function getNewConfig(
 // Extract the old configuration and confirm any errors that might have occurred
 //----------------------------------------------------------------------------------------------------------------------
 
-async function extractOldConfig(parsedConfig: ParsedConfig | undefined) {
+async function getOldConfig(parsedConfig: ParsedConfig | undefined) {
     if (parsedConfig) {
         const { partial, errors } = parsedConfig;
         if (errors && errors.length) {
@@ -99,14 +99,14 @@ async function extractOldConfig(parsedConfig: ParsedConfig | undefined) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getProjectName(presets: Presets, projectRoot: Path) {
-    const defaultName = presets.oldConfig?.projectName?.trim() || projectRoot.path.replace(/.*\//, "").trim();
+    const defaultName = projectRoot.path.replace(/.*\//, "").trim();
     const preselectedName = presets.commandLineConfig.projectName;
     if (undefined !== preselectedName) {
         return DEFAULT_ENUM === preselectedName ? defaultName : preselectedName;
     }
     return prompt<string>({
         type: "text",
-        initial: defaultName,
+        initial: presets.oldConfig?.projectName?.trim() || defaultName,
         message: "Project name",
         format: input => input.trim(),
         validate: toValidator(ConfigProperties.projectName.parseNewValue),
@@ -269,35 +269,55 @@ async function getPackageManager(presets: Presets) {
     }
 }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Get the source directory
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Select the source directory
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getSrcDir(oldConfig: OldConfig | undefined) {
-//     const message = "The path must be a valid relative path and not contain blanks or special characters";
-//     return prompt<string>({
-//         type: "text",
-//         initial: oldConfig?.srcDir?.trim() || "src",
-//         message: "Source directory",
-//         format: input => input.trim().replace(/^\.\//g, "").replace(/\/+$/, "").replace(/\\/g, "/"),
-//         validate: value => (!!value.match(/^[^:*?<> \s]+$/) && !value.match(/^(\/|[a-z]:)/i)) || message,
-//     });
-// }
+async function getSrcDir(presets: Presets) {
+    const FIELD = "srcDir";
+    const defaultDirectory = "src";
+    const preselectedDirectory = presets.commandLineConfig[FIELD];
+    if (preselectedDirectory) {
+        return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
+    } else {
+        return prompt<string>({
+            type: "text",
+            initial: presets.oldConfig?.[FIELD] ?? defaultDirectory,
+            message: "Source directory",
+            format: input => input.trim(),
+            validate: toValidator(ConfigProperties[FIELD].parseNewValue),
+        });
+    }
+}
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Get the output directory for transpiled JavaScript files
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Select the TSC compiler's output directory
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getTscOutDir(oldConfig: OldConfig | undefined) {
-//     const message = "The path must be a valid relative path and not contain blanks or special characters";
-//     return prompt<string>({
-//         type: "text",
-//         initial: oldConfig?.tscOutDir?.trim() || "build",
-//         message: "tsc output directory",
-//         format: input => input.trim().replace(/^\.\//g, "").replace(/\/+$/, "").replace(/\\/g, "/"),
-//         validate: value => (!!value.match(/^[^:*?<> \s]+$/) && !value.match(/^(\/|[a-z]:)/i)) || message,
-//     });
-// }
+async function getTscOutDir(
+    presets: Presets,
+    runtime: NewConfig["runtime"],
+    bundler: NewConfig["bundler"],
+    dtsBundler: NewConfig["dtsBundler"]
+) {
+    if ("ts-node" === runtime && "disabled" === dtsBundler.value) {
+        return "";
+    }
+    const FIELD = "tscOutDir";
+    const defaultDirectory = "disabled" === bundler.value ? "dist" : "build";
+    const preselectedDirectory = presets.commandLineConfig[FIELD];
+    if (preselectedDirectory) {
+        return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
+    } else {
+        return prompt<string>({
+            type: "text",
+            initial: presets.oldConfig?.[FIELD] ?? defaultDirectory,
+            message: "TSC output directory",
+            format: input => input.trim(),
+            validate: toValidator(ConfigProperties[FIELD].parseNewValue),
+        });
+    }
+}
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select libraries to install
