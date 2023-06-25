@@ -39,7 +39,7 @@ export async function getNewConfig(
     const module = await getModule(presets);
     const bundler = await getBundler(presets);
     const dtsBundler = await getDtsBundler(presets, bundler);
-    // const formatter = await getFormatter(oldConfig);
+    const formatter = await getFormatter(presets);
     // const packageManager = await getPackageManager(oldConfig);
     // const srcDir = await getSrcDir(oldConfig);
     // const tscOutDir = await getTscOutDir(oldConfig);
@@ -53,7 +53,7 @@ export async function getNewConfig(
         module,
         bundler,
         dtsBundler,
-        // formatter,
+        formatter,
         // packageManager,
         // srcDir,
         // tscOutDir,
@@ -212,36 +212,29 @@ async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
     }
 }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the bundler
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Select the bundler
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getBundler(oldConfig: OldConfig | undefined) {
-//     const choices = toChoice(
-//         ["default", "esbuild", Bundler.unpinned("esbuild")],
-//         ["esbuild", undefined, Bundler.pinned("esbuild")],
-//         ["disabled", "Don't use a bundler", Bundler.unpinned("disabled")]
-//     );
-//     const initial = findMatchingChoice(choices, oldConfig?.bundler, 0);
-//     return prompt<Bundler>({ type: "select", message: "Bundler", choices, initial });
-// }
+async function getFormatter(presets: Presets) {
+    type T = NewConfig["formatter"];
+    const defaultValue: T = unpinned("prettier");
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.formatter;
+    const oldValue = presets.oldConfig?.formatter;
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+    } else {
+        const options: ChoiceOptions<T> = [
+            createDefaultOption(defaultValue.value),
+            ...ConfigProperties.formatter.options.map(array => [...array, pinned(array[0])] as const),
+        ];
+        const choices = toChoice(options);
+        const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);
+        return prompt<T>({ type: "select", message: "Formatter", choices, initial });
+    }
+}
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select the bundler for .d.ts declaration files
-// //----------------------------------------------------------------------------------------------------------------------
 
-// async function getBundlerDts(oldConfig: OldConfig | undefined, bundler: Bundler) {
-//     if (bundler.value === "disabled") {
-//         return BundlerDts.unpinned("disabled");
-//     }
-//     const choices = toChoice(
-//         ["default", "dts-bundle-generator", BundlerDts.unpinned("dts-bundle-generator")],
-//         ["dts-bundle-generator", undefined, BundlerDts.pinned("dts-bundle-generator")],
-//         ["disabled", "Don't bundle declaration files", BundlerDts.unpinned("disabled")]
-//     );
-//     const initial = findMatchingChoice(choices, oldConfig?.bundlerDts, 0);
-//     return prompt<BundlerDts>({ type: "select", message: "Declaration bundler", choices, initial });
-// }
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select the formatter
