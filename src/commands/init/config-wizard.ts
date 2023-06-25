@@ -1,11 +1,11 @@
 import { exit } from "process";
 import prompts, { type Choice, type PromptObject } from "prompts";
-import type { ConfigError } from "../../config/config-data-types.js";
+import { pinned, unpinned, type ConfigError, type PinnableEnumValue } from "../../config/config-data-types.js";
 import type { ParsedConfig } from "../../config/config-loader.js";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import { ConfigProperties } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
-import { DEFAULT_ENUM } from "../../utilities/constants.js";
+import { DEFAULT_ENUM, defaultMightChange } from "../../utilities/constants.js";
 import type { Path } from "../../utilities/path.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ export async function getNewConfig(
     const artifact = await getArtifact(presets);
     const runtime = await getRuntime(presets);
     const module = await getModule(presets);
-    // const bundler = await getBundler(oldConfig);
+    const bundler = await getBundler(presets);
     // const bundlerDts = await getBundlerDts(oldConfig, bundler);
     // const formatter = await getFormatter(oldConfig);
     // const packageManager = await getPackageManager(oldConfig);
@@ -51,7 +51,7 @@ export async function getNewConfig(
         artifact,
         runtime,
         module,
-        // bundler,
+        bundler,
         // bundlerDts,
         // formatter,
         // packageManager,
@@ -150,7 +150,6 @@ async function getRuntime(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getModule(presets: Presets) {
-    console.log(presets);
     type T = NewConfig["module"];
     const defaultValue: T = "esm";
     const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.module;
@@ -162,6 +161,29 @@ async function getModule(presets: Presets) {
         const choices = toChoice(options);
         const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
         return prompt<T>({ type: "select", message: "Module system", choices, initial });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Select the bundler
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getBundler(presets: Presets) {
+    type T = NewConfig["bundler"];
+    const defaultValue: T = unpinned("esbuild");
+    const preselectedValue: T = pinned("disabled");
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig.bundler;
+    const oldValue = presets.oldConfig?.bundler;
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+    } else {
+        const options: ChoiceOptions<T> = [
+            createDefaultOption(defaultValue.value),
+            ...ConfigProperties.bundler.options.map(array => [...array, pinned(array[0])] as const),
+        ];
+        const choices = toChoice(options);
+        const initial = findPinnableMatchingChoice(options, oldValue, preselectedValue);
+        return prompt<T>({ type: "select", message: "Bundler", choices, initial });
     }
 }
 
@@ -318,6 +340,14 @@ async function getModule(presets: Presets) {
 // }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Convert
+//----------------------------------------------------------------------------------------------------------------------
+
+function toPinned<T>(value: PinnableEnumValue<T>) {
+    return { value: value.value, pinned: true };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Convert a parser function into a validator
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -326,6 +356,14 @@ function toValidator(parseNewValue: (value: string, source: string | undefined) 
         const result = parseNewValue(value, undefined);
         return result && "object" === typeof result && "error" in result ? result.error : true;
     };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Create a "default" option that currently resolves to the given value
+//----------------------------------------------------------------------------------------------------------------------
+
+function createDefaultOption<T extends string>(value: T) {
+    return ["default", defaultMightChange(value), unpinned(value)] as const;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -345,17 +383,44 @@ function toChoice<T>(options: ChoiceOptions<T>): Choice[] {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Find
+// Find the best initial choice for a non-pinnable enum
 //----------------------------------------------------------------------------------------------------------------------
 
-function findNonPinnableMatchingChoice(
-    choices: ChoiceOptions<string>,
-    ...selectedValues: ReadonlyArray<string | undefined>
+function findNonPinnableMatchingChoice<T extends string>(
+    choices: ChoiceOptions<T>,
+    ...selectedValues: ReadonlyArray<T | undefined>
 ) {
     for (const selectedValue of selectedValues) {
         const index = choices.findIndex(choice => choice[0] === selectedValue);
         if (0 <= index) {
             return index;
+        }
+    }
+    return 0;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Find the best initial choice for a pinnable enum
+//----------------------------------------------------------------------------------------------------------------------
+
+function findPinnableMatchingChoice<T extends string>(
+    choices: ChoiceOptions<PinnableEnumValue<T>>,
+    ...selectedValues: ReadonlyArray<PinnableEnumValue<T> | undefined>
+) {
+    console.log(choices);
+    console.log(selectedValues);
+    for (const selectedValue of selectedValues) {
+        if (selectedValue) {
+            const index1 = choices.findIndex(
+                choice => choice[2].pinned === selectedValue.pinned && choice[2].value === selectedValue.value
+            );
+            if (0 <= index1) {
+                return index1;
+            }
+            const index2 = choices.findIndex(choice => choice[2].value === selectedValue.value);
+            if (0 <= index2) {
+                return index2;
+            }
         }
     }
     return 0;

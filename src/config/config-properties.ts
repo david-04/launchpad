@@ -1,3 +1,4 @@
+import { defaultMightChange } from "../utilities/constants.js";
 import {
     createNonPinnableEnumProperty,
     createPinnableEnumProperty,
@@ -79,7 +80,7 @@ const CURRENT_CONFIG_PROPERTIES = {
             description: "the runtime environment",
         },
         currentValues: [
-            ["cli", "currently node, might change during future uplifts"],
+            ["cli", defaultMightChange("node")],
             ["node", "command line (pre-compiled to JavaScript)"],
             ["ts-node", "command line (compile on-the-fly when executing)"],
             ["web", "web browser"],
@@ -122,7 +123,10 @@ const CURRENT_CONFIG_PROPERTIES = {
             option: "--bundler",
             description: "the bundler",
         },
-        currentValues: [["esbuild"], ["disabled", "don't use bundling"]] as const,
+        currentValues: [
+            ["esbuild", undefined],
+            ["disabled", "don't use bundling"],
+        ] as const,
         obsoleteValues: [] as const,
     }),
 
@@ -140,7 +144,10 @@ const CURRENT_CONFIG_PROPERTIES = {
             option: "--dts-bundler",
             description: "the declaration bundler for d.ts files",
         },
-        currentValues: [["dts-bundle-generator"], ["disabled", "don't bundle declaration files"]] as const,
+        currentValues: [
+            ["dts-bundle-generator", undefined],
+            ["disabled", "don't bundle declaration files"],
+        ] as const,
         obsoleteValues: [] as const,
     }),
 
@@ -158,7 +165,11 @@ const CURRENT_CONFIG_PROPERTIES = {
             option: "--formatter",
             description: "the code formatter",
         },
-        currentValues: [["prettier"], ["rome"], ["disabled", "don't format sources"]] as const,
+        currentValues: [
+            ["prettier", undefined],
+            ["rome", undefined],
+            ["disabled", "don't format sources"],
+        ] as const,
         obsoleteValues: [] as const,
     }),
 
@@ -176,7 +187,11 @@ const CURRENT_CONFIG_PROPERTIES = {
             option: "--package-manager",
             description: "the Node package manager",
         },
-        currentValues: [["npm"], ["pnpm"], ["yarn"]] as const,
+        currentValues: [
+            ["npm", undefined],
+            ["pnpm", undefined],
+            ["yarn", undefined],
+        ] as const,
         obsoleteValues: [] as const,
     }),
 

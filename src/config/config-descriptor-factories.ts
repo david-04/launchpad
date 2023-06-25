@@ -90,7 +90,7 @@ type PinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, 
     readonly name: string;
     readonly configFile?: ConfigFileDescriptor<KEY>;
     readonly commandLine?: CommandLineDescriptor;
-    readonly currentValues: ReadonlyArray<readonly [CURRENT, string?]>;
+    readonly currentValues: ReadonlyArray<readonly [CURRENT, string | undefined]>;
     readonly obsoleteValues: ReadonlyArray<OBSOLETE>;
 };
 

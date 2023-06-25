@@ -63,3 +63,11 @@ export type PinnableEnumValue<T> = {
     value: T;
     pinned: boolean;
 };
+
+export function pinned<T extends string>(value: T) {
+    return { value, pinned: true } as const;
+}
+
+export function unpinned<T>(value: T) {
+    return { value, pinned: false } as const;
+}
