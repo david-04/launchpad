@@ -58,9 +58,9 @@ export async function launchpad(argv: ReadonlyArray<string>) {
 async function findAndInvokeHandler(argument: string | undefined, options: ReadonlyArray<string>) {
     const [command, ...rest] = COMMANDS.filter(command => command.name.toLowerCase() === argument?.toLowerCase());
     if (!argument) {
-        fail(`Missing command line argument.\nTry launchpad --help for more information`);
+        fail(`Missing command line argument. Try launchpad --help for more information.`);
     } else if (!command) {
-        fail(`Invalid command: ${argument}\nTry launchpad --help for more information`);
+        fail(`Invalid command: ${argument}. Try launchpad --help for more information.`);
     } else if (rest.length) {
         fail(`Found more than one handler for command ${argument}`);
     } else {
