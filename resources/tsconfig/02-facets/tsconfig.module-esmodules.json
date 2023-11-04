@@ -5,7 +5,7 @@
         // Modules
         //------------------------------------------------------------------------------------------------------------------
 
-        "module": "ES6", //                                 Specify what module code is generated.
+        "module": "Node16", //                              Specify what module code is generated.
         "moduleResolution": "node16" //                     Specify how TypeScript looks up a file from a given module specifier.
     }
 }

@@ -30,7 +30,7 @@
         "lib": [
             "es2022"
         ],
-        "module": "es6",
+        "module": "node16",
         "moduleDetection": "force",
         "moduleResolution": "node16",
         "newLine": "lf",
@@ -69,8 +69,5 @@
     },
     "include": [
         "../src/**/*.ts"
-    ],
-    "ts-node": {
-        "esm": true
-    }
+    ]
 }

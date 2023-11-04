@@ -105,7 +105,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "lib": [
                 "es2022"
             ],
-            "module": "es6",
+            "module": "node16",
             "moduleDetection": "force",
             "moduleResolution": "node16",
             "newLine": "lf",
@@ -252,7 +252,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "lib": [
                 "es2022"
             ],
-            "module": "es6",
+            "module": "node16",
             "moduleDetection": "force",
             "moduleResolution": "node16",
             "newLine": "lf",
@@ -395,7 +395,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSources": false,
             "isolatedModules": true,
             "jsx": "react",
-            "module": "es6",
+            "module": "node16",
             "moduleDetection": "force",
             "moduleResolution": "node16",
             "newLine": "lf",
@@ -538,7 +538,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSources": false,
             "isolatedModules": true,
             "jsx": "react",
-            "module": "es6",
+            "module": "node16",
             "moduleDetection": "force",
             "moduleResolution": "node16",
             "newLine": "lf",
