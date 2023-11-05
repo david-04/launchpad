@@ -15,6 +15,6 @@ do
     tsc -p "$SOURCE_DIR/$COMPILATION" --showConfig > "$OUTPUT_DIR/$COMPILATION"
 done
 
-node scripts/build-tsconfig.js $COMPILATIONS
+node bin/build-tsconfig.js $COMPILATIONS
 
 cd $OUTPUT_DIR && rm -f $COMPILATIONS

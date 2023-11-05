@@ -5,9 +5,9 @@ cd "`dirname "${BASH_SOURCE[0]}"`/.."
 
 echo Updating version information...
 
-VERSION_NUMBER=$(scripts/get-version-number.sh)
-VERSION_NUMBER_CODE=$(scripts/get-version-number.sh | sed 's/"//g;s/\./, /g;s/^/new Version(/;s/$/)/')
-COPYRIGHT_YEARS=$(scripts/get-copyright-years.sh)
+VERSION_NUMBER=$(bin/get-version-number.sh)
+VERSION_NUMBER_CODE=$(bin/get-version-number.sh | sed 's/"//g;s/\./, /g;s/^/new Version(/;s/$/)/')
+COPYRIGHT_YEARS=$(bin/get-copyright-years.sh)
 METADATA_TS=src/resources/version-information.ts
 
 sed -i "s/.*const VERSION_NUMBER.*/export const VERSION_NUMBER = $VERSION_NUMBER_CODE;/g" $METADATA_TS

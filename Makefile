@@ -24,20 +24,20 @@ TSCONFIG_TARGETS         = src/resources/tsconfig-templates.ts .launchpad/tsconf
 
 tsconfig : $(TSCONFIG_TARGETS);
 
-$(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./scripts/build-tsconfig.sh  ./scripts/build-tsconfig.js
-	./scripts/build-tsconfig.sh
+$(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/build-tsconfig.sh  ./bin/build-tsconfig.js
+	./bin/build-tsconfig.sh
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Update version information
 #-----------------------------------------------------------------------------------------------------------------------
 
-UPDATE_VERSION_INFO_SRC		= CHANGELOG.md scripts/update-version-information.sh scripts/get-copyright-years.sh scripts/get-version-number.sh
+UPDATE_VERSION_INFO_SRC		= CHANGELOG.md bin/update-version-information.sh bin/get-copyright-years.sh bin/get-version-number.sh
 UPDATE_VERSION_INFO_TARGETS	= LICENSE package.json dist/package.json src/resources/version-information.ts
 
 version : $(UPDATE_VERSION_INFO_TARGETS);
 
 $(UPDATE_VERSION_INFO_TARGETS) : $(UPDATE_VERSION_INFO_SRC)
-	./scripts/update-version-information.sh
+	./bin/update-version-information.sh
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Compile
@@ -84,7 +84,7 @@ $(call lp.clean.bundles)
 #-----------------------------------------------------------------------------------------------------------------------
 
 # run : $(LP_TSC_TARGETS)
-# 	node build/scripts/launchpad-postinstall.js
+# 	node build/bin/launchpad-postinstall.js
 
 init :
 	ts-node-esm src/debug.ts
