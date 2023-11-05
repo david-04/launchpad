@@ -79,7 +79,7 @@ $(call lp.format.add-before-hook         , pwd && ls ) # append commands to run 
 $(call lp.format.overwrite-before-hooks  , pwd && ls ) # overwrite any previsouly defined before-hook commands
 $(call lp.format.add-after-hook          , pwd && ls ) # append commands to run after formatting
 $(call lp.format.overwrite-after-hooks   , pwd && ls ) # overwrite any previsouly defined after-hook commands
-$(call lp.format.overwrite-command       , rome -w   ) # overwrite the command itself
+$(call lp.format.overwrite-command       , prettier  ) # overwrite the command itself
 
 $(call lp.bundle.get-command-with-hooks  , Format... ) # get the command with all hooks (with an optional "echo")
 $(call lp.bundle.get-default-command     , Format... ) # get the built-in command (with an optional "echo")

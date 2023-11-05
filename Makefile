@@ -86,19 +86,9 @@ $(call lp.clean.bundles)
 # run : $(LP_TSC_TARGETS)
 # 	node build/bin/launchpad-postinstall.js
 
-init :
-	ts-node-esm src/debug.ts init \
-							 --project-name=test \
-							 --artifact=app \
-							 --runtime=cli \
-							 --module-system=esm \
-							 --bundler=disabled \
-							 --dts-bundler=disabled \
-							 --formatter=prettier \
-							 --package-manager=yarn \
-							 --src-dir=src \
-							 --web-app-dir=dist \
-							 --tsc-out-dir=dist \
+init : $(LP_TSC_TARGETS)
+	echo Running launchpad init...
+	ts-node-esm build/debug.js
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets

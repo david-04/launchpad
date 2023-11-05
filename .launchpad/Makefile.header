@@ -149,7 +149,7 @@ __LP_DEFAULT_DTS_BUNDLER=dts-bundle-generator
 LP_SETTINGS_DTS_BUNDLER_ENUMS="disabled" or "$(__LP_DEFAULT_DTS_BUNDLER)"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_DTS_BUNDLER)
 
-LP_SETTINGS_FORMATTER_ENUMS="disabled", "prettier" or "rome"
+LP_SETTINGS_FORMATTER_ENUMS="disabled" or "prettier"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_FORMATTER)
 
 LP_SETTINGS_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
@@ -433,14 +433,12 @@ __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
 __LP_FORMAT_DEFAULT_AFTER_HOOKS         =
 __LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
 __LP_FORMAT_DEFAULT_COMMAND_prettier    =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-files))
-__LP_FORMAT_DEFAULT_COMMAND_rome        =rome format --write --skip-errors --max-diagnostics=0 $(patsubst %, '%', $(call lp.format.get-files))
 __LP_FORMAT_DEFAULT_COMMAND             =$(__LP_FORMAT_DEFAULT_COMMAND_$(LP_SETTINGS_FORMATTER))
 __LP_FORMAT_EFFECTIVE_COMMAND           =$(call lp.format.get-default-command)
 __LP_FORMAT_DEFAULT_FILES               =
 __LP_FORMAT_EFFECTIVE_FILES             =$(__LP_FORMAT_DEFAULT_FILES)
 
 __LP_FORMAT_ROOT_LEVEL_DIRECTORIES      =$(filter-out .launchpad .vscode .yarn node_modules,$(call lp.fn.normalize.file-paths, $(wildcard */)))
-__LP_FORMAT_EXTENSIONS_rome             =ts tsx js jsx json
 __LP_FORMAT_EXTENSIONS_prettier         =ts tsx js jsx json html htm css less sass
 __LP_FORMAT_EXTENSIONS                  =$(__LP_FORMAT_EXTENSIONS_$(LP_SETTINGS_FORMATTER))
 

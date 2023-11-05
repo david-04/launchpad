@@ -167,7 +167,6 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         currentValues: [
             ["prettier", undefined],
-            ["rome", undefined],
             ["disabled", "don't format sources"],
         ] as const,
         obsoleteValues: [] as const,
