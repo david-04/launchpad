@@ -16,5 +16,6 @@ export function init() {
         "--src-dir=src",
         "--web-app-dir=dist",
         "--tsc-out-dir=dist",
+        "--bundler-out-dir=dist/js",
     ]);
 }

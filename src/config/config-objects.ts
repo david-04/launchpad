@@ -65,8 +65,8 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
 export type OldPartialConfig = ReturnType<typeof assembleConfig>;
 export type OldConfig = ReturnType<typeof validateConfig>;
 
-type NewConfigType<T extends keyof typeof ConfigProperties.current> = Exclude<
-    ReturnType<(typeof ConfigProperties.current)[T]["parseNewValue"]>,
+type NewConfigType<T extends keyof typeof ConfigProperties.currentAndInitOnly> = Exclude<
+    ReturnType<(typeof ConfigProperties.currentAndInitOnly)[T]["parseNewValue"]>,
     ConfigError
 >;
 
@@ -83,6 +83,7 @@ export type NewConfig = {
     srcDir: NewConfigType<"srcDir">;
     webAppDir: NewConfigType<"webAppDir">;
     tscOutDir: NewConfigType<"tscOutDir">;
+    bundlerOutDir: NewConfigType<"bundlerOutDir">;
 };
 
 export type CommandLineConfig = ReturnType<typeof assembleConfigFromCommandLineOptions>;
@@ -104,5 +105,6 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
         webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),
         tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
+        bundlerOutDir: ConfigProperties.bundlerOutDir.parseFromCommandLine(properties),
     } as const satisfies Omit<{ [K in keyof NewConfig]: NewConfig[K] | undefined | "default" }, "version">;
 }

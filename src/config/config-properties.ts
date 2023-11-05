@@ -253,6 +253,28 @@ const CURRENT_CONFIG_PROPERTIES = {
 } as const;
 
 //----------------------------------------------------------------------------------------------------------------------
+// Parameters that are only needed during initialization
+//----------------------------------------------------------------------------------------------------------------------
+
+const INIT_ONLY_CONFIG_PROPERTIES = {
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    // Bundler output directory
+    //------------------------------------------------------------------------------------------------------------------
+
+    bundlerOutDir: createStringProperty({
+        name: "Bundler output directory",
+        commandLine: {
+            option: "--bundler-out-dir",
+            placeholder: "<DIR>",
+            description: "Bundler output directory",
+        },
+        parseOldValue: createDirectoryParser("Bundler output directory", "optional"),
+        parseNewValue: createDirectoryParser("Bundler output directory", "optional"),
+    }),
+} as const;
+
+//----------------------------------------------------------------------------------------------------------------------
 // Obsolete configuration properties
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -262,7 +284,16 @@ const OBSOLETE_CONFIG_PROPERTIES = {} as const;
 // Create compilations of the configuration properties
 //----------------------------------------------------------------------------------------------------------------------
 
-const ALL_CONFIG_PROPERTIES = { ...CURRENT_CONFIG_PROPERTIES, ...OBSOLETE_CONFIG_PROPERTIES } as const;
+const ALL_CONFIG_PROPERTIES = {
+    ...CURRENT_CONFIG_PROPERTIES,
+    ...OBSOLETE_CONFIG_PROPERTIES,
+    ...INIT_ONLY_CONFIG_PROPERTIES,
+} as const;
+const CURRENT_AND_OBSOLETE_CONFIG_PROPERTIES = { ...CURRENT_CONFIG_PROPERTIES, ...OBSOLETE_CONFIG_PROPERTIES } as const;
+const CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES = {
+    ...CURRENT_CONFIG_PROPERTIES,
+    ...INIT_ONLY_CONFIG_PROPERTIES,
+} as const;
 
 const toArray = <T extends object>(properties: T) => Object.keys(properties).map(key => properties[key as keyof T]);
 
@@ -270,10 +301,18 @@ export const ConfigProperties = {
     ...ALL_CONFIG_PROPERTIES,
     all: ALL_CONFIG_PROPERTIES,
     current: CURRENT_CONFIG_PROPERTIES,
+    currentAndInitOnly: CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES,
+    currentAndObsolete: CURRENT_AND_OBSOLETE_CONFIG_PROPERTIES,
+    initOnly: INIT_ONLY_CONFIG_PROPERTIES,
     obsolete: OBSOLETE_CONFIG_PROPERTIES,
     arrays: {
         all: toArray(ALL_CONFIG_PROPERTIES),
         current: toArray(CURRENT_CONFIG_PROPERTIES),
+        currentAndInitOnly: toArray(CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES),
+        currentAndObsolete: toArray(CURRENT_AND_OBSOLETE_CONFIG_PROPERTIES),
+        initOnly: toArray(INIT_ONLY_CONFIG_PROPERTIES),
         obsolete: toArray(OBSOLETE_CONFIG_PROPERTIES),
     },
 } as const;
+
+export type InitOnlyConfigProperties = keyof typeof INIT_ONLY_CONFIG_PROPERTIES;

@@ -21,8 +21,6 @@ import {
 // Data types
 //----------------------------------------------------------------------------------------------------------------------
 
-// type EnumProperty = { readonly value: string; readonly pinned: boolean };
-
 type Presets = {
     oldConfig: OldPartialConfig | undefined;
     commandLineConfig: CommandLineConfig;
@@ -50,6 +48,7 @@ export async function getNewConfig(
     const srcDir = await getSrcDir(presets);
     const webAppDir = await getWebAppDir(presets, runtime);
     const tscOutDir = await getTscOutDir(presets, { projectName, runtime, bundler, dtsBundler, webAppDir });
+    const bundlerOutDir = await getBundlerOutDir(presets, { runtime, bundler, webAppDir });
     // const libraries = await getLibraries(runtime);
     // const installDevToolsLocally = await getInstallDevToolsLocally();
     return {
@@ -65,6 +64,7 @@ export async function getNewConfig(
         srcDir,
         webAppDir,
         tscOutDir,
+        bundlerOutDir,
         // libraries,
         // installDevToolsLocally,
     };
@@ -350,6 +350,29 @@ function getDefaultTscOutDir(
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Select the bundler output directory
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runtime" | "bundler" | "webAppDir">) {
+    if ("disabled" === config.bundler.value) {
+        return "";
+    }
+    const FIELD = "bundlerOutDir";
+    const defaultDirectory = "web" === config.runtime ? `${config.webAppDir}/js` : "dist";
+    const preselectedDirectory = presets.commandLineConfig[FIELD];
+    if (preselectedDirectory) {
+        return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
+    } else {
+        return prompt<string>({
+            type: "text",
+            initial: defaultDirectory,
+            message: "Bundler output directory",
+            format: input => input.trim(),
+            validate: toValidator(ConfigProperties[FIELD].parseNewValue),
+        });
+    }
+}
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select libraries to install
