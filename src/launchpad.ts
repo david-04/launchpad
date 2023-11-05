@@ -80,14 +80,13 @@ function showHelp() {
         .map(help => `  ${help}`);
     const options = getConfigProperties();
     const helpMessage = [
+        "Usage: launchpad [COMMAND] [OPTIONS]",
         "",
-        "  Usage: launchpad [COMMAND] [OPTIONS]",
-        "",
-        "  [COMMAND]",
+        "[COMMAND]",
         "",
         ...commands,
         "",
-        "  [OPTIONS]",
+        "[OPTIONS]",
         "",
         ...options.map(option => `  ${option}`),
     ];
@@ -99,7 +98,7 @@ function showHelp() {
 //----------------------------------------------------------------------------------------------------------------------
 
 function getConfigProperties() {
-    const properties = ConfigProperties.arrays.current
+    const properties = ConfigProperties.arrays.currentAndInitOnly
         .map(property => property.commandLineInfo)
         .filter(<T>(property: T): property is Exclude<T, undefined> => !!property)
         .map(property => ({

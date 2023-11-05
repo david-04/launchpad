@@ -117,7 +117,8 @@ export type ParsedConfig = ReturnType<typeof parseConfig>;
 
 function validatePropertyKeys(properties: ConfigFileProperties, addError: AddError) {
     for (const configFileProperty of properties) {
-        if (!ConfigProperties.arrays.all.some(property => property.matchesConfigFileKey(configFileProperty.key))) {
+        const key = configFileProperty.key;
+        if (!ConfigProperties.arrays.currentAndObsolete.some(property => property.matchesConfigFileKey(key))) {
             addError(configFileProperty.formatError(`Unknown config property "${configFileProperty.key}"`));
         }
     }
