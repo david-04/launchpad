@@ -48,7 +48,8 @@ export async function getNewConfig(
     const formatter = await getFormatter(presets);
     const packageManager = await getPackageManager(presets);
     const srcDir = await getSrcDir(presets);
-    const tscOutDir = await getTscOutDir(presets, runtime, bundler, dtsBundler);
+    const webAppDir = await getWebAppDir(presets, runtime);
+    const tscOutDir = await getTscOutDir(presets, { projectName, runtime, bundler, dtsBundler, webAppDir });
     // const libraries = await getLibraries(runtime);
     // const installDevToolsLocally = await getInstallDevToolsLocally();
     return {
@@ -62,6 +63,7 @@ export async function getNewConfig(
         formatter,
         packageManager,
         srcDir,
+        webAppDir,
         tscOutDir,
         // libraries,
         // installDevToolsLocally,
@@ -291,20 +293,39 @@ async function getSrcDir(presets: Presets) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Select the web app root directory
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getWebAppDir(presets: Presets, runtime: NewConfig["runtime"]) {
+    if ("web" !== runtime) {
+        return "";
+    }
+    const FIELD = "webAppDir";
+    const defaultDirectory = "dist";
+    const preselectedDirectory = presets.commandLineConfig[FIELD];
+    if (preselectedDirectory) {
+        return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
+    } else {
+        return prompt<string>({
+            type: "text",
+            initial: defaultDirectory,
+            message: "Web app root directory",
+            format: input => input.trim(),
+            validate: toValidator(ConfigProperties[FIELD].parseNewValue),
+        });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Select the TSC compiler's output directory
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getTscOutDir(
-    presets: Presets,
-    runtime: NewConfig["runtime"],
-    bundler: NewConfig["bundler"],
-    dtsBundler: NewConfig["dtsBundler"]
-) {
-    if ("ts-node" === runtime && "disabled" === dtsBundler.value) {
+async function getTscOutDir(presets: Presets, config: Parameters<typeof getDefaultTscOutDir>[0]) {
+    if ("ts-node" === config.runtime && "disabled" === config.dtsBundler.value) {
         return "";
     }
     const FIELD = "tscOutDir";
-    const defaultDirectory = "disabled" === bundler.value ? "dist" : "build";
+    const defaultDirectory = getDefaultTscOutDir(config);
     const preselectedDirectory = presets.commandLineConfig[FIELD];
     if (preselectedDirectory) {
         return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
@@ -318,6 +339,17 @@ async function getTscOutDir(
         });
     }
 }
+
+function getDefaultTscOutDir(
+    config: Pick<NewConfig, "projectName" | "runtime" | "bundler" | "dtsBundler" | "webAppDir">
+) {
+    if ("web" === config.runtime) {
+        return "disabled" === config.bundler.value ? `${config.webAppDir}/js/${config.projectName}` : "build";
+    } else {
+        return "disabled" === config.bundler.value ? "dist" : "build";
+    }
+}
+
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select libraries to install

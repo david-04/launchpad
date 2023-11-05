@@ -11,6 +11,8 @@ import { ConfigProperties } from "./config-properties.js";
 // Parse available configuration properties into an old config object
 //----------------------------------------------------------------------------------------------------------------------
 
+type CommandLineOnlyProperties = "webAppDir";
+
 export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, addError: AddError) {
     return {
         version: ConfigProperties.version.parseOldValue(properties, addError),
@@ -24,7 +26,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         packageManager: ConfigProperties.packageManager.parseOldValue(properties, addError),
         srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
         tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
-    } as const satisfies { [K in keyof typeof ConfigProperties.current]: unknown };
+    } as const satisfies Omit<{ [K in keyof typeof ConfigProperties.current]: unknown }, CommandLineOnlyProperties>;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,6 +81,7 @@ export type NewConfig = {
     formatter: NewConfigType<"formatter">;
     packageManager: NewConfigType<"packageManager">;
     srcDir: NewConfigType<"srcDir">;
+    webAppDir: NewConfigType<"webAppDir">;
     tscOutDir: NewConfigType<"tscOutDir">;
 };
 
@@ -99,6 +102,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         formatter: ConfigProperties.formatter.parseFromCommandLine(properties),
         packageManager: ConfigProperties.packageManager.parseFromCommandLine(properties),
         srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
+        webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),
         tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
     } as const satisfies Omit<{ [K in keyof NewConfig]: NewConfig[K] | undefined | "default" }, "version">;
 }

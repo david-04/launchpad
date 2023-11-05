@@ -215,6 +215,25 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
+    // Web app directory
+    //------------------------------------------------------------------------------------------------------------------
+
+    webAppDir: createStringProperty({
+        name: "web app directory",
+        configFile: {
+            obsoleteKeys: [],
+            newConfigObjectName: "srcDir",
+        },
+        commandLine: {
+            option: "--web-app-dir",
+            placeholder: "<DIR>",
+            description: "relative path to the web app root directory",
+        },
+        parseOldValue: createDirectoryParser("web app directory", "mandatory"),
+        parseNewValue: createDirectoryParser("web app directory", "mandatory"),
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
     // TSC output directory
     //------------------------------------------------------------------------------------------------------------------
 
