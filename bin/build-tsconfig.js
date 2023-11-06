@@ -29,7 +29,7 @@ function loadParseAndNormalizeTsconfigJson(path, fileName) {
     const relativePath = join(path, fileName);
     const rawContent = loadFile(relativePath);
     const parsedContent = parseJson(relativePath, rawContent);
-    const normalizedContent = normalizeTsconfig(parsedContent);
+    const normalizedContent = normalizeTsconfig(fileName, parsedContent);
     return { name: fileName, json: normalizedContent };
 }
 
@@ -61,13 +61,14 @@ function parseJson(relativePath, rawContent) {
 // Normalize a tsconfig.json
 //----------------------------------------------------------------------------------------------------------------------
 
-function normalizeTsconfig(json) {
+function normalizeTsconfig(fileName, json) {
     const compilerOptionsIn = json.compilerOptions;
     const compilerOptionsOut = {};
     Object.keys(compilerOptionsIn)
         .sort()
         .forEach(key => (compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key])));
-    return { compilerOptions: compilerOptionsOut, include: ["../src/**/*.ts"] };
+    const tsNode = 0 <= fileName.indexOf("-esm") ? { "ts-node": { esm: true } } : {};
+    return { compilerOptions: compilerOptionsOut, include: ["../src/**/*.ts"], ...tsNode };
 }
 
 //----------------------------------------------------------------------------------------------------------------------

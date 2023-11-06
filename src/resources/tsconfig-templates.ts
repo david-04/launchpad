@@ -144,7 +144,10 @@ export const TSCONFIG_JSON_TEMPLATES = {
         },
         "include": [
             "../src/**/*.ts"
-        ]
+        ],
+        "ts-node": {
+            "esm": true
+        }
     },
     "tsconfig.cli-library-cjs.json": {
         "compilerOptions": {
@@ -291,7 +294,10 @@ export const TSCONFIG_JSON_TEMPLATES = {
         },
         "include": [
             "../src/**/*.ts"
-        ]
+        ],
+        "ts-node": {
+            "esm": true
+        }
     },
     "tsconfig.web-application-cjs.json": {
         "compilerOptions": {
@@ -434,7 +440,10 @@ export const TSCONFIG_JSON_TEMPLATES = {
         },
         "include": [
             "../src/**/*.ts"
-        ]
+        ],
+        "ts-node": {
+            "esm": true
+        }
     },
     "tsconfig.web-library-cjs.json": {
         "compilerOptions": {
@@ -577,6 +586,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
         },
         "include": [
             "../src/**/*.ts"
-        ]
+        ],
+        "ts-node": {
+            "esm": true
+        }
     }
 } as const;
