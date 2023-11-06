@@ -63,6 +63,24 @@ export function parseVersion(value: string, source: string | undefined) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Parse boolean
+//----------------------------------------------------------------------------------------------------------------------
+
+export function parseBoolean(value: string, source: string | undefined) {
+    const trimmed = value.trim();
+    const normalized = value.toLowerCase();
+    if (["t", "true", "y", "yes"].includes(normalized)) {
+        return true;
+    } else if (["f", "false", "n", "no"].includes(normalized)) {
+        return false;
+    } else {
+        return source
+            ? error(`"${trimmed}" is not a valid value for ${source}`)
+            : error(`"${trimmed}" is not a valid boolean (allowed values: true/false or yes/no)`);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Create a parser for non-pinnable enum values
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -93,6 +111,17 @@ export function createPinnableEnumParser<T extends string>(allowedValues: Readon
         const unpinned = parser(pinned ? trimmed.substring(0, trimmed.length - PINNED_SUFFIX.length) : trimmed, source);
         return "string" === typeof unpinned ? { value: unpinned, pinned } : (unpinned as ConfigError);
     };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Parse a comma-separated list of values
+//----------------------------------------------------------------------------------------------------------------------
+
+export function parseStringArray(value: string) {
+    return value
+        .split(",")
+        .map(value => value.trim())
+        .filter(value => value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

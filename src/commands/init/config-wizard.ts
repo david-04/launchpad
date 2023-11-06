@@ -1,16 +1,19 @@
 import { exit } from "process";
+import type { Choice } from "prompts";
 import { pinned, unpinned } from "../../config/config-data-types.js";
 import type { ParsedConfig } from "../../config/config-loader.js";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import { ConfigProperties } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
-import { DEFAULT_ENUM } from "../../utilities/constants.js";
+import { DEFAULT_ENUM, type DefaultEnum } from "../../utilities/constants.js";
 import type { Path } from "../../utilities/path.js";
 import {
     createDefaultOption,
     findNonPinnableMatchingChoice,
     findPinnableMatchingChoice,
     prompt,
+    promptMultiSelect,
+    promptYesNo,
     toChoice,
     toPinned,
     toValidator,
@@ -49,8 +52,10 @@ export async function getNewConfig(
     const webAppDir = await getWebAppDir(presets, runtime);
     const tscOutDir = await getTscOutDir(presets, { projectName, runtime, bundler, dtsBundler, webAppDir });
     const bundlerOutDir = await getBundlerOutDir(presets, { runtime, bundler, webAppDir });
-    // const libraries = await getLibraries(runtime);
-    // const installDevToolsLocally = await getInstallDevToolsLocally();
+    const dependencies = await getDependencies(presets, { runtime });
+    const installDevDependencies = await getInstallDevDependencies(presets);
+    // create project template
+    // createDebugFile
     return {
         version,
         projectName,
@@ -65,8 +70,8 @@ export async function getNewConfig(
         webAppDir,
         tscOutDir,
         bundlerOutDir,
-        // libraries,
-        // installDevToolsLocally,
+        dependencies,
+        installDevDependencies,
     };
 }
 
@@ -374,25 +379,74 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
     }
 }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select libraries to install
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Get the dependencies to install
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getLibraries(runtime: Runtime) {
-//     const choices = toChoice([
-//         "@types/node",
-//         "Typings for Node.js",
-//         "@types/node" satisfies Library,
-//         runtime.value !== "web",
-//     ]);
-//     return prompt<ReadonlyArray<Library>>({
-//         type: "multiselect",
-//         message: "Libraries",
-//         choices,
-//         instructions: false,
-//         hint: "Use [SPACE] to select/deselect",
-//     });
-// }
+async function getDependencies(presets: Presets, config: Pick<NewConfig, "runtime">) {
+    const options = getDependencyOptions(presets, config);
+    if (0 == options.interactive.length) {
+        return options.autoSelected;
+    } else {
+        console.log(options.interactive);
+        const selection = await promptMultiSelect({
+            type: "multiselect",
+            choices: options.interactive,
+            message: "Install packages",
+        });
+        return [...options.autoSelected, ...selection].sort();
+    }
+}
+
+function getDependencyOptions(presets: Presets, config: Pick<NewConfig, "runtime">) {
+    const defaultOptionalDependencies = config.runtime === "web" ? [] : ["@types/node"];
+    return toDependencyOptions({
+        mandatory: toSet(presets.commandLineConfig.dependencies, []),
+        preselected: toSet(presets.commandLineConfig.preselectedDependencies, []),
+        optional: toSet(presets.commandLineConfig.optionalDependencies, defaultOptionalDependencies),
+    });
+}
+
+function toSet(
+    value: ReadonlyArray<string> | DefaultEnum | undefined,
+    defaultValues: ReadonlyArray<string>
+): ReadonlySet<string> {
+    return value instanceof Array ? new Set(value) : new Set(defaultValues);
+}
+
+function toDependencyOptions(dependencies: Record<"mandatory" | "preselected" | "optional", ReadonlySet<string>>) {
+    const preselected = new Set<string>(dependencies.preselected);
+    const optional = new Set<string>(dependencies.optional);
+    dependencies.mandatory.forEach(dependency => [preselected, optional].forEach(set => set.delete(dependency)));
+    preselected.forEach(dependency => optional.delete(dependency));
+    return {
+        autoSelected: [...dependencies.mandatory],
+        interactive: [
+            ...Array.from(preselected).map(value => ({ value, title: value, selected: true } as const)),
+            ...Array.from(optional).map(value => ({ value, title: value, selected: false } as const)),
+        ].sort((a, b) => a.value.localeCompare(b.value)) as Choice[],
+    } as const;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Install dev dependencies locally
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getInstallDevDependencies(presets: Presets) {
+    const FIELD = "installDevDependencies";
+    const preselectedOption = presets.commandLineConfig[FIELD];
+    console.log(presets);
+    if (undefined !== preselectedOption) {
+        return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
+    } else {
+        return promptYesNo({
+            message: "Install dev dependencies (compiler, bundler, formatter, ...)",
+            yesHint: "Install locally",
+            noHint: "Rely on globally installed versions",
+            default: true,
+        });
+    }
+}
 
 // //----------------------------------------------------------------------------------------------------------------------
 // // Select if development tools are to be installed locally

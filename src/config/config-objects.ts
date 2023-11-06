@@ -11,7 +11,12 @@ import { ConfigProperties } from "./config-properties.js";
 // Parse available configuration properties into an old config object
 //----------------------------------------------------------------------------------------------------------------------
 
-type CommandLineOnlyProperties = "webAppDir";
+type CommandLineOnlyProperties =
+    | "webAppDir"
+    | "autoSelectedDependencies"
+    | "preselectedDependencies"
+    | "optionalDependencies"
+    | "installDevDependencies";
 
 export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, addError: AddError) {
     return {
@@ -84,6 +89,13 @@ export type NewConfig = {
     webAppDir: NewConfigType<"webAppDir">;
     tscOutDir: NewConfigType<"tscOutDir">;
     bundlerOutDir: NewConfigType<"bundlerOutDir">;
+    installDevDependencies: NewConfigType<"installDevDependencies">;
+    dependencies: NewConfigType<"dependencies">;
+};
+
+export type NewConfigCli = NewConfig & {
+    preselectedDependencies: NewConfigType<"preselectedDependencies">;
+    optionalDependencies: NewConfigType<"optionalDependencies">;
 };
 
 export type CommandLineConfig = ReturnType<typeof assembleConfigFromCommandLineOptions>;
@@ -106,5 +118,9 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),
         tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
         bundlerOutDir: ConfigProperties.bundlerOutDir.parseFromCommandLine(properties),
-    } as const satisfies Omit<{ [K in keyof NewConfig]: NewConfig[K] | undefined | "default" }, "version">;
+        installDevDependencies: ConfigProperties.installDevDependencies.parseFromCommandLine(properties),
+        dependencies: ConfigProperties.dependencies.parseFromCommandLine(properties),
+        preselectedDependencies: ConfigProperties.preselectedDependencies.parseFromCommandLine(properties),
+        optionalDependencies: ConfigProperties.optionalDependencies.parseFromCommandLine(properties),
+    } as const satisfies Omit<{ [K in keyof NewConfigCli]: NewConfigCli[K] | undefined | "default" }, "version">;
 }

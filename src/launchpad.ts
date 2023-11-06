@@ -84,11 +84,11 @@ function showHelp() {
         "",
         "[COMMAND]",
         "",
-        ...commands,
+        ...commands.sort(),
         "",
         "[OPTIONS]",
         "",
-        ...options.map(option => `  ${option}`),
+        ...options.map(option => `  ${option}`).sort(),
     ];
     helpMessage.forEach(line => console.log(line));
 }

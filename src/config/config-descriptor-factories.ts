@@ -4,13 +4,13 @@ import {
     ValidationError,
     type AddError,
     type CommandLineInfo,
+    type CommandLineOptions,
     type ConfigError,
     type ConfigFileProperties,
     type PinnableEnumValue,
     type SerializationDetails,
-    type CommandLineOptions,
 } from "./config-data-types.js";
-import { createNonPinnableEnumParser, createPinnableEnumParser, parseVersion } from "./config-parsers.js";
+import { createNonPinnableEnumParser, createPinnableEnumParser, parseBoolean, parseVersion } from "./config-parsers.js";
 import type { Version } from "./version-number.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -160,7 +160,74 @@ export function createStringProperty<KEY extends string>(property: StringPropert
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// String-array properties
+//----------------------------------------------------------------------------------------------------------------------
+
+type StringArrayPropertyDescriptor<KEY extends string> = {
+    readonly name: string;
+    readonly configFile?: ConfigFileDescriptor<KEY>;
+    readonly commandLine?: CommandLineDescriptorWithPlaceholder;
+    readonly parseOldValue: (value: string, source: string | undefined) => ReadonlyArray<string> | ConfigError;
+    readonly parseNewValue: (value: string, source: string | undefined) => ReadonlyArray<string> | ConfigError;
+};
+
+export function createStringArrayProperty<KEY extends string>(property: StringArrayPropertyDescriptor<KEY>) {
+    const placeholder = property.commandLine ? `[${property.commandLine?.placeholder}]` : undefined;
+    const commandLineInfo = createCommandLineInfo(property.commandLine, placeholder);
+    const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
+    const parseOldValue = createOldValueParser<ReadonlyArray<string>>(matchesConfigFileKey, property.parseOldValue);
+    const parseNewValue = property.parseNewValue;
+    const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
+    const serialize = createSerializer<ReadonlyArray<string>, KEY>(
+        property.configFile,
+        (value: ReadonlyArray<string>) => Array.from(value).join(",")
+    );
+    const assertOldValuePresent = createAssertPresentHandler<KEY, ReadonlyArray<string>>(
+        property.name,
+        property.configFile
+    );
+    return {
+        commandLineInfo,
+        matchesConfigFileKey,
+        parseOldValue,
+        parseNewValue,
+        parseFromCommandLine,
+        serialize,
+        assertOldValuePresent,
+    } as const satisfies AssembledDescriptor<ReadonlyArray<string>, ReadonlyArray<string>, KEY>;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Version number
+//----------------------------------------------------------------------------------------------------------------------
+
+type BooleanPropertyDescriptor<KEY extends string> = {
+    readonly name: string;
+    readonly configFile?: ConfigFileDescriptor<KEY>;
+    readonly commandLine?: CommandLineDescriptorWithPlaceholder;
+};
+
+export function createBooleanProperty<KEY extends string>(property: BooleanPropertyDescriptor<KEY>) {
+    const commandLineInfo = property.commandLine;
+    const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
+    const parseOldValue = createOldValueParser<boolean>(matchesConfigFileKey, parseBoolean);
+    const parseNewValue = parseBoolean;
+    const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
+    const serialize = createSerializer<boolean, KEY>(property.configFile, (value: boolean) => value ? "true" : "false");
+    const assertOldValuePresent = createAssertPresentHandler<KEY, boolean>(property.name, property.configFile);
+    return {
+        commandLineInfo,
+        matchesConfigFileKey,
+        parseOldValue,
+        parseNewValue,
+        parseFromCommandLine,
+        serialize,
+        assertOldValuePresent,
+    } as const satisfies AssembledDescriptor<boolean, boolean, KEY>;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Boolean
 //----------------------------------------------------------------------------------------------------------------------
 
 type VersionPropertyDescriptor<KEY extends string> = {

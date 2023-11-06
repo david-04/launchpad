@@ -1,11 +1,13 @@
 import { defaultMightChange } from "../utilities/constants.js";
 import {
+    createBooleanProperty,
     createNonPinnableEnumProperty,
     createPinnableEnumProperty,
+    createStringArrayProperty,
     createStringProperty,
     createVersionProperty,
 } from "./config-descriptor-factories.js";
-import { createDirectoryParser, parseProjectName } from "./config-parsers.js";
+import { createDirectoryParser, parseProjectName, parseStringArray } from "./config-parsers.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Current configuration properties
@@ -271,6 +273,52 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
         },
         parseOldValue: createDirectoryParser("Bundler output directory", "optional"),
         parseNewValue: createDirectoryParser("Bundler output directory", "optional"),
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Libraries (npm packages) to install
+    //------------------------------------------------------------------------------------------------------------------
+
+    installDevDependencies: createBooleanProperty({
+        name: "Install development tools",
+        commandLine: {
+            option: "--install-dev-dependencies",
+            placeholder: "[true | false]",
+            description: "Install development tools (compiler, bundler, formatter, ...)",
+        },
+    }),
+
+    dependencies: createStringArrayProperty({
+        name: "NPM packages to install without prompting",
+        commandLine: {
+            option: "--auto-selected-dependencies",
+            placeholder: "<dep1>,<dep2>,...",
+            description: "Install these NPM packages (without prompting)",
+        },
+        parseOldValue: parseStringArray,
+        parseNewValue: parseStringArray,
+    }),
+
+    preselectedDependencies: createStringArrayProperty({
+        name: "Pre-selected NPM packages",
+        commandLine: {
+            option: "--preselected-dependencies",
+            placeholder: "<dep1>,<dep2>, ...",
+            description: "Suggest these NPM packages (pre-selected)",
+        },
+        parseOldValue: parseStringArray,
+        parseNewValue: parseStringArray,
+    }),
+
+    optionalDependencies: createStringArrayProperty({
+        name: "Optional NPM packages",
+        commandLine: {
+            option: "--optional-dependencies",
+            placeholder: "<dep1>,<dep2>,...",
+            description: "Suggest these NPM packages (not pre-selected)",
+        },
+        parseOldValue: parseStringArray,
+        parseNewValue: parseStringArray,
     }),
 } as const;
 

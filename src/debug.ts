@@ -17,5 +17,9 @@ export function init() {
         "--web-app-dir=dist",
         "--tsc-out-dir=dist",
         "--bundler-out-dir=dist/js",
+        "--auto-selected-dependencies=",
+        "--preselected-dependencies=",
+        "--optional-dependencies=",
+        "--install-dev-dependencies=false",
     ]);
 }

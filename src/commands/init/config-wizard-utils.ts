@@ -96,3 +96,23 @@ export function findPinnableMatchingChoice<T extends string>(
 export async function prompt<T>(options: Omit<PromptObject<string>, "name">): Promise<T> {
     return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1);
 }
+
+export async function promptMultiSelect(options: Omit<PromptObject<string>, "name">) {
+    return await prompt<ReadonlyArray<string>>({
+        instructions: false,
+        hint: "[space | arrow right/left] = toggle selection; [enter / return] = save and continue",
+        ...options,
+    });
+}
+
+export async function promptYesNo(options: { message: string; default: boolean; yesHint?: string; noHint?: string }) {
+    return await prompt<boolean>({
+        type: "select",
+        message: options.message,
+        choices: [
+            { title: "Yes", value: true, description: options.yesHint },
+            { title: "No", value: false, description: options.noHint },
+        ],
+        initial: options.default ? 0 : 1,
+    });
+}
