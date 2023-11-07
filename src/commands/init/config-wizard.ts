@@ -18,7 +18,7 @@ import {
     toPinned,
     toValidator,
     type ChoiceOptions,
-} from "./config-wizard-utils.js";
+} from "../../utilities/prompt.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types

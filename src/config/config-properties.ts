@@ -296,7 +296,7 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
         name: "NPM packages to install without prompting",
         commandLine: {
             option: "--auto-selected-dependencies",
-            placeholder: "<dep1>,<dep2>,...",
+            placeholder: "<dep1>, <dep2>, ...",
             description: "Install these NPM packages (without prompting)",
         },
         parseOldValue: parseStringArray,
@@ -307,7 +307,7 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
         name: "Pre-selected NPM packages",
         commandLine: {
             option: "--preselected-dependencies",
-            placeholder: "<dep1>,<dep2>, ...",
+            placeholder: "<dep1>, <dep2>, ...",
             description: "Suggest these NPM packages (pre-selected)",
         },
         parseOldValue: parseStringArray,
@@ -318,7 +318,7 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
         name: "Optional NPM packages",
         commandLine: {
             option: "--optional-dependencies",
-            placeholder: "<dep1>,<dep2>,...",
+            placeholder: "<dep1>, <dep2>, ...",
             description: "Suggest these NPM packages (not pre-selected)",
         },
         parseOldValue: parseStringArray,
