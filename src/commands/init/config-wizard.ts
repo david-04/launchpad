@@ -44,10 +44,11 @@ export async function getNewConfig(
     const artifact = await getArtifact(presets);
     const runtime = await getRuntime(presets);
     const module = await getModule(presets);
+    const installationMode = await getInstallationMode(presets);
     const bundler = await getBundler(presets);
     const dtsBundler = await getDtsBundler(presets, bundler);
     const formatter = await getFormatter(presets);
-    const packageManager = await getPackageManager(presets);
+    const packageManager = await getPackageManager(presets, { installationMode });
     const srcDir = await getSrcDir(presets);
     const webAppDir = await getWebAppDir(presets, { runtime, artifact });
     const tscOutDir = await getTscOutDir(presets, { projectName, runtime, bundler, dtsBundler, webAppDir });
@@ -62,6 +63,7 @@ export async function getNewConfig(
         artifact,
         runtime,
         module,
+        installationMode,
         bundler,
         dtsBundler,
         formatter,
@@ -183,6 +185,26 @@ async function getModule(presets: Presets) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Select the launchpad installation mode
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getInstallationMode(presets: Presets) {
+    const FIELD = "installationMode";
+    type T = NewConfig[typeof FIELD];
+    const defaultValue: T = "local";
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
+    } else {
+        const options = ConfigProperties[FIELD].options.map(array => [...array, array[0]] as const);
+        const choices = toChoice(options);
+        const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
+        return prompt<T>({ type: "select", message: "Launchpad installation mode", choices, initial });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Select the bundler
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -259,7 +281,7 @@ async function getFormatter(presets: Presets) {
 // Select the package manager
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getPackageManager(presets: Presets) {
+async function getPackageManager(presets: Presets, config: Pick<NewConfig, "installationMode">) {
     const FIELD = "packageManager";
     type T = NewConfig[typeof FIELD];
     const defaultValue: T = unpinned("npm");
@@ -270,7 +292,9 @@ async function getPackageManager(presets: Presets) {
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
-            ...ConfigProperties[FIELD].options.map(array => [...array, pinned(array[0])] as const),
+            ...ConfigProperties[FIELD].options
+                .filter(option => config.installationMode !== "global-auto-update" || option[0] === "yarn")
+                .map(array => [...array, pinned(array[0])] as const),
         ];
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);

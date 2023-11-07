@@ -74,6 +74,7 @@ lp.fn.config.assert.enum        =$(foreach fn, not-empty valid-enum single-enum,
 
 lp.fn.config.fail               =$(info Invalid configuration in $(__LP_SETTINGS_CFG)) \
                                  $(info $(strip $(1))) \
+                                 $(info ) \
                                  $(error $(__LP_BLANK))
 lp.fn.config.fail.missing-value =$(call lp.fn.config.fail, $(1) is not set $(if $(2), (should be $(strip $(2)))))
 lp.fn.config.fail.invalid-enum  =$(call lp.fn.config.fail, $(strip $(1)) must be $($(strip $(1))_ENUMS) (current value: "$(strip $($(strip $(1)))")))
@@ -154,6 +155,15 @@ $(call lp.fn.config.validate-enum, LP_SETTINGS_FORMATTER)
 
 LP_SETTINGS_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_PACKAGE_MANAGER)
+
+LP_SETTINGS_INSTALLATION_MODE_ENUMS="local", "no-install", "global-auto-update" or "global-no-update"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_INSTALLATION_MODE)
+
+ifeq "$(LP_SETTINGS_PACKAGE_MANAGER)" "yarn"
+    ifeq "$(LP_SETTINGS_INSTALLATION_MODE)" "global-auto-update"
+        $(call lp.fn.config.fail, LP_SETTINGS_PACKAGE_MANAGER=yarn can't be combined with LP_SETTINGS_INSTALLATION_MODE=global-auto-update)
+    endif
+endif
 
 $(call lp.fn.config.normalize.string, LP_SETTINGS_SRC_DIR)
 $(call lp.fn.config.assert.not-empty, LP_SETTINGS_SRC_DIR)

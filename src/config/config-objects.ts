@@ -18,6 +18,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         artifact: ConfigProperties.artifact.parseOldValue(properties, addError),
         runtime: ConfigProperties.runtime.parseOldValue(properties, addError),
         module: ConfigProperties.module.parseOldValue(properties, addError),
+        installationMode: ConfigProperties.installationMode.parseOldValue(properties, addError),
         bundler: ConfigProperties.bundler.parseOldValue(properties, addError),
         dtsBundler: ConfigProperties.dtsBundler.parseOldValue(properties, addError),
         formatter: ConfigProperties.formatter.parseOldValue(properties, addError),
@@ -41,6 +42,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             artifact: ConfigProperties.artifact.assertOldValuePresent(config.artifact),
             runtime: ConfigProperties.runtime.assertOldValuePresent(config.runtime),
             module: ConfigProperties.module.assertOldValuePresent(config.module),
+            installationMode: ConfigProperties.installationMode.assertOldValuePresent(config.installationMode),
             bundler: ConfigProperties.bundler.assertOldValuePresent(config.bundler),
             dtsBundler: ConfigProperties.dtsBundler.assertOldValuePresent(config.dtsBundler),
             formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
@@ -77,6 +79,7 @@ export type NewConfig = {
     projectName: NewConfigType<"projectName">;
     artifact: NewConfigType<"artifact">;
     runtime: NewConfigType<"runtime">;
+    installationMode: NewConfigType<"installationMode">;
     module: NewConfigType<"module">;
     bundler: NewConfigType<"bundler">;
     dtsBundler: NewConfigType<"dtsBundler">;
@@ -109,6 +112,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         artifact: ConfigProperties.artifact.parseFromCommandLine(properties),
         runtime: ConfigProperties.runtime.parseFromCommandLine(properties),
         module: ConfigProperties.module.parseFromCommandLine(properties),
+        installationMode: ConfigProperties.installationMode.parseFromCommandLine(properties),
         bundler: ConfigProperties.bundler.parseFromCommandLine(properties),
         dtsBundler: ConfigProperties.dtsBundler.parseFromCommandLine(properties),
         formatter: ConfigProperties.formatter.parseFromCommandLine(properties),

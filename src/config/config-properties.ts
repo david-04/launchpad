@@ -112,6 +112,29 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
+    // Installation mode
+    //------------------------------------------------------------------------------------------------------------------
+
+    installationMode: createNonPinnableEnumProperty({
+        name: "launchpad installation mode",
+        configFile: {
+            currentKey: "LP_SETTINGS_INSTALLATION_MODE",
+            newConfigObjectName: "installationMode",
+        },
+        commandLine: {
+            option: "--installation-mode",
+            description: "Install location of the launchpad npm package",
+        },
+        currentValues: [
+            ["local", "install locally within the project"],
+            ["no-install", "don't install launchpad, use npx/yarn dlx/pnpm exec/bunx"],
+            ["global-auto-update", "use a globally installed version and update it during uplifts"],
+            ["global-no-update", "use a globally installed version but don't update it during uplifts"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
     // Bundler
     //------------------------------------------------------------------------------------------------------------------
 
