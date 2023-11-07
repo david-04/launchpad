@@ -110,6 +110,7 @@ function parseConfig(configFilePath: Path, properties: ConfigFileProperties, err
 }
 
 export type ParsedConfig = ReturnType<typeof parseConfig>;
+export type ValidatedConfig = Exclude<ParsedConfig["validated"], undefined>;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Check if there are any unknown properties

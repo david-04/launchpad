@@ -1,6 +1,10 @@
 import { launchpad } from "./launchpad.js";
 
-init();
+postinstall();
+
+export function postinstall() {
+    launchpad(["postinstall"]);
+}
 
 export function init() {
     launchpad([

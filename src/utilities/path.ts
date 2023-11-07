@@ -66,6 +66,14 @@ export class Path {
     public loadFileContents() {
         return fs.readFileSync(this.path).toString();
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Append to the file
+    //------------------------------------------------------------------------------------------------------------------
+
+    public appendFileContents(contents: string | ReadonlyArray<string>) {
+        return fs.appendFileSync(this.path, "string" === typeof contents ? contents : contents.join("\n"));
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

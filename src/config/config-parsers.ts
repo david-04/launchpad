@@ -50,7 +50,7 @@ export function createDirectoryParser(type: string, mode: "optional" | "mandator
 export function parseVersion(value: string, source: string | undefined) {
     const trimmed = value.trim();
     const split = trimmed.split(".").map(value => value.trim());
-    const parsed = split.map(segment => (segment.match(/^\d+$/) ? parseInt(value) : NaN));
+    const parsed = split.map(segment => (segment.match(/^\d+$/) ? parseInt(segment) : NaN));
     const [major, minor, patch, ...other] = parsed;
     const isNumber = (value?: number): value is number => undefined !== value && !isNaN(value) && 0 <= value;
     if (isNumber(major) && isNumber(minor) && isNumber(patch) && !other.length) {
