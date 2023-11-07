@@ -54,8 +54,8 @@ export async function getNewConfig(
     const bundlerOutDir = await getBundlerOutDir(presets, { runtime, bundler, webAppDir });
     const dependencies = await getDependencies(presets, { runtime });
     const installDevDependencies = await getInstallDevDependencies(presets);
-    // create project template
-    // createDebugFile
+    const createProjectTemplate = await getCreateProjectTemplate(presets);
+    const createDebugModule = await getCreateDebugModule(presets);
     return {
         version,
         projectName,
@@ -72,6 +72,8 @@ export async function getNewConfig(
         bundlerOutDir,
         dependencies,
         installDevDependencies,
+        createProjectTemplate,
+        createDebugModule,
     };
 }
 
@@ -272,7 +274,7 @@ async function getPackageManager(presets: Presets) {
         ];
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);
-        return prompt<T>({ type: "select", message: "Formatter", choices, initial });
+        return prompt<T>({ type: "select", message: "Package manager", choices, initial });
     }
 }
 
@@ -388,7 +390,6 @@ async function getDependencies(presets: Presets, config: Pick<NewConfig, "runtim
     if (0 == options.interactive.length) {
         return options.autoSelected;
     } else {
-        console.log(options.interactive);
         const selection = await promptMultiSelect({
             type: "multiselect",
             choices: options.interactive,
@@ -435,7 +436,6 @@ function toDependencyOptions(dependencies: Record<"mandatory" | "preselected" | 
 async function getInstallDevDependencies(presets: Presets) {
     const FIELD = "installDevDependencies";
     const preselectedOption = presets.commandLineConfig[FIELD];
-    console.log(presets);
     if (undefined !== preselectedOption) {
         return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
     } else {
@@ -448,19 +448,37 @@ async function getInstallDevDependencies(presets: Presets) {
     }
 }
 
-// //----------------------------------------------------------------------------------------------------------------------
-// // Select if development tools are to be installed locally
-// //----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+// Create a project template
+//----------------------------------------------------------------------------------------------------------------------
 
-// async function getInstallDevToolsLocally() {
-//     const choices = toChoice(
-//         ["install locally", "Install compiler/bundler/formatter locally", true],
-//         ["use globally installed", "Use globally installed compiler/bundler/formatter", true]
-//     );
-//     return prompt<boolean>({
-//         type: "select",
-//         message: "Dev dependencies",
-//         choices,
-//         initial: choices.length - 1,
-//     });
-// }
+async function getCreateProjectTemplate(presets: Presets) {
+    const FIELD = "createProjectTemplate";
+    const preselectedOption = presets.commandLineConfig[FIELD];
+    if (undefined !== preselectedOption) {
+        return DEFAULT_ENUM === preselectedOption ? !presets.oldConfig : preselectedOption;
+    } else if (!presets.oldConfig) {
+        return true;
+    } else {
+        return promptYesNo({
+            message: "Create project template",
+            yesHint: "Scaffold a minimal project",
+            noHint: "Don't create any source files",
+            default: false,
+        });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Create a debug module
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getCreateDebugModule(presets: Presets) {
+    const FIELD = "createDebugModule";
+    const preselectedOption = presets.commandLineConfig[FIELD];
+    if (undefined !== preselectedOption) {
+        return DEFAULT_ENUM === preselectedOption ? false : preselectedOption;
+    } else {
+        return false;
+    }
+}

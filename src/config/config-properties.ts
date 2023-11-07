@@ -40,7 +40,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         commandLine: {
             option: "--project-name",
             placeholder: "<NAME>",
-            description: "name of the main module",
+            description: "Name of the main module/project",
         },
         parseOldValue: parseProjectName,
         parseNewValue: parseProjectName,
@@ -58,7 +58,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--artifact",
-            description: "the project's artifact",
+            description: "Project type",
         },
         currentValues: [
             ["app", "a stand-alone application"],
@@ -79,7 +79,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--runtime",
-            description: "the runtime environment",
+            description: "Runtime environment",
         },
         currentValues: [
             ["cli", defaultMightChange("node")],
@@ -102,7 +102,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--module-system",
-            description: "the target module system",
+            description: "Target module system",
         },
         currentValues: [
             ["cjs", "CommonJS"],
@@ -123,7 +123,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--bundler",
-            description: "the bundler",
+            description: "Bundler",
         },
         currentValues: [
             ["esbuild", undefined],
@@ -144,7 +144,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--dts-bundler",
-            description: "the declaration bundler for d.ts files",
+            description: "Bundler for declaration files (d.ts)",
         },
         currentValues: [
             ["dts-bundle-generator", undefined],
@@ -165,7 +165,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--formatter",
-            description: "the code formatter",
+            description: "Code formatter",
         },
         currentValues: [
             ["prettier", undefined],
@@ -186,7 +186,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--package-manager",
-            description: "the Node package manager",
+            description: "Package manager",
         },
         currentValues: [
             ["npm", undefined],
@@ -209,7 +209,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         commandLine: {
             option: "--src-dir",
             placeholder: "<DIR>",
-            description: "relative path to the source directory",
+            description: "Relative path to the source directory",
         },
         parseOldValue: createDirectoryParser("source directory", "mandatory"),
         parseNewValue: createDirectoryParser("source directory", "mandatory"),
@@ -228,7 +228,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         commandLine: {
             option: "--web-app-dir",
             placeholder: "<DIR>",
-            description: "relative path to the web app root directory",
+            description: "Relative path to the web application (with the index.html)",
         },
         parseOldValue: createDirectoryParser("web app directory", "mandatory"),
         parseNewValue: createDirectoryParser("web app directory", "mandatory"),
@@ -319,6 +319,28 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
         },
         parseOldValue: parseStringArray,
         parseNewValue: parseStringArray,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Project template
+    //------------------------------------------------------------------------------------------------------------------
+
+    createProjectTemplate: createBooleanProperty({
+        name: "Create project template",
+        commandLine: {
+            option: "--create-project-files",
+            placeholder: "[true | false]",
+            description: "Create a basic project template (main module, Makefile, ...)",
+        },
+    }),
+
+    createDebugModule: createBooleanProperty({
+        name: "Create a debug module",
+        commandLine: {
+            option: "--create-debug-module",
+            placeholder: "[true | false]",
+            description: "Create a debug.ts file",
+        },
     }),
 } as const;
 

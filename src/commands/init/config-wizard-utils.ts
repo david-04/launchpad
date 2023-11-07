@@ -70,8 +70,6 @@ export function findPinnableMatchingChoice<T extends string>(
     choices: ChoiceOptions<PinnableEnumValue<T>>,
     ...selectedValues: ReadonlyArray<PinnableEnumValue<T> | undefined>
 ) {
-    console.log(choices);
-    console.log(selectedValues);
     for (const selectedValue of selectedValues) {
         if (selectedValue) {
             const index1 = choices.findIndex(

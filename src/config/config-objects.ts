@@ -91,6 +91,8 @@ export type NewConfig = {
     bundlerOutDir: NewConfigType<"bundlerOutDir">;
     installDevDependencies: NewConfigType<"installDevDependencies">;
     dependencies: NewConfigType<"dependencies">;
+    createProjectTemplate: NewConfigType<"createProjectTemplate">;
+    createDebugModule: NewConfigType<"createDebugModule">;
 };
 
 export type NewConfigCli = NewConfig & {
@@ -122,5 +124,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         dependencies: ConfigProperties.dependencies.parseFromCommandLine(properties),
         preselectedDependencies: ConfigProperties.preselectedDependencies.parseFromCommandLine(properties),
         optionalDependencies: ConfigProperties.optionalDependencies.parseFromCommandLine(properties),
+        createProjectTemplate: ConfigProperties.createProjectTemplate.parseFromCommandLine(properties),
+        createDebugModule: ConfigProperties.createDebugModule.parseFromCommandLine(properties),
     } as const satisfies Omit<{ [K in keyof NewConfigCli]: NewConfigCli[K] | undefined | "default" }, "version">;
 }
