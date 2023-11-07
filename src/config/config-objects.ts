@@ -11,13 +11,6 @@ import { ConfigProperties } from "./config-properties.js";
 // Parse available configuration properties into an old config object
 //----------------------------------------------------------------------------------------------------------------------
 
-type CommandLineOnlyProperties =
-    | "webAppDir"
-    | "autoSelectedDependencies"
-    | "preselectedDependencies"
-    | "optionalDependencies"
-    | "installDevDependencies";
-
 export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, addError: AddError) {
     return {
         version: ConfigProperties.version.parseOldValue(properties, addError),
@@ -30,8 +23,10 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         formatter: ConfigProperties.formatter.parseOldValue(properties, addError),
         packageManager: ConfigProperties.packageManager.parseOldValue(properties, addError),
         srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
+        webAppDir: ConfigProperties.webAppDir.parseOldValue(properties, addError),
         tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
-    } as const satisfies Omit<{ [K in keyof typeof ConfigProperties.current]: unknown }, CommandLineOnlyProperties>;
+        bundlerOutDir: ConfigProperties.bundlerOutDir.parseOldValue(properties, addError),
+    } as const satisfies { [K in keyof typeof ConfigProperties.currentAndObsolete]: unknown };
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -51,7 +46,9 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
             packageManager: ConfigProperties.packageManager.assertOldValuePresent(config.packageManager),
             srcDir: ConfigProperties.srcDir.assertOldValuePresent(config.srcDir),
+            webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.srcDir),
             tscOutDir: ConfigProperties.tscOutDir.assertOldValuePresent(config.tscOutDir),
+            bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.tscOutDir),
         } as const satisfies typeof config;
     } catch (error: unknown) {
         if (error instanceof ValidationError) {

@@ -222,8 +222,8 @@ const CURRENT_CONFIG_PROPERTIES = {
     webAppDir: createStringProperty({
         name: "web app directory",
         configFile: {
-            obsoleteKeys: [],
-            newConfigObjectName: "srcDir",
+            currentKey: "LP_SETTINGS_WEB_APP_DIR",
+            newConfigObjectName: "webAppDir",
         },
         commandLine: {
             option: "--web-app-dir",
@@ -252,20 +252,17 @@ const CURRENT_CONFIG_PROPERTIES = {
         parseOldValue: createDirectoryParser("TypeScript output directory", "optional"),
         parseNewValue: createDirectoryParser("TypeScript output directory", "optional"),
     }),
-} as const;
 
-//----------------------------------------------------------------------------------------------------------------------
-// Parameters that are only needed during initialization
-//----------------------------------------------------------------------------------------------------------------------
-
-const INIT_ONLY_CONFIG_PROPERTIES = {
-    //
     //------------------------------------------------------------------------------------------------------------------
     // Bundler output directory
     //------------------------------------------------------------------------------------------------------------------
 
     bundlerOutDir: createStringProperty({
         name: "Bundler output directory",
+        configFile: {
+            currentKey: "LP_SETTINGS_BUNDLER_OUT_DIR",
+            newConfigObjectName: "bundlerOutDir",
+        },
         commandLine: {
             option: "--bundler-out-dir",
             placeholder: "<DIR>",
@@ -274,7 +271,14 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
         parseOldValue: createDirectoryParser("Bundler output directory", "optional"),
         parseNewValue: createDirectoryParser("Bundler output directory", "optional"),
     }),
+} as const;
 
+//----------------------------------------------------------------------------------------------------------------------
+// Parameters that are only needed during initialization
+//----------------------------------------------------------------------------------------------------------------------
+
+const INIT_ONLY_CONFIG_PROPERTIES = {
+    //
     //------------------------------------------------------------------------------------------------------------------
     // Libraries (npm packages) to install
     //------------------------------------------------------------------------------------------------------------------

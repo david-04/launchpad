@@ -5,7 +5,7 @@ import type { ParsedConfig } from "../../config/config-loader.js";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import { ConfigProperties } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
-import { DEFAULT_ENUM, type DefaultEnum } from "../../utilities/constants.js";
+import { DEFAULT_ENUM, N_A_ENUM, type DefaultEnum } from "../../utilities/constants.js";
 import type { Path } from "../../utilities/path.js";
 import {
     createDefaultOption,
@@ -49,7 +49,7 @@ export async function getNewConfig(
     const formatter = await getFormatter(presets);
     const packageManager = await getPackageManager(presets);
     const srcDir = await getSrcDir(presets);
-    const webAppDir = await getWebAppDir(presets, runtime);
+    const webAppDir = await getWebAppDir(presets, { runtime, artifact });
     const tscOutDir = await getTscOutDir(presets, { projectName, runtime, bundler, dtsBundler, webAppDir });
     const bundlerOutDir = await getBundlerOutDir(presets, { runtime, bundler, webAppDir });
     const dependencies = await getDependencies(presets, { runtime });
@@ -211,11 +211,11 @@ async function getBundler(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
-    const FIELD = "dtsBundler";
-    type T = NewConfig[typeof FIELD];
     if ("disabled" === bundler.value) {
         return pinned("disabled");
     }
+    const FIELD = "dtsBundler";
+    type T = NewConfig[typeof FIELD];
     const defaultValue: T = unpinned("dts-bundle-generator");
     const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
@@ -303,9 +303,9 @@ async function getSrcDir(presets: Presets) {
 // Select the web app root directory
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getWebAppDir(presets: Presets, runtime: NewConfig["runtime"]) {
-    if ("web" !== runtime) {
-        return "";
+async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" | "artifact">) {
+    if ("web" !== config.runtime || "app" !== config.artifact) {
+        return N_A_ENUM;
     }
     const FIELD = "webAppDir";
     const defaultDirectory = "dist";
@@ -313,9 +313,10 @@ async function getWebAppDir(presets: Presets, runtime: NewConfig["runtime"]) {
     if (preselectedDirectory) {
         return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
     } else {
+        const previousValue = presets.oldConfig?.[FIELD];
         return prompt<string>({
             type: "text",
-            initial: defaultDirectory,
+            initial: undefined !== previousValue && N_A_ENUM !== previousValue ? previousValue : defaultDirectory,
             message: "Web app root directory",
             format: input => input.trim(),
             validate: toValidator(ConfigProperties[FIELD].parseNewValue),
@@ -363,7 +364,7 @@ function getDefaultTscOutDir(
 
 async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runtime" | "bundler" | "webAppDir">) {
     if ("disabled" === config.bundler.value) {
-        return "";
+        return N_A_ENUM;
     }
     const FIELD = "bundlerOutDir";
     const defaultDirectory = "web" === config.runtime ? `${config.webAppDir}/js` : "dist";
@@ -371,9 +372,10 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
     if (preselectedDirectory) {
         return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
     } else {
+        const previousValue = presets.oldConfig?.[FIELD];
         return prompt<string>({
             type: "text",
-            initial: defaultDirectory,
+            initial: undefined !== previousValue && N_A_ENUM !== previousValue ? previousValue : defaultDirectory,
             message: "Bundler output directory",
             format: input => input.trim(),
             validate: toValidator(ConfigProperties[FIELD].parseNewValue),
