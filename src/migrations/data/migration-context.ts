@@ -29,7 +29,6 @@ export class MigrationContext {
         projectRoot: Path;
         canRunPackageManagerCommands: boolean;
         canPromptUser: boolean;
-        tabSize: number;
         oldConfig: OldConfig | undefined;
         newConfig: NewConfig;
     }) {
@@ -40,12 +39,12 @@ export class MigrationContext {
         this._newConfig = options.newConfig;
         this.files = new FileOrDirectoryCache(
             options.projectRoot,
-            options.tabSize,
+            options.newConfig.tabSize,
             (root, path, tabSize) => new File(root, path, tabSize)
         );
         this.directories = new FileOrDirectoryCache(
             options.projectRoot,
-            options.tabSize,
+            options.newConfig.tabSize,
             (root, path) => new Directory(root, path)
         );
     }

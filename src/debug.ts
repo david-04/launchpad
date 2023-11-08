@@ -1,6 +1,6 @@
 import { launchpad } from "./launchpad.js";
 
-postinstall();
+init();
 
 export function postinstall() {
     launchpad(["postinstall"]);
@@ -18,6 +18,10 @@ export function init() {
         "--formatter=prettier",
         "--package-manager=npm",
         "--src-dir=src",
+        "--tab-size=4",
+        "--installation-mode=global-no-update",
+        "--create-project-files=true",
+        "--create-debug-module=true",
         "--web-app-dir=dist",
         "--tsc-out-dir=dist",
         "--bundler-out-dir=dist/js",

@@ -6,7 +6,7 @@ import { MigrationContext } from "./data/migration-context.js";
 //----------------------------------------------------------------------------------------------------------------------
 
 export function migrate(
-    context: Omit<ConstructorParameters<typeof MigrationContext>[0], "newConfig"> & {
+    context: Omit<ConstructorParameters<typeof MigrationContext>[0], "newConfig" | "tabSize"> & {
         newConfig: NewConfig | undefined;
     }
 ) {

@@ -48,6 +48,7 @@ export async function getNewConfig(
     const bundler = await getBundler(presets);
     const dtsBundler = await getDtsBundler(presets, bundler);
     const formatter = await getFormatter(presets);
+    const tabSize = await getTabSize(presets);
     const packageManager = await getPackageManager(presets, { installationMode });
     const srcDir = await getSrcDir(presets);
     const webAppDir = await getWebAppDir(presets, { runtime, artifact });
@@ -67,6 +68,7 @@ export async function getNewConfig(
         bundler,
         dtsBundler,
         formatter,
+        tabSize,
         packageManager,
         srcDir,
         webAppDir,
@@ -255,7 +257,7 @@ async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Select the bundler
+// Select the formatter
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getFormatter(presets: Presets) {
@@ -274,6 +276,35 @@ async function getFormatter(presets: Presets) {
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);
         return prompt<T>({ type: "select", message: "Formatter", choices, initial });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Select the tab size
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getTabSize(presets: Presets) {
+    const FIELD = "tabSize";
+    type T = NewConfig[typeof FIELD];
+    const defaultValue: T = 4;
+    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
+    } else {
+        return prompt<number>({
+            type: "number",
+            initial: oldValue ?? defaultValue,
+            message: "Tab size",
+            validate: toValidator((value, source) => {
+                if ("" === value) {
+                    return "";
+                } else {
+                    const result = ConfigProperties[FIELD].parseNewValue(value, source);
+                    return "number" === typeof result ? `${result}` : result;
+                }
+            }),
+        });
     }
 }
 

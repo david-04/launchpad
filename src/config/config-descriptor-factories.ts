@@ -10,7 +10,13 @@ import {
     type PinnableEnumValue,
     type SerializationDetails,
 } from "./config-data-types.js";
-import { createNonPinnableEnumParser, createPinnableEnumParser, parseBoolean, parseVersion } from "./config-parsers.js";
+import {
+    createIntegerParser,
+    createNonPinnableEnumParser,
+    createPinnableEnumParser,
+    parseBoolean,
+    parseVersion,
+} from "./config-parsers.js";
 import type { Version } from "./version-number.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,7 +204,7 @@ export function createStringArrayProperty<KEY extends string>(property: StringAr
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Version number
+// Boolean
 //----------------------------------------------------------------------------------------------------------------------
 
 type BooleanPropertyDescriptor<KEY extends string> = {
@@ -227,7 +233,38 @@ export function createBooleanProperty<KEY extends string>(property: BooleanPrope
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Boolean
+// Number
+//----------------------------------------------------------------------------------------------------------------------
+
+type IntegerPropertyDescriptor<KEY extends string> = {
+    readonly name: string;
+    readonly configFile?: ConfigFileDescriptor<KEY>;
+    readonly commandLine?: CommandLineDescriptorWithPlaceholder;
+    readonly range: {min: number, max: number};
+};
+
+export function createIntegerProperty<KEY extends string>(property: IntegerPropertyDescriptor<KEY>) {
+    const commandLineInfo = property.commandLine;
+    const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
+    const numberParser = createIntegerParser(property.name, property.range.min, property.range.max);
+    const parseOldValue = createOldValueParser<number>(matchesConfigFileKey, numberParser);
+    const parseNewValue = numberParser;
+    const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
+    const serialize = createSerializer<number, KEY>(property.configFile, (value: number) => `${value}`);
+    const assertOldValuePresent = createAssertPresentHandler<KEY, number>(property.name, property.configFile);
+    return {
+        commandLineInfo,
+        matchesConfigFileKey,
+        parseOldValue,
+        parseNewValue,
+        parseFromCommandLine,
+        serialize,
+        assertOldValuePresent,
+    } as const satisfies AssembledDescriptor<number, number, KEY>;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Version number
 //----------------------------------------------------------------------------------------------------------------------
 
 type VersionPropertyDescriptor<KEY extends string> = {

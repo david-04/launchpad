@@ -81,6 +81,27 @@ export function parseBoolean(value: string, source: string | undefined) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Create a parser for numbers
+//----------------------------------------------------------------------------------------------------------------------
+
+export function createIntegerParser<T extends number>(name: string, min: number, max: number) {
+    return (value: string, source: string | undefined) => {
+        const parsed = parseInt(value);
+        if (isNaN(parsed)) {
+            return source
+                ? error(`"${value}" is not a valid value for ${source} (it must be a number/integer)`)
+                : error(`"${value}" is not a valid ${name} (it must be a number/integer)`);
+        } else if (parsed< min || max < parsed) {
+            return source
+                ? error(`"${value}" is not a valid value for ${source} (it must be between ${min} and ${max})`)
+                : error(`"${value}" is not a valid ${name} (it must be between ${min} and ${max})`);
+        } else {
+            return parsed as T;
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Create a parser for non-pinnable enum values
 //----------------------------------------------------------------------------------------------------------------------
 

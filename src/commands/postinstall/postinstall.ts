@@ -24,7 +24,6 @@ export async function postinstall(projectRoot: Path, configFile: Path, _options:
                     oldConfig,
                     newConfig: undefined,
                     projectRoot,
-                    tabSize: 4,
                 });
             } else if (parsedConfig && !oldConfig) {
                 exitWithConfigError(projectRoot, configFile, parsedConfig.errors);

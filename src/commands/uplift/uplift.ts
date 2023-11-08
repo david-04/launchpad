@@ -30,7 +30,6 @@ export async function uplift(projectRoot: Path, configFile: Path, _options: Read
             oldConfig,
             newConfig: undefined,
             projectRoot,
-            tabSize: 4,
         });
     }
 }

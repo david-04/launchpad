@@ -22,6 +22,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         bundler: ConfigProperties.bundler.parseOldValue(properties, addError),
         dtsBundler: ConfigProperties.dtsBundler.parseOldValue(properties, addError),
         formatter: ConfigProperties.formatter.parseOldValue(properties, addError),
+        tabSize: ConfigProperties.tabSize.parseOldValue(properties, addError),
         packageManager: ConfigProperties.packageManager.parseOldValue(properties, addError),
         srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
         webAppDir: ConfigProperties.webAppDir.parseOldValue(properties, addError),
@@ -46,6 +47,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             bundler: ConfigProperties.bundler.assertOldValuePresent(config.bundler),
             dtsBundler: ConfigProperties.dtsBundler.assertOldValuePresent(config.dtsBundler),
             formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
+            tabSize: ConfigProperties.tabSize.assertOldValuePresent(config.tabSize),
             packageManager: ConfigProperties.packageManager.assertOldValuePresent(config.packageManager),
             srcDir: ConfigProperties.srcDir.assertOldValuePresent(config.srcDir),
             webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.srcDir),
@@ -84,6 +86,7 @@ export type NewConfig = {
     bundler: NewConfigType<"bundler">;
     dtsBundler: NewConfigType<"dtsBundler">;
     formatter: NewConfigType<"formatter">;
+    tabSize: NewConfigType<"tabSize">;
     packageManager: NewConfigType<"packageManager">;
     srcDir: NewConfigType<"srcDir">;
     webAppDir: NewConfigType<"webAppDir">;
@@ -116,6 +119,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         bundler: ConfigProperties.bundler.parseFromCommandLine(properties),
         dtsBundler: ConfigProperties.dtsBundler.parseFromCommandLine(properties),
         formatter: ConfigProperties.formatter.parseFromCommandLine(properties),
+        tabSize: ConfigProperties.tabSize.parseFromCommandLine(properties),
         packageManager: ConfigProperties.packageManager.parseFromCommandLine(properties),
         srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
         webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),

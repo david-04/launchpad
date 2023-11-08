@@ -1,6 +1,7 @@
 import { defaultMightChange } from "../utilities/constants.js";
 import {
     createBooleanProperty,
+    createIntegerProperty,
     createNonPinnableEnumProperty,
     createPinnableEnumProperty,
     createStringArrayProperty,
@@ -195,6 +196,27 @@ const CURRENT_CONFIG_PROPERTIES = {
             ["disabled", "don't format sources"],
         ] as const,
         obsoleteValues: [] as const,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Tab size
+    //------------------------------------------------------------------------------------------------------------------
+
+    tabSize: createIntegerProperty({
+        name: "tab size",
+        configFile: {
+            currentKey: "LP_SETTINGS_TAB_SIZE",
+            newConfigObjectName: "tabSize",
+        },
+        commandLine: {
+            option: "--tab-size",
+            placeholder: "<SIZE>",
+            description: "Tab size (for code formatting)",
+        },
+        range: {
+            min: 2,
+            max: 20,
+        },
     }),
 
     //------------------------------------------------------------------------------------------------------------------
