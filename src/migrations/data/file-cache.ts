@@ -48,10 +48,14 @@ export class File {
     }
 
     public get json() {
-        return undefined === this.newContents ? undefined : JSON.parse(this.newContents.replace(/(\n\s)+$/, ""));
+        try {
+            return undefined === this.newContents ? undefined : JSON.parse(this.newContents.replace(/(\n\s)+$/, ""));
+        } catch (error) {
+            fail(`Failed to parse ${this.absolutePath.path}: ${error}`);
+        }
     }
 
-    public set json(json: Exclude<object, null>) {
+    public set json(json: ReturnType<(typeof JSON)["parse"]>) {
         this.newContents = undefined === json ? json : File.serialize(json, this.tabSize);
     }
 

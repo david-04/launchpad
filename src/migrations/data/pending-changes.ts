@@ -15,16 +15,8 @@ export class PendingChanges {
     // Initialization
     //------------------------------------------------------------------------------------------------------------------
 
-    public constructor(projectRoot: Path, tabSize: number) {
-        this.files = new FileOrDirectoryCache(
-            projectRoot,
-            tabSize,
-            (projectRoot, relativePath, tabSize) => new File(projectRoot, relativePath, tabSize)
-        );
-        this.directories = new FileOrDirectoryCache(
-            projectRoot,
-            tabSize,
-            (projectRoot, relativePath) => new Directory(projectRoot, relativePath)
-        );
+    public constructor(projectRoot: Path, tab: number) {
+        this.files = new FileOrDirectoryCache(projectRoot, tab, (root, path, tabSize) => new File(root, path, tabSize));
+        this.directories = new FileOrDirectoryCache(projectRoot, tab, (root, path) => new Directory(root, path));
     }
 }

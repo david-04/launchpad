@@ -31,19 +31,19 @@ export class FriendlyError extends Error {
 //----------------------------------------------------------------------------------------------------------------------
 
 export function fail(message: string): never {
-    throw new FriendlyError(`ERROR: ${message}`);
+    throw new FriendlyError(message);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // Get the error message
 //----------------------------------------------------------------------------------------------------------------------
 
-export function formatError(error?: unknown) {
+export function formatError(error: unknown) {
     if (error instanceof FriendlyError) {
-        return error.message;
+        return `${error.message}`;
     } else if (error instanceof Error) {
-        return error;
+        return error.stack ?? `${error.name}: ${error.message}`;
     } else {
-        return `ERROR: ${error}`;
+        return `${error}`;
     }
 }

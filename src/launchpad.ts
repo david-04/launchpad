@@ -46,7 +46,7 @@ export async function launchpad(argv: ReadonlyArray<string>) {
             return await findAndInvokeHandler(command, options);
         }
     } catch (error: unknown) {
-        console.error(formatError(error));
+        console.error("ERROR:", formatError(error));
         process.exit(1);
     }
 }
