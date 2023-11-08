@@ -1,25 +1,64 @@
+import type { NewConfig, OldConfig } from "../../config/config-objects.js";
 import type { Path } from "../../utilities/path.js";
-import { PendingChanges } from "./pending-changes.js";
+import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Context information that's passed around when initializing and uplifting
 //----------------------------------------------------------------------------------------------------------------------
 
 export class MigrationContext {
+    public readonly projectRoot;
+    public readonly canRunPackageManagerCommands;
+    public readonly canPromptUser;
+    public readonly oldConfig;
+    public _newConfig;
+
     public readonly skippedSteps = new Array<string>();
-    public readonly pendingChanges;
     public readonly errors = new Array<string>();
+
+    public readonly preCommands = new Array<string>();
+    public readonly files;
+    public readonly directories;
+    public readonly postCommands = new Array<string>();
 
     //------------------------------------------------------------------------------------------------------------------
     // Initialization
     //------------------------------------------------------------------------------------------------------------------
 
-    public constructor(
-        public readonly projectRoot: Path,
-        public readonly canRunPackageManagerCommands: boolean,
-        public readonly canPromptUser: boolean,
-        tabSize: number
-    ) {
-        this.pendingChanges = new PendingChanges(projectRoot, tabSize);
+    public constructor(options: {
+        projectRoot: Path;
+        canRunPackageManagerCommands: boolean;
+        canPromptUser: boolean;
+        tabSize: number;
+        oldConfig: OldConfig | undefined;
+        newConfig: NewConfig;
+    }) {
+        this.projectRoot = options.projectRoot;
+        this.canRunPackageManagerCommands = options.canRunPackageManagerCommands;
+        this.canPromptUser = options.canPromptUser;
+        this.oldConfig = options.oldConfig;
+        this._newConfig = options.newConfig;
+        this.files = new FileOrDirectoryCache(
+            options.projectRoot,
+            options.tabSize,
+            (root, path, tabSize) => new File(root, path, tabSize)
+        );
+        this.directories = new FileOrDirectoryCache(
+            options.projectRoot,
+            options.tabSize,
+            (root, path) => new Directory(root, path)
+        );
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Getters and setters
+    //------------------------------------------------------------------------------------------------------------------
+
+    public get newConfig() {
+        return this._newConfig;
+    }
+
+    public overrideNewConfig(override: Partial<NewConfig>) {
+        this._newConfig = { ...this._newConfig, ...override };
     }
 }
