@@ -1,5 +1,5 @@
-import { loadConfigFile, type ParsedConfig } from "../../config/config-loader.js";
-import type { NewConfig } from "../../config/config-objects.js";
+import { loadConfigFile } from "../../config/config-loader.js";
+import { migrate } from "../../migrations/migrate.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import { DISABLE_POSTINSTALL_ENV_VARIABLE_NAME, LAUNCHPAD_ERROR_FILE } from "../../utilities/constants.js";
 import { ERROR_BANNER, FriendlyError } from "../../utilities/fail.js";
@@ -18,9 +18,14 @@ export async function postinstall(projectRoot: Path, configFile: Path, _options:
             const parsedConfig = loadConfigFile(configFile);
             const oldConfig = parsedConfig?.validated;
             if (oldConfig && 0 !== oldConfig.version.compareTo(VERSION_NUMBER)) {
-                // TODO: Upgrade everything that can be done without an npm add/remove/install
-                const newConfig = migrateConfig(oldConfig);
-                console.log(newConfig);
+                migrate({
+                    canPromptUser: false,
+                    canRunPackageManagerCommands: false,
+                    oldConfig,
+                    newConfig: undefined,
+                    projectRoot,
+                    tabSize: 4,
+                });
             } else if (parsedConfig && !oldConfig) {
                 exitWithConfigError(projectRoot, configFile, parsedConfig.errors);
             }
@@ -28,21 +33,6 @@ export async function postinstall(projectRoot: Path, configFile: Path, _options:
             exitWithUnexpectedPostinstallError(projectRoot, error);
         }
     }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Migrate the old config to the new config
-//----------------------------------------------------------------------------------------------------------------------
-
-function migrateConfig(oldConfig: Exclude<ParsedConfig["validated"], undefined>): NewConfig {
-    return {
-        ...oldConfig,
-        version: VERSION_NUMBER,
-        dependencies: [],
-        installDevDependencies: false,
-        createProjectTemplate: false,
-        createDebugModule: false,
-    };
 }
 
 //----------------------------------------------------------------------------------------------------------------------

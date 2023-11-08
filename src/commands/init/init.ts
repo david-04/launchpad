@@ -1,5 +1,6 @@
 import { parseCommandLineOptions } from "../../config/command-line-parser.js";
 import { loadConfigFile } from "../../config/config-loader.js";
+import { migrate } from "../../migrations/migrate.js";
 import type { Path } from "../../utilities/path.js";
 import { getNewConfig } from "./config-wizard.js";
 
@@ -11,5 +12,12 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
     const parsedConfig = loadConfigFile(configFile);
     const commandLineConfig = parseCommandLineOptions(options);
     const newConfig = await getNewConfig(projectRoot, parsedConfig, commandLineConfig);
-    console.log(newConfig);
+    migrate({
+        canPromptUser: true,
+        canRunPackageManagerCommands: true,
+        oldConfig: undefined,
+        newConfig,
+        projectRoot,
+        tabSize: 4,
+    });
 }
