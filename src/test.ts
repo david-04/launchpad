@@ -16,7 +16,7 @@ addCommand("init", [
     "--package-manager=npm",
     "--src-dir=src",
     "--tab-size=4",
-    "--installation-mode=global-no-update",
+    "--installation-mode=global",
     "--create-project-files=true",
     "--create-debug-module=true",
     "--web-app-dir=dist",

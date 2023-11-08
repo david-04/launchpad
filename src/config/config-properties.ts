@@ -68,6 +68,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         commandLine: {
             option: "--artifact",
             description: "Project type",
+            placeholder: "[app | lib]",
         },
         currentValues: [
             ["app", "a stand-alone application"],
@@ -86,10 +87,6 @@ const CURRENT_CONFIG_PROPERTIES = {
             currentKey: "LP_SETTINGS_RUNTIME",
             newConfigObjectName: "runtime",
         },
-        // commandLine: {
-        //     option: "--runtime",
-        //     description: "Runtime environment",
-        // },
         currentValues: [
             ["node", "command line"],
             ["web", "web browser"],
@@ -130,13 +127,14 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         commandLine: {
             option: "--installation-mode",
-            description: "Install location of the launchpad npm package",
+            description: "Location of the the launchpad npm package",
+            placeholder: "[local | global | global-auto-update | temp]",
         },
         currentValues: [
             ["local", "install locally within the project"],
-            ["no-install", "don't install launchpad, use npx/yarn dlx/pnpm exec/bunx"],
+            ["global", "use a globally installed version but don't update it during uplifts"],
             ["global-auto-update", "use a globally installed version and update it during uplifts"],
-            ["global-no-update", "use a globally installed version but don't update it during uplifts"],
+            ["temp", "don't install launchpad, use npx/yarn dlx/pnpm exec/bunx"],
         ] as const,
         obsoleteValues: [] as const,
     }),
@@ -347,6 +345,7 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
         commandLine: {
             option: "--runtime",
             description: "Runtime environment",
+            placeholder: "[cli | node | web]",
         },
         currentValues: [
             ["cli", defaultMightChange("node")],

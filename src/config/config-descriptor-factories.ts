@@ -49,6 +49,7 @@ type CommandLineDescriptor = {
 };
 
 type CommandLineDescriptorWithPlaceholder = CommandLineDescriptor & { readonly placeholder: string };
+type CommandLineDescriptorWithOptionalPlaceholder = CommandLineDescriptor & { readonly placeholder?: string };
 
 //----------------------------------------------------------------------------------------------------------------------
 // Non-pinnable enums
@@ -57,7 +58,7 @@ type CommandLineDescriptorWithPlaceholder = CommandLineDescriptor & { readonly p
 type NonPinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
     readonly name: string;
     readonly configFile?: ConfigFileDescriptor<KEY>;
-    readonly commandLine?: CommandLineDescriptor;
+    readonly commandLine?: CommandLineDescriptorWithOptionalPlaceholder;
     readonly currentValues: ReadonlyArray<readonly [CURRENT, string?]>;
     readonly obsoleteValues: ReadonlyArray<OBSOLETE>;
 };
@@ -69,7 +70,10 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
     const currentValues = property.currentValues.map(value => value[0]);
     const allValues = [...currentValues, ...property.obsoleteValues];
     const currentValuesWithDefault = [DEFAULT_ENUM, ...currentValues];
-    const commandLineInfo = createCommandLineInfo(property.commandLine, `[${currentValuesWithDefault.join(" | ")}]`);
+    const commandLineInfo = createCommandLineInfo(
+        property.commandLine,
+        property.commandLine?.placeholder ?? `[${currentValuesWithDefault.join(" | ")}]`
+    );
     const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
     const parseOldValue = createOldValueParser<ALL>(matchesConfigFileKey, createNonPinnableEnumParser(allValues));
     const parseNewValue = createNonPinnableEnumParser(currentValues);
