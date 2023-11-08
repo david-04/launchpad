@@ -5,7 +5,7 @@ import type { ParsedConfig } from "../../config/config-loader.js";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import { ConfigProperties } from "../../config/config-properties.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
-import { DEFAULT_ENUM, N_A_ENUM, type DefaultEnum } from "../../utilities/constants.js";
+import { DEFAULT_ENUM, type DefaultEnum } from "../../utilities/constants.js";
 import type { Path } from "../../utilities/path.js";
 import {
     createDefaultOption,
@@ -378,7 +378,7 @@ async function getSrcDir(presets: Presets) {
 
 async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" | "artifact">) {
     if ("web" !== config.runtime.value || "app" !== config.artifact) {
-        return N_A_ENUM;
+        return "";
     }
     const FIELD = "webAppDir";
     const defaultDirectory = "dist";
@@ -389,7 +389,7 @@ async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" 
         const previousValue = presets.oldConfig?.[FIELD];
         return prompt<string>({
             type: "text",
-            initial: undefined !== previousValue && N_A_ENUM !== previousValue ? previousValue : defaultDirectory,
+            initial: previousValue?.trim() || defaultDirectory,
             message: "Web app root directory",
             format: input => input.trim(),
             validate: toValidator(ConfigProperties[FIELD].parseNewValue),
@@ -434,7 +434,7 @@ function getDefaultTscOutDir(
 
 async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runtime" | "bundler" | "webAppDir">) {
     if ("disabled" === config.bundler.value) {
-        return N_A_ENUM;
+        return "";
     }
     const FIELD = "bundlerOutDir";
     const defaultDirectory = "web" === config.runtime.value ? `${config.webAppDir}/js` : "dist";
@@ -445,7 +445,7 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
         const previousValue = presets.oldConfig?.[FIELD];
         return prompt<string>({
             type: "text",
-            initial: undefined !== previousValue && N_A_ENUM !== previousValue ? previousValue : defaultDirectory,
+            initial: previousValue?.trim() || defaultDirectory,
             message: "Bundler output directory",
             format: input => input.trim(),
             validate: toValidator(ConfigProperties[FIELD].parseNewValue),

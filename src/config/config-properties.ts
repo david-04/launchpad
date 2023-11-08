@@ -281,7 +281,7 @@ const CURRENT_CONFIG_PROPERTIES = {
             placeholder: "<DIR>",
             description: "Relative path to the web application (with the index.html)",
         },
-        parseOldValue: createDirectoryParser("web app directory", "mandatory"),
+        parseOldValue: createDirectoryParser("web app directory", "optional"),
         parseNewValue: createDirectoryParser("web app directory", "mandatory"),
     }),
 

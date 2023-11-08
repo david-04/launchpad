@@ -28,6 +28,8 @@ export function createDirectoryParser(type: string, mode: "optional" | "mandator
         const trimmed = value.trim().replace(/\\/g, "/");
         if (!trimmed && "mandatory" === mode) {
             return error(`${reference} must neither be empty nor the current directory`);
+        } else if (!trimmed) {
+            return trimmed;
         } else if (trimmed.match(/^(\/|[a-z]:)/i)) {
             return error(`${reference} must not be a relative (and not an absolute) path`);
         } else {

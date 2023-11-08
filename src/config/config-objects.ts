@@ -50,7 +50,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             tabSize: ConfigProperties.tabSize.assertOldValuePresent(config.tabSize),
             packageManager: ConfigProperties.packageManager.assertOldValuePresent(config.packageManager),
             srcDir: ConfigProperties.srcDir.assertOldValuePresent(config.srcDir),
-            webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.srcDir),
+            webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.webAppDir),
             tscOutDir: ConfigProperties.tscOutDir.assertOldValuePresent(config.tscOutDir),
             bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.tscOutDir),
         } as const satisfies typeof config;
