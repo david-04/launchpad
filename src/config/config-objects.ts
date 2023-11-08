@@ -98,7 +98,8 @@ export type NewConfig = {
     createDebugModule: NewConfigType<"createDebugModule">;
 };
 
-export type NewConfigCli = NewConfig & {
+export type NewConfigCli = Omit<NewConfig, "runtime"> & {
+    runtimeCli: NewConfigType<"runtimeCli">;
     preselectedDependencies: NewConfigType<"preselectedDependencies">;
     optionalDependencies: NewConfigType<"optionalDependencies">;
 };
@@ -113,7 +114,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
     return {
         projectName: ConfigProperties.projectName.parseFromCommandLine(properties),
         artifact: ConfigProperties.artifact.parseFromCommandLine(properties),
-        runtime: ConfigProperties.runtime.parseFromCommandLine(properties),
+        runtimeCli: ConfigProperties.runtimeCli.parseFromCommandLine(properties),
         module: ConfigProperties.module.parseFromCommandLine(properties),
         installationMode: ConfigProperties.installationMode.parseFromCommandLine(properties),
         bundler: ConfigProperties.bundler.parseFromCommandLine(properties),

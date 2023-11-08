@@ -134,11 +134,8 @@ include $(__LP_SETTINGS_CFG)
 LP_SETTINGS_ARTIFACT_ENUMS="app" or "lib"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_ARTIFACT)
 
-LP_SETTINGS_RUNTIME_ENUMS="cli", "node", "ts-node" or "web"
+LP_SETTINGS_RUNTIME_ENUMS="node" or "web"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_RUNTIME)
-ifeq "$(LP_SETTINGS_RUNTIME_ENUMS)" "cli"
-LP_SETTINGS_RUNTIME_ENUMS=node
-endif
 
 LP_SETTINGS_MODULE_SYSTEM_ENUMS="cjs" or "esm"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_MODULE_SYSTEM)
@@ -158,30 +155,21 @@ $(call lp.fn.config.validate-enum, LP_SETTINGS_PACKAGE_MANAGER)
 
 LP_SETTINGS_INSTALLATION_MODE_ENUMS="local", "no-install", "global-auto-update" or "global-no-update"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_INSTALLATION_MODE)
-
-ifeq "$(LP_SETTINGS_PACKAGE_MANAGER)" "yarn"
-    ifeq "$(LP_SETTINGS_INSTALLATION_MODE)" "global-auto-update"
-        $(call lp.fn.config.fail, LP_SETTINGS_PACKAGE_MANAGER=yarn can't be combined with LP_SETTINGS_INSTALLATION_MODE=global-auto-update)
-    endif
+ifeq "$(LP_SETTINGS_PACKAGE_MANAGER)-$(LP_SETTINGS_INSTALLATION_MODE)" "yarn-global-auto-update"
+    $(call lp.fn.config.fail, LP_SETTINGS_PACKAGE_MANAGER=yarn can't be combined with LP_SETTINGS_INSTALLATION_MODE=global-auto-update)
 endif
 
 $(call lp.fn.config.normalize.string, LP_SETTINGS_SRC_DIR)
 $(call lp.fn.config.assert.not-empty, LP_SETTINGS_SRC_DIR)
 
 $(call lp.fn.config.normalize.string, LP_SETTINGS_TSC_OUT_DIR)
+ifeq "$(LP_SETTINGS_TSC_OUT_DIR)" ""
+    $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty)
+endif
 
 ifeq "$(LP_SETTINGS_BUNDLER)" ""
     ifneq "$(LP_SETTINGS_DTS_BUNDLER)" ""
         $(call lp.fn.config.fail, LP_SETTINGS_DTS_BUNDLER must be "disabled" when LP_SETTINGS_BUNDLER is "disabled" as well)
-    endif
-endif
-
-ifeq "$(LP_SETTINGS_TSC_OUT_DIR)" ""
-    ifneq "$(LP_SETTINGS_RUNTIME)" "ts-node"
-        $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty when LP_SETTINGS_RUNTIME is "$(LP_SETTINGS_RUNTIME)")
-    endif
-    ifneq "$(LP_SETTINGS_DTS_BUNDLER)" ""
-        $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty unless LP_SETTINGS_DTS_BUNDLER is "disabled")
     endif
 endif
 

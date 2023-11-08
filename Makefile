@@ -12,6 +12,10 @@ autorun : tsc;
 
 $(call lp.help.add-phony-target, tsconfig, ........... assemble the tsconfig.json templates)
 $(call lp.help.add-phony-target, version, ............ update version number and copyright years)
+$(call lp.help.add-phony-target, init, ............... run debug init)
+$(call lp.help.add-phony-target, help, ............... run debug help)
+$(call lp.help.add-phony-target, postinsatll, ........ run debug postinstall)
+$(call lp.help.add-phony-target, uplift, ............. run debug uplift)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Embed tsconfig.json templates
@@ -86,9 +90,14 @@ $(call lp.clean.bundles)
 # run : $(LP_TSC_TARGETS)
 # 	node build/bin/launchpad-postinstall.js
 
-init : $(LP_TSC_TARGETS)
-	echo Running launchpad init...
-	ts-node-esm build/debug.js
+init : run-debug.init;
+help : run-debug.help;
+uplift : run-debug.uplift;
+postinstall : run-debug.postinstall;
+
+run-debug.% :  $(LP_TSC_TARGETS)
+	echo Running launchpad $*...
+	ts-node-esm build/debug.js $*
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets

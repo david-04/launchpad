@@ -150,19 +150,37 @@ async function getArtifact(presets: Presets) {
 // Select the runtime
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getRuntime(presets: Presets) {
-    const FIELD = "runtime";
-    type T = NewConfig[typeof FIELD];
-    const defaultValue: T = "cli";
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
-    const oldValue = presets.oldConfig?.[FIELD];
+async function getRuntime(presets: Presets): Promise<NewConfig["runtime"]> {
+    const FIELD = "runtimeCli";
+    type T = CommandLineConfig[typeof FIELD];
+    const preselectedValue: T = "cli";
+    const presetValue = DEFAULT_ENUM === presets.commandLineConfig[FIELD] ? "cli" : presets.commandLineConfig[FIELD];
+    const oldValue = runtimeConfigToCli(presets.oldConfig?.["runtime"]);
     if (presetValue) {
-        return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
+        return runtimeCliToConfig(presetValue);
     } else {
         const options = ConfigProperties[FIELD].options.map(array => [...array, array[0]] as const);
         const choices = toChoice(options);
-        const initial = findNonPinnableMatchingChoice(options, oldValue, defaultValue);
-        return prompt<T>({ type: "select", message: "Runtime", choices, initial });
+        const initial = findNonPinnableMatchingChoice(options, oldValue, preselectedValue);
+        return runtimeCliToConfig(
+            await prompt<Exclude<T, "default" | undefined>>({ type: "select", message: "Bundler", choices, initial })
+        );
+    }
+}
+
+function runtimeConfigToCli(property: NewConfig["runtime"] | undefined): CommandLineConfig["runtimeCli"] {
+    if (undefined === property) {
+        return undefined;
+    } else {
+        return "node" === property.value && !property.pinned ? "cli" : property.value;
+    }
+}
+
+function runtimeCliToConfig(value: Exclude<CommandLineConfig["runtimeCli"], undefined>): NewConfig["runtime"] {
+    if ("cli" === value || DEFAULT_ENUM === value) {
+        return unpinned("node");
+    } else {
+        return pinned(value);
     }
 }
 
@@ -359,7 +377,7 @@ async function getSrcDir(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" | "artifact">) {
-    if ("web" !== config.runtime || "app" !== config.artifact) {
+    if ("web" !== config.runtime.value || "app" !== config.artifact) {
         return N_A_ENUM;
     }
     const FIELD = "webAppDir";
@@ -384,9 +402,6 @@ async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" 
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getTscOutDir(presets: Presets, config: Parameters<typeof getDefaultTscOutDir>[0]) {
-    if ("ts-node" === config.runtime && "disabled" === config.dtsBundler.value) {
-        return "";
-    }
     const FIELD = "tscOutDir";
     const defaultDirectory = getDefaultTscOutDir(config);
     const preselectedDirectory = presets.commandLineConfig[FIELD];
@@ -406,7 +421,7 @@ async function getTscOutDir(presets: Presets, config: Parameters<typeof getDefau
 function getDefaultTscOutDir(
     config: Pick<NewConfig, "projectName" | "runtime" | "bundler" | "dtsBundler" | "webAppDir">
 ) {
-    if ("web" === config.runtime) {
+    if ("web" === config.runtime.value) {
         return "disabled" === config.bundler.value ? `${config.webAppDir}/js/${config.projectName}` : "build";
     } else {
         return "disabled" === config.bundler.value ? "dist" : "build";
@@ -422,7 +437,7 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
         return N_A_ENUM;
     }
     const FIELD = "bundlerOutDir";
-    const defaultDirectory = "web" === config.runtime ? `${config.webAppDir}/js` : "dist";
+    const defaultDirectory = "web" === config.runtime.value ? `${config.webAppDir}/js` : "dist";
     const preselectedDirectory = presets.commandLineConfig[FIELD];
     if (preselectedDirectory) {
         return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
@@ -457,7 +472,7 @@ async function getDependencies(presets: Presets, config: Pick<NewConfig, "runtim
 }
 
 function getDependencyOptions(presets: Presets, config: Pick<NewConfig, "runtime">) {
-    const defaultOptionalDependencies = config.runtime === "web" ? [] : ["@types/node"];
+    const defaultOptionalDependencies = "web" === config.runtime.value ? [] : ["@types/node"];
     return toDependencyOptions({
         mandatory: toSet(presets.commandLineConfig.dependencies, []),
         preselected: toSet(presets.commandLineConfig.preselectedDependencies, []),
