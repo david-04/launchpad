@@ -57,27 +57,31 @@ export async function getNewConfig(
     const dependencies = await getDependencies(presets, { runtime });
     const installDevDependencies = await getInstallDevDependencies(presets);
     const createProjectTemplate = await getCreateProjectTemplate(presets);
-    const createDebugModule = await getCreateDebugModule(presets);
+    const createDebugModule = getCreateFile(presets, createProjectTemplate, "createDebugModule", true);
+    const createMakefile = getCreateFile(presets, createProjectTemplate, "createMakefile", true);
+    const createVsCodeSettings = getCreateFile(presets, createProjectTemplate, "createVsCodeSettings", true);
     return {
-        version,
-        projectName,
         artifact,
-        runtime,
-        module,
-        installationMode,
         bundler,
+        bundlerOutDir,
+        createDebugModule,
+        createMakefile,
+        createProjectTemplate,
+        createVsCodeSettings,
+        dependencies,
         dtsBundler,
         formatter,
-        tabSize,
-        packageManager,
-        srcDir,
-        webAppDir,
-        tscOutDir,
-        bundlerOutDir,
-        dependencies,
+        installationMode,
         installDevDependencies,
-        createProjectTemplate,
-        createDebugModule,
+        module,
+        packageManager,
+        projectName,
+        runtime,
+        srcDir,
+        tabSize,
+        tscOutDir,
+        version,
+        webAppDir,
     };
 }
 
@@ -542,15 +546,19 @@ async function getCreateProjectTemplate(presets: Presets) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Create a debug module
+// Create a debug module / Makefile / VSCode settings
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getCreateDebugModule(presets: Presets) {
-    const FIELD = "createDebugModule";
-    const preselectedOption = presets.commandLineConfig[FIELD];
-    if (undefined !== preselectedOption) {
-        return DEFAULT_ENUM === preselectedOption ? false : preselectedOption;
-    } else {
+function getCreateFile(
+    presets: Presets,
+    createProjectTemplate: boolean,
+    key: keyof CommandLineConfig,
+    defaultValue: boolean
+) {
+    if (!createProjectTemplate) {
         return false;
+    } else {
+        const preselected = presets.commandLineConfig[key];
+        return "boolean" === typeof preselected ? preselected : defaultValue;
     }
 }

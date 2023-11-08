@@ -10,53 +10,18 @@ import {
 } from "./config-descriptor-factories.js";
 import { createDirectoryParser, parseProjectName, parseStringArray } from "./config-parsers.js";
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//    ######  ##     ## ########  ########  ######## ##    ## ########
-//   ##    ## ##     ## ##     ## ##     ## ##       ###   ##    ##
-//   ##       ##     ## ##     ## ##     ## ##       ####  ##    ##
-//   ##       ##     ## ########  ########  ######   ## ## ##    ##
-//   ##       ##     ## ##   ##   ##   ##   ##       ##  ####    ##
-//   ##    ## ##     ## ##    ##  ##    ##  ##       ##   ###    ##
-//    ######   #######  ##     ## ##     ## ######## ##    ##    ##
-//
-//----------------------------------------------------------------------------------------------------------------------
-
 const CURRENT_CONFIG_PROPERTIES = {
     //
     //------------------------------------------------------------------------------------------------------------------
-    // Version number
-    //------------------------------------------------------------------------------------------------------------------
-
-    version: createVersionProperty({
-        name: "version number",
-        configFile: {
-            currentKey: "LP_SETTINGS_VERSION",
-            newConfigObjectName: "version",
-        },
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Project name
-    //------------------------------------------------------------------------------------------------------------------
-
-    projectName: createStringProperty({
-        name: "project name",
-        configFile: {
-            currentKey: "LP_SETTINGS_PROJECT_NAME",
-            newConfigObjectName: "projectName",
-        },
-        commandLine: {
-            option: "--project-name",
-            placeholder: "<NAME>",
-            description: "Name of the main module/project",
-        },
-        parseOldValue: parseProjectName,
-        parseNewValue: parseProjectName,
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Artifact
+    //
+    //      ###    ########  ######## #### ########    ###     ######  ########
+    //     ## ##   ##     ##    ##     ##  ##         ## ##   ##    ##    ##
+    //    ##   ##  ##     ##    ##     ##  ##        ##   ##  ##          ##
+    //   ##     ## ########     ##     ##  ######   ##     ## ##          ##
+    //   ######### ##   ##      ##     ##  ##       ######### ##          ##
+    //   ##     ## ##    ##     ##     ##  ##       ##     ## ##    ##    ##
+    //   ##     ## ##     ##    ##    #### ##       ##     ##  ######     ##
+    //
     //------------------------------------------------------------------------------------------------------------------
 
     artifact: createNonPinnableEnumProperty({
@@ -78,45 +43,129 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // Runtime
+    //
+    //   ########  ##     ## ##    ## ########  ##       ######## ########
+    //   ##     ## ##     ## ###   ## ##     ## ##       ##       ##     ##
+    //   ##     ## ##     ## ####  ## ##     ## ##       ##       ##     ##
+    //   ########  ##     ## ## ## ## ##     ## ##       ######   ########
+    //   ##     ## ##     ## ##  #### ##     ## ##       ##       ##   ##
+    //   ##     ## ##     ## ##   ### ##     ## ##       ##       ##    ##
+    //   ########   #######  ##    ## ########  ######## ######## ##     ##
+    //
     //------------------------------------------------------------------------------------------------------------------
 
-    runtime: createPinnableEnumProperty({
-        name: "runtime environment",
+    bundler: createPinnableEnumProperty({
+        name: "bundler",
         configFile: {
-            currentKey: "LP_SETTINGS_RUNTIME",
-            newConfigObjectName: "runtime",
-        },
-        currentValues: [
-            ["node", "command line"],
-            ["web", "web browser"],
-        ] as const,
-        obsoleteValues: [] as const,
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Module
-    //------------------------------------------------------------------------------------------------------------------
-
-    module: createNonPinnableEnumProperty({
-        name: "module system",
-        configFile: {
-            currentKey: "LP_SETTINGS_MODULE_SYSTEM",
-            newConfigObjectName: "module",
+            currentKey: "LP_SETTINGS_BUNDLER",
+            newConfigObjectName: "bundler",
         },
         commandLine: {
-            option: "--module-system",
-            description: "Target module system",
+            option: "--bundler",
+            description: "Bundler",
         },
         currentValues: [
-            ["cjs", "CommonJS"],
-            ["esm", "ECMAScript modules"],
+            ["esbuild", undefined],
+            ["disabled", "don't use bundling"],
         ] as const,
         obsoleteValues: [] as const,
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // Installation mode
+    //
+    // ########  ##     ## ##    ## ########  ##       ######## ########          ########  #### ########
+    // ##     ## ##     ## ###   ## ##     ## ##       ##       ##     ##         ##     ##  ##  ##     ##
+    // ##     ## ##     ## ####  ## ##     ## ##       ##       ##     ##         ##     ##  ##  ##     ##
+    // ########  ##     ## ## ## ## ##     ## ##       ######   ########          ##     ##  ##  ########
+    // ##     ## ##     ## ##  #### ##     ## ##       ##       ##   ##           ##     ##  ##  ##   ##
+    // ##     ## ##     ## ##   ### ##     ## ##       ##       ##    ##          ##     ##  ##  ##    ##
+    // ########   #######  ##    ## ########  ######## ######## ##     ##         ########  #### ##     ##
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    bundlerOutDir: createStringProperty({
+        name: "bundler output directory",
+        configFile: {
+            currentKey: "LP_SETTINGS_BUNDLER_OUT_DIR",
+            newConfigObjectName: "bundlerOutDir",
+        },
+        commandLine: {
+            option: "--bundler-out-dir",
+            placeholder: "<DIR>",
+            description: "Bundler output directory",
+        },
+        parseOldValue: createDirectoryParser("Bundler output directory", "optional"),
+        parseNewValue: createDirectoryParser("Bundler output directory", "optional"),
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //   ########  ########  ######         ########  ##     ## ##    ## ########  ##       ######## ########
+    //   ##     ##    ##    ##    ##        ##     ## ##     ## ###   ## ##     ## ##       ##       ##     ##
+    //   ##     ##    ##    ##              ##     ## ##     ## ####  ## ##     ## ##       ##       ##     ##
+    //   ##     ##    ##     ######         ########  ##     ## ## ## ## ##     ## ##       ######   ########
+    //   ##     ##    ##          ##        ##     ## ##     ## ##  #### ##     ## ##       ##       ##   ##
+    //   ##     ##    ##    ##    ##        ##     ## ##     ## ##   ### ##     ## ##       ##       ##    ##
+    //   ########     ##     ######         ########   #######  ##    ## ########  ######## ######## ##     ##
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    dtsBundler: createPinnableEnumProperty({
+        name: "d.ts bundler",
+        configFile: {
+            currentKey: "LP_SETTINGS_DTS_BUNDLER",
+            newConfigObjectName: "dtsBundler",
+        },
+        commandLine: {
+            option: "--dts-bundler",
+            description: "Bundler for declaration files (d.ts)",
+        },
+        currentValues: [
+            ["dts-bundle-generator", undefined],
+            ["disabled", "don't bundle declaration files"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //   ########  #######  ########  ##     ##    ###    ######## ######## ######## ########
+    //   ##       ##     ## ##     ## ###   ###   ## ##      ##       ##    ##       ##     ##
+    //   ##       ##     ## ##     ## #### ####  ##   ##     ##       ##    ##       ##     ##
+    //   ######   ##     ## ########  ## ### ## ##     ##    ##       ##    ######   ########
+    //   ##       ##     ## ##   ##   ##     ## #########    ##       ##    ##       ##   ##
+    //   ##       ##     ## ##    ##  ##     ## ##     ##    ##       ##    ##       ##    ##
+    //   ##        #######  ##     ## ##     ## ##     ##    ##       ##    ######## ##     ##
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    formatter: createPinnableEnumProperty({
+        name: "formatter",
+        configFile: {
+            currentKey: "LP_SETTINGS_FORMATTER",
+            newConfigObjectName: "formatter",
+        },
+        commandLine: {
+            option: "--formatter",
+            description: "Code formatter",
+        },
+        currentValues: [
+            ["prettier", undefined],
+            ["disabled", "don't format sources"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //   #### ##    ##  ######  ########    ###    ##       ##            ##     ##  #######  ########  ########
+    //    ##  ###   ## ##    ##    ##      ## ##   ##       ##            ###   ### ##     ## ##     ## ##
+    //    ##  ####  ## ##          ##     ##   ##  ##       ##            #### #### ##     ## ##     ## ##
+    //    ##  ## ## ##  ######     ##    ##     ## ##       ##            ## ### ## ##     ## ##     ## ######
+    //    ##  ##  ####       ##    ##    ######### ##       ##            ##     ## ##     ## ##     ## ##
+    //    ##  ##   ### ##    ##    ##    ##     ## ##       ##            ##     ## ##     ## ##     ## ##
+    //   #### ##    ##  ######     ##    ##     ## ######## ########      ##     ##  #######  ########  ########
+    //
     //------------------------------------------------------------------------------------------------------------------
 
     installationMode: createNonPinnableEnumProperty({
@@ -140,91 +189,44 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // Bundler
+    //
+    //   ##     ##  #######  ########  ##     ## ##       ########        ######  ##    ##  ######
+    //   ###   ### ##     ## ##     ## ##     ## ##       ##             ##    ##  ##  ##  ##    ##
+    //   #### #### ##     ## ##     ## ##     ## ##       ##             ##         ####   ##
+    //   ## ### ## ##     ## ##     ## ##     ## ##       ######          ######     ##     ######
+    //   ##     ## ##     ## ##     ## ##     ## ##       ##                   ##    ##          ##
+    //   ##     ## ##     ## ##     ## ##     ## ##       ##             ##    ##    ##    ##    ##
+    //   ##     ##  #######  ########   #######  ######## ########        ######     ##     ######
+    //
     //------------------------------------------------------------------------------------------------------------------
 
-    bundler: createPinnableEnumProperty({
-        name: "bundler",
+    module: createNonPinnableEnumProperty({
+        name: "module system",
         configFile: {
-            currentKey: "LP_SETTINGS_BUNDLER",
-            newConfigObjectName: "bundler",
+            currentKey: "LP_SETTINGS_MODULE_SYSTEM",
+            newConfigObjectName: "module",
         },
         commandLine: {
-            option: "--bundler",
-            description: "Bundler",
+            option: "--module-system",
+            description: "Target module system",
         },
         currentValues: [
-            ["esbuild", undefined],
-            ["disabled", "don't use bundling"],
+            ["cjs", "CommonJS"],
+            ["esm", "ECMAScript modules"],
         ] as const,
         obsoleteValues: [] as const,
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // DTS Bundler
-    //------------------------------------------------------------------------------------------------------------------
-
-    dtsBundler: createPinnableEnumProperty({
-        name: "d.ts bundler",
-        configFile: {
-            currentKey: "LP_SETTINGS_DTS_BUNDLER",
-            newConfigObjectName: "dtsBundler",
-        },
-        commandLine: {
-            option: "--dts-bundler",
-            description: "Bundler for declaration files (d.ts)",
-        },
-        currentValues: [
-            ["dts-bundle-generator", undefined],
-            ["disabled", "don't bundle declaration files"],
-        ] as const,
-        obsoleteValues: [] as const,
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Formatter
-    //------------------------------------------------------------------------------------------------------------------
-
-    formatter: createPinnableEnumProperty({
-        name: "formatter",
-        configFile: {
-            currentKey: "LP_SETTINGS_FORMATTER",
-            newConfigObjectName: "formatter",
-        },
-        commandLine: {
-            option: "--formatter",
-            description: "Code formatter",
-        },
-        currentValues: [
-            ["prettier", undefined],
-            ["disabled", "don't format sources"],
-        ] as const,
-        obsoleteValues: [] as const,
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Tab size
-    //------------------------------------------------------------------------------------------------------------------
-
-    tabSize: createIntegerProperty({
-        name: "tab size",
-        configFile: {
-            currentKey: "LP_SETTINGS_TAB_SIZE",
-            newConfigObjectName: "tabSize",
-        },
-        commandLine: {
-            option: "--tab-size",
-            placeholder: "<SIZE>",
-            description: "Tab size (for code formatting)",
-        },
-        range: {
-            min: 2,
-            max: 20,
-        },
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Package manager
+    //
+    //   ########     ###     ######  ##    ##    ###     ######   ########       ##     ##  ######   ########
+    //   ##     ##   ## ##   ##    ## ##   ##    ## ##   ##    ##  ##             ###   ### ##    ##  ##     ##
+    //   ##     ##  ##   ##  ##       ##  ##    ##   ##  ##        ##             #### #### ##        ##     ##
+    //   ########  ##     ## ##       #####    ##     ## ##   #### ######         ## ### ## ##   #### ########
+    //   ##        ######### ##       ##  ##   ######### ##    ##  ##             ##     ## ##    ##  ##   ##
+    //   ##        ##     ## ##    ## ##   ##  ##     ## ##    ##  ##             ##     ## ##    ##  ##    ##
+    //   ##        ##     ##  ######  ##    ## ##     ##  ######   ########       ##     ##  ######   ##     ##
+    //
     //------------------------------------------------------------------------------------------------------------------
 
     packageManager: createPinnableEnumProperty({
@@ -246,7 +248,67 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // Source directory
+    //
+    //   ########  ########   #######        ## ########  ######  ########    ##    ##    ###    ##     ## ########
+    //   ##     ## ##     ## ##     ##       ## ##       ##    ##    ##       ###   ##   ## ##   ###   ### ##
+    //   ##     ## ##     ## ##     ##       ## ##       ##          ##       ####  ##  ##   ##  #### #### ##
+    //   ########  ########  ##     ##       ## ######   ##          ##       ## ## ## ##     ## ## ### ## ######
+    //   ##        ##   ##   ##     ## ##    ## ##       ##          ##       ##  #### ######### ##     ## ##
+    //   ##        ##    ##  ##     ## ##    ## ##       ##    ##    ##       ##   ### ##     ## ##     ## ##
+    //   ##        ##     ##  #######   ######  ########  ######     ##       ##    ## ##     ## ##     ## ########
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    projectName: createStringProperty({
+        name: "project name",
+        configFile: {
+            currentKey: "LP_SETTINGS_PROJECT_NAME",
+            newConfigObjectName: "projectName",
+        },
+        commandLine: {
+            option: "--project-name",
+            placeholder: "<NAME>",
+            description: "Name of the main module/project",
+        },
+        parseOldValue: parseProjectName,
+        parseNewValue: parseProjectName,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //   ########  ##     ## ##    ## ######## #### ##     ## ########
+    //   ##     ## ##     ## ###   ##    ##     ##  ###   ### ##
+    //   ##     ## ##     ## ####  ##    ##     ##  #### #### ##
+    //   ########  ##     ## ## ## ##    ##     ##  ## ### ## ######
+    //   ##   ##   ##     ## ##  ####    ##     ##  ##     ## ##
+    //   ##    ##  ##     ## ##   ###    ##     ##  ##     ## ##
+    //   ##     ##  #######  ##    ##    ##    #### ##     ## ########
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    runtime: createPinnableEnumProperty({
+        name: "runtime environment",
+        configFile: {
+            currentKey: "LP_SETTINGS_RUNTIME",
+            newConfigObjectName: "runtime",
+        },
+        currentValues: [
+            ["node", "command line"],
+            ["web", "web browser"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //    ######   #######  ##     ## ########   ######  ########        ########  #### ########
+    //   ##    ## ##     ## ##     ## ##     ## ##    ## ##              ##     ##  ##  ##     ##
+    //   ##       ##     ## ##     ## ##     ## ##       ##              ##     ##  ##  ##     ##
+    //    ######  ##     ## ##     ## ########  ##       ######          ##     ##  ##  ########
+    //         ## ##     ## ##     ## ##   ##   ##       ##              ##     ##  ##  ##   ##
+    //   ##    ## ##     ## ##     ## ##    ##  ##    ## ##              ##     ##  ##  ##    ##
+    //    ######   #######   #######  ##     ##  ######  ########        ########  #### ##     ##
+    //
     //------------------------------------------------------------------------------------------------------------------
 
     srcDir: createStringProperty({
@@ -265,26 +327,41 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // Web app directory
+    //
+    //   ########    ###    ########         ######  ####  ######  ########
+    //      ##      ## ##   ##     ##       ##    ##  ##  ##    ## ##
+    //      ##     ##   ##  ##     ##       ##        ##  ##       ##
+    //      ##    ##     ## ########         ######   ##   ######  ######
+    //      ##    ######### ##     ##             ##  ##        ## ##
+    //      ##    ##     ## ##     ##       ##    ##  ##  ##    ## ##
+    //      ##    ##     ## ########         ######  ####  ######  ########
+    //
     //------------------------------------------------------------------------------------------------------------------
 
-    webAppDir: createStringProperty({
-        name: "web app directory",
+    tabSize: createIntegerProperty({
+        name: "tab size",
         configFile: {
-            currentKey: "LP_SETTINGS_WEB_APP_DIR",
-            newConfigObjectName: "webAppDir",
+            currentKey: "LP_SETTINGS_TAB_SIZE",
+            newConfigObjectName: "tabSize",
         },
         commandLine: {
-            option: "--web-app-dir",
-            placeholder: "<DIR>",
-            description: "Relative path to the web application (with the index.html)",
+            option: "--tab-size",
+            placeholder: "<SIZE>",
+            description: "Tab size (for code formatting)",
         },
-        parseOldValue: createDirectoryParser("web app directory", "optional"),
-        parseNewValue: createDirectoryParser("web app directory", "mandatory"),
+        range: { min: 2, max: 20 },
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // TSC output directory
+    //
+    //   ########  ######   ######          #######  ##     ## ########        ########  #### ########
+    //      ##    ##    ## ##    ##        ##     ## ##     ##    ##           ##     ##  ##  ##     ##
+    //      ##    ##       ##              ##     ## ##     ##    ##           ##     ##  ##  ##     ##
+    //      ##     ######  ##              ##     ## ##     ##    ##           ##     ##  ##  ########
+    //      ##          ## ##              ##     ## ##     ##    ##           ##     ##  ##  ##   ##
+    //      ##    ##    ## ##    ##        ##     ## ##     ##    ##           ##     ##  ##  ##    ##
+    //      ##     ######   ######          #######   #######     ##           ########  #### ##     ##
+    //
     //------------------------------------------------------------------------------------------------------------------
 
     tscOutDir: createStringProperty({
@@ -303,41 +380,69 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // Bundler output directory
+    //
+    //    ##     ## ######## ########   ######  ####  #######  ##    ##          ##    ##  #######
+    //    ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##          ###   ## ##     ##
+    //    ##     ## ##       ##     ## ##        ##  ##     ## ####  ##          ####  ## ##     ##
+    //    ##     ## ######   ########   ######   ##  ##     ## ## ## ##          ## ## ## ##     ##
+    //     ##   ##  ##       ##   ##         ##  ##  ##     ## ##  ####          ##  #### ##     ##
+    //      ## ##   ##       ##    ##  ##    ##  ##  ##     ## ##   ###          ##   ### ##     ##
+    //       ###    ######## ##     ##  ######  ####  #######  ##    ##          ##    ##  #######
+    //
     //------------------------------------------------------------------------------------------------------------------
 
-    bundlerOutDir: createStringProperty({
-        name: "Bundler output directory",
+    version: createVersionProperty({
+        name: "version number",
         configFile: {
-            currentKey: "LP_SETTINGS_BUNDLER_OUT_DIR",
-            newConfigObjectName: "bundlerOutDir",
+            currentKey: "LP_SETTINGS_VERSION",
+            newConfigObjectName: "version",
+        },
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    //   ##      ## ######## ########            ###    ########  ########         ########  #### ########
+    //   ##  ##  ## ##       ##     ##          ## ##   ##     ## ##     ##        ##     ##  ##  ##     ##
+    //   ##  ##  ## ##       ##     ##         ##   ##  ##     ## ##     ##        ##     ##  ##  ##     ##
+    //   ##  ##  ## ######   ########         ##     ## ########  ########         ##     ##  ##  ########
+    //   ##  ##  ## ##       ##     ##        ######### ##        ##               ##     ##  ##  ##   ##
+    //   ##  ##  ## ##       ##     ##        ##     ## ##        ##               ##     ##  ##  ##    ##
+    //    ###  ###  ######## ########         ##     ## ##        ##               ########  #### ##     ##
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    webAppDir: createStringProperty({
+        name: "web app directory",
+        configFile: {
+            currentKey: "LP_SETTINGS_WEB_APP_DIR",
+            newConfigObjectName: "webAppDir",
         },
         commandLine: {
-            option: "--bundler-out-dir",
+            option: "--web-app-dir",
             placeholder: "<DIR>",
-            description: "Bundler output directory",
+            description: "Relative path to the web application (with the index.html)",
         },
-        parseOldValue: createDirectoryParser("Bundler output directory", "optional"),
-        parseNewValue: createDirectoryParser("Bundler output directory", "optional"),
+        parseOldValue: createDirectoryParser("web app directory", "optional"),
+        parseNewValue: createDirectoryParser("web app directory", "mandatory"),
     }),
 } as const;
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//    ######  ##       ####
-//   ##    ## ##        ##
-//   ##       ##        ##
-//   ##       ##        ##
-//   ##       ##        ##
-//   ##    ## ##        ##
-//    ######  ######## ####
+//     ######  ##       ####        #######  ##    ## ##       ##    ##
+//    ##    ## ##        ##        ##     ## ###   ## ##        ##  ##
+//    ##       ##        ##        ##     ## ####  ## ##         ####
+//    ##       ##        ##        ##     ## ## ## ## ##          ##
+//    ##       ##        ##        ##     ## ##  #### ##          ##
+//    ##    ## ##        ##        ##     ## ##   ### ##          ##
+//     ######  ######## ####        #######  ##    ## ########    ##
 //
 //----------------------------------------------------------------------------------------------------------------------
 
 const INIT_ONLY_CONFIG_PROPERTIES = {
     //
     //------------------------------------------------------------------------------------------------------------------
-    // Runtime (command-line only)
+    // Runtime
     //------------------------------------------------------------------------------------------------------------------
 
     runtimeCli: createNonPinnableEnumProperty({
@@ -356,46 +461,46 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
     }),
 
     //------------------------------------------------------------------------------------------------------------------
-    // Libraries (npm packages) to install
+    // Dependencies to install
     //------------------------------------------------------------------------------------------------------------------
 
     installDevDependencies: createBooleanProperty({
-        name: "Install development tools",
+        name: "install development tools toggle",
         commandLine: {
             option: "--install-dev-dependencies",
             placeholder: "[true | false]",
-            description: "Install development tools (compiler, bundler, formatter, ...)",
+            description: "Install development tools (compiler, bundler, formatter, ...) locally",
         },
     }),
 
     dependencies: createStringArrayProperty({
-        name: "NPM packages to install without prompting",
+        name: "auto-selected NPM packages",
         commandLine: {
             option: "--auto-selected-dependencies",
             placeholder: "<dep1>, <dep2>, ...",
-            description: "Install these NPM packages (without prompting)",
+            description: "NPM packages to install without without prompting",
         },
         parseOldValue: parseStringArray,
         parseNewValue: parseStringArray,
     }),
 
     preselectedDependencies: createStringArrayProperty({
-        name: "Pre-selected NPM packages",
+        name: "pre-selected NPM packages",
         commandLine: {
             option: "--preselected-dependencies",
             placeholder: "<dep1>, <dep2>, ...",
-            description: "Suggest these NPM packages (pre-selected)",
+            description: "Pre-selected NPM packages offered for installation",
         },
         parseOldValue: parseStringArray,
         parseNewValue: parseStringArray,
     }),
 
     optionalDependencies: createStringArrayProperty({
-        name: "Optional NPM packages",
+        name: "optional NPM packages",
         commandLine: {
             option: "--optional-dependencies",
             placeholder: "<dep1>, <dep2>, ...",
-            description: "Suggest these NPM packages (not pre-selected)",
+            description: "Optional (non-pre-selected) NPM packages offered for installation",
         },
         parseOldValue: parseStringArray,
         parseNewValue: parseStringArray,
@@ -406,47 +511,53 @@ const INIT_ONLY_CONFIG_PROPERTIES = {
     //------------------------------------------------------------------------------------------------------------------
 
     createProjectTemplate: createBooleanProperty({
-        name: "Create project template",
+        name: "project template toggle",
         commandLine: {
-            option: "--create-project-files",
+            option: "--create-project-template",
             placeholder: "[true | false]",
             description: "Create a basic project template (main module, Makefile, ...)",
         },
     }),
 
     createDebugModule: createBooleanProperty({
-        name: "Create a debug module",
+        name: "debug module toggle",
         commandLine: {
             option: "--create-debug-module",
             placeholder: "[true | false]",
             description: "Create a debug.ts file",
         },
     }),
-} as const;
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//    #######  ########   ######   #######  ##       ######## ######## ########
-//   ##     ## ##     ## ##    ## ##     ## ##       ##          ##    ##
-//   ##     ## ##     ## ##       ##     ## ##       ##          ##    ##
-//   ##     ## ########   ######  ##     ## ##       ######      ##    ######
-//   ##     ## ##     ##       ## ##     ## ##       ##          ##    ##
-//   ##     ## ##     ## ##    ## ##     ## ##       ##          ##    ##
-//    #######  ########   ######   #######  ######## ########    ##    ########
-//
-//----------------------------------------------------------------------------------------------------------------------
+    createMakefile: createBooleanProperty({
+        name: "Makefile toggle",
+        commandLine: {
+            option: "--create-makefile",
+            placeholder: "[true | false]",
+            description: "Create a template Makefile",
+        },
+    }),
+
+    createVsCodeSettings: createBooleanProperty({
+        name: "VSCode settings toggle",
+        commandLine: {
+            option: "--create-vscode-settings",
+            placeholder: "[true | false]",
+            description: "Create settings for VSCode",
+        },
+    }),
+} as const;
 
 const OBSOLETE_CONFIG_PROPERTIES = {} as const;
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//      ###     ######   ######  ######## ##     ## ########  ##       ######## ########
-//     ## ##   ##    ## ##    ## ##       ###   ### ##     ## ##       ##       ##     ##
-//    ##   ##  ##       ##       ##       #### #### ##     ## ##       ##       ##     ##
-//   ##     ##  ######   ######  ######   ## ### ## ########  ##       ######   ##     ##
-//   #########       ##       ## ##       ##     ## ##     ## ##       ##       ##     ##
-//   ##     ## ##    ## ##    ## ##       ##     ## ##     ## ##       ##       ##     ##
-//   ##     ##  ######   ######  ######## ##     ## ########  ######## ######## ########
+//       ###     ######   ######  ######## ##     ## ########  ##       ##    ##
+//      ## ##   ##    ## ##    ## ##       ###   ### ##     ## ##        ##  ##
+//     ##   ##  ##       ##       ##       #### #### ##     ## ##         ####
+//    ##     ##  ######   ######  ######   ## ### ## ########  ##          ##
+//    #########       ##       ## ##       ##     ## ##     ## ##          ##
+//    ##     ## ##    ## ##    ## ##       ##     ## ##     ## ##          ##
+//    ##     ##  ######   ######  ######## ##     ## ########  ########    ##
 //
 //----------------------------------------------------------------------------------------------------------------------
 

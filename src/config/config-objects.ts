@@ -13,21 +13,21 @@ import { ConfigProperties } from "./config-properties.js";
 
 export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, addError: AddError) {
     return {
-        version: ConfigProperties.version.parseOldValue(properties, addError),
-        projectName: ConfigProperties.projectName.parseOldValue(properties, addError),
         artifact: ConfigProperties.artifact.parseOldValue(properties, addError),
-        runtime: ConfigProperties.runtime.parseOldValue(properties, addError),
-        module: ConfigProperties.module.parseOldValue(properties, addError),
-        installationMode: ConfigProperties.installationMode.parseOldValue(properties, addError),
         bundler: ConfigProperties.bundler.parseOldValue(properties, addError),
+        bundlerOutDir: ConfigProperties.bundlerOutDir.parseOldValue(properties, addError),
         dtsBundler: ConfigProperties.dtsBundler.parseOldValue(properties, addError),
         formatter: ConfigProperties.formatter.parseOldValue(properties, addError),
-        tabSize: ConfigProperties.tabSize.parseOldValue(properties, addError),
+        installationMode: ConfigProperties.installationMode.parseOldValue(properties, addError),
+        module: ConfigProperties.module.parseOldValue(properties, addError),
         packageManager: ConfigProperties.packageManager.parseOldValue(properties, addError),
+        projectName: ConfigProperties.projectName.parseOldValue(properties, addError),
+        runtime: ConfigProperties.runtime.parseOldValue(properties, addError),
         srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
-        webAppDir: ConfigProperties.webAppDir.parseOldValue(properties, addError),
+        tabSize: ConfigProperties.tabSize.parseOldValue(properties, addError),
         tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
-        bundlerOutDir: ConfigProperties.bundlerOutDir.parseOldValue(properties, addError),
+        version: ConfigProperties.version.parseOldValue(properties, addError),
+        webAppDir: ConfigProperties.webAppDir.parseOldValue(properties, addError),
     } as const satisfies { [K in keyof typeof ConfigProperties.currentAndObsolete]: unknown };
 }
 
@@ -38,21 +38,21 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
 export function validateConfig(config: ReturnType<typeof assembleConfig>, addError: AddError) {
     try {
         return {
-            version: ConfigProperties.version.assertOldValuePresent(config.version),
-            projectName: ConfigProperties.projectName.assertOldValuePresent(config.projectName),
             artifact: ConfigProperties.artifact.assertOldValuePresent(config.artifact),
-            runtime: ConfigProperties.runtime.assertOldValuePresent(config.runtime),
-            module: ConfigProperties.module.assertOldValuePresent(config.module),
-            installationMode: ConfigProperties.installationMode.assertOldValuePresent(config.installationMode),
             bundler: ConfigProperties.bundler.assertOldValuePresent(config.bundler),
+            bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.tscOutDir),
             dtsBundler: ConfigProperties.dtsBundler.assertOldValuePresent(config.dtsBundler),
             formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
-            tabSize: ConfigProperties.tabSize.assertOldValuePresent(config.tabSize),
+            installationMode: ConfigProperties.installationMode.assertOldValuePresent(config.installationMode),
+            module: ConfigProperties.module.assertOldValuePresent(config.module),
             packageManager: ConfigProperties.packageManager.assertOldValuePresent(config.packageManager),
+            projectName: ConfigProperties.projectName.assertOldValuePresent(config.projectName),
+            runtime: ConfigProperties.runtime.assertOldValuePresent(config.runtime),
             srcDir: ConfigProperties.srcDir.assertOldValuePresent(config.srcDir),
-            webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.webAppDir),
+            tabSize: ConfigProperties.tabSize.assertOldValuePresent(config.tabSize),
             tscOutDir: ConfigProperties.tscOutDir.assertOldValuePresent(config.tscOutDir),
-            bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.tscOutDir),
+            version: ConfigProperties.version.assertOldValuePresent(config.version),
+            webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.webAppDir),
         } as const satisfies typeof config;
     } catch (error: unknown) {
         if (error instanceof ValidationError) {
@@ -77,31 +77,33 @@ type NewConfigType<T extends keyof typeof ConfigProperties.currentAndInitOnly> =
 >;
 
 export type NewConfig = {
-    version: NewConfigType<"version">;
-    projectName: NewConfigType<"projectName">;
     artifact: NewConfigType<"artifact">;
-    runtime: NewConfigType<"runtime">;
-    installationMode: NewConfigType<"installationMode">;
-    module: NewConfigType<"module">;
     bundler: NewConfigType<"bundler">;
+    bundlerOutDir: NewConfigType<"bundlerOutDir">;
+    createDebugModule: NewConfigType<"createDebugModule">;
+    createMakefile: NewConfigType<"createMakefile">;
+    createProjectTemplate: NewConfigType<"createProjectTemplate">;
+    createVsCodeSettings: NewConfigType<"createVsCodeSettings">;
+    dependencies: NewConfigType<"dependencies">;
     dtsBundler: NewConfigType<"dtsBundler">;
     formatter: NewConfigType<"formatter">;
-    tabSize: NewConfigType<"tabSize">;
-    packageManager: NewConfigType<"packageManager">;
-    srcDir: NewConfigType<"srcDir">;
-    webAppDir: NewConfigType<"webAppDir">;
-    tscOutDir: NewConfigType<"tscOutDir">;
-    bundlerOutDir: NewConfigType<"bundlerOutDir">;
+    installationMode: NewConfigType<"installationMode">;
     installDevDependencies: NewConfigType<"installDevDependencies">;
-    dependencies: NewConfigType<"dependencies">;
-    createProjectTemplate: NewConfigType<"createProjectTemplate">;
-    createDebugModule: NewConfigType<"createDebugModule">;
+    module: NewConfigType<"module">;
+    packageManager: NewConfigType<"packageManager">;
+    projectName: NewConfigType<"projectName">;
+    runtime: NewConfigType<"runtime">;
+    srcDir: NewConfigType<"srcDir">;
+    tabSize: NewConfigType<"tabSize">;
+    tscOutDir: NewConfigType<"tscOutDir">;
+    version: NewConfigType<"version">;
+    webAppDir: NewConfigType<"webAppDir">;
 };
 
 export type NewConfigCli = Omit<NewConfig, "runtime"> & {
-    runtimeCli: NewConfigType<"runtimeCli">;
-    preselectedDependencies: NewConfigType<"preselectedDependencies">;
     optionalDependencies: NewConfigType<"optionalDependencies">;
+    preselectedDependencies: NewConfigType<"preselectedDependencies">;
+    runtimeCli: NewConfigType<"runtimeCli">;
 };
 
 export type CommandLineConfig = ReturnType<typeof assembleConfigFromCommandLineOptions>;
@@ -112,25 +114,27 @@ export type CommandLineConfig = ReturnType<typeof assembleConfigFromCommandLineO
 
 export function assembleConfigFromCommandLineOptions(properties: CommandLineOptions) {
     return {
-        projectName: ConfigProperties.projectName.parseFromCommandLine(properties),
         artifact: ConfigProperties.artifact.parseFromCommandLine(properties),
-        runtimeCli: ConfigProperties.runtimeCli.parseFromCommandLine(properties),
-        module: ConfigProperties.module.parseFromCommandLine(properties),
-        installationMode: ConfigProperties.installationMode.parseFromCommandLine(properties),
         bundler: ConfigProperties.bundler.parseFromCommandLine(properties),
+        bundlerOutDir: ConfigProperties.bundlerOutDir.parseFromCommandLine(properties),
+        createDebugModule: ConfigProperties.createDebugModule.parseFromCommandLine(properties),
+        createMakefile: ConfigProperties.createMakefile.parseFromCommandLine(properties),
+        createProjectTemplate: ConfigProperties.createProjectTemplate.parseFromCommandLine(properties),
+        createVsCodeSettings: ConfigProperties.createVsCodeSettings.parseFromCommandLine(properties),
+        dependencies: ConfigProperties.dependencies.parseFromCommandLine(properties),
         dtsBundler: ConfigProperties.dtsBundler.parseFromCommandLine(properties),
         formatter: ConfigProperties.formatter.parseFromCommandLine(properties),
-        tabSize: ConfigProperties.tabSize.parseFromCommandLine(properties),
-        packageManager: ConfigProperties.packageManager.parseFromCommandLine(properties),
-        srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
-        webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),
-        tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
-        bundlerOutDir: ConfigProperties.bundlerOutDir.parseFromCommandLine(properties),
+        installationMode: ConfigProperties.installationMode.parseFromCommandLine(properties),
         installDevDependencies: ConfigProperties.installDevDependencies.parseFromCommandLine(properties),
-        dependencies: ConfigProperties.dependencies.parseFromCommandLine(properties),
-        preselectedDependencies: ConfigProperties.preselectedDependencies.parseFromCommandLine(properties),
+        module: ConfigProperties.module.parseFromCommandLine(properties),
         optionalDependencies: ConfigProperties.optionalDependencies.parseFromCommandLine(properties),
-        createProjectTemplate: ConfigProperties.createProjectTemplate.parseFromCommandLine(properties),
-        createDebugModule: ConfigProperties.createDebugModule.parseFromCommandLine(properties),
+        packageManager: ConfigProperties.packageManager.parseFromCommandLine(properties),
+        preselectedDependencies: ConfigProperties.preselectedDependencies.parseFromCommandLine(properties),
+        projectName: ConfigProperties.projectName.parseFromCommandLine(properties),
+        runtimeCli: ConfigProperties.runtimeCli.parseFromCommandLine(properties),
+        srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
+        tabSize: ConfigProperties.tabSize.parseFromCommandLine(properties),
+        tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
+        webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),
     } as const satisfies Omit<{ [K in keyof NewConfigCli]: NewConfigCli[K] | undefined | "default" }, "version">;
 }
