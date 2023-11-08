@@ -1,6 +1,6 @@
-import { init } from "./commands/init/init.js";
-import { postinstall } from "./commands/postinstall/postinstall.js";
-import { uplift } from "./commands/uplift/uplift.js";
+import { init } from "./commands/init.js";
+import { postinstall } from "./commands/postinstall.js";
+import { uplift } from "./commands/uplift.js";
 import { ConfigProperties } from "./config/config-properties.js";
 import { VERSION_NUMBER } from "./resources/version-information.js";
 import { fail, formatError } from "./utilities/fail.js";
