@@ -1,4 +1,5 @@
-import type { NewConfig, OldConfig } from "../../config/config-objects.js";
+import type { ParsedConfig } from "../../config/config-loader.js";
+import type { NewConfig } from "../../config/config-objects.js";
 import type { Path } from "../../utilities/path.js";
 import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
 
@@ -11,7 +12,7 @@ export class MigrationContext {
     public readonly canRunPackageManagerCommands;
     public readonly canPromptUser;
     public readonly oldConfig;
-    public _newConfig;
+    public readonly newConfig;
 
     public readonly skippedSteps = new Array<string>();
     public readonly errors = new Array<string>();
@@ -29,14 +30,14 @@ export class MigrationContext {
         projectRoot: Path;
         canRunPackageManagerCommands: boolean;
         canPromptUser: boolean;
-        oldConfig: OldConfig | undefined;
+        oldConfig: ParsedConfig | undefined;
         newConfig: NewConfig;
     }) {
         this.projectRoot = options.projectRoot;
         this.canRunPackageManagerCommands = options.canRunPackageManagerCommands;
         this.canPromptUser = options.canPromptUser;
         this.oldConfig = options.oldConfig;
-        this._newConfig = options.newConfig;
+        this.newConfig = options.newConfig;
         this.files = new FileOrDirectoryCache(
             options.projectRoot,
             options.newConfig.tabSize,
@@ -47,17 +48,5 @@ export class MigrationContext {
             options.newConfig.tabSize,
             (root, path) => new Directory(root, path)
         );
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Getters and setters
-    //------------------------------------------------------------------------------------------------------------------
-
-    public get newConfig() {
-        return this._newConfig;
-    }
-
-    public overrideNewConfig(override: Partial<NewConfig>) {
-        this._newConfig = { ...this._newConfig, ...override };
     }
 }

@@ -27,7 +27,7 @@ export async function uplift(projectRoot: Path, configFile: Path, _options: Read
         migrate({
             canPromptUser: true,
             canRunPackageManagerCommands: true,
-            oldConfig,
+            oldConfig: parsedConfig,
             newConfig: undefined,
             projectRoot,
         });

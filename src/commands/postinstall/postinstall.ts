@@ -21,7 +21,7 @@ export async function postinstall(projectRoot: Path, configFile: Path, _options:
                 migrate({
                     canPromptUser: false,
                     canRunPackageManagerCommands: false,
-                    oldConfig,
+                    oldConfig: parsedConfig,
                     newConfig: undefined,
                     projectRoot,
                 });
