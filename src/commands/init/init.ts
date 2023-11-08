@@ -1,6 +1,6 @@
 import { parseCommandLineOptions } from "../../config/command-line-parser.js";
 import { loadConfigFile } from "../../config/config-loader.js";
-import { migrate } from "../../migrations/migrate.js";
+import { migrate } from "../../migration/migrate.js";
 import type { Path } from "../../utilities/path.js";
 import { getNewConfig } from "./config-wizard.js";
 

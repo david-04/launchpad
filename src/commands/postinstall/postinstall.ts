@@ -1,5 +1,5 @@
 import { loadConfigFile } from "../../config/config-loader.js";
-import { migrate } from "../../migrations/migrate.js";
+import { migrate } from "../../migration/migrate.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import { DISABLE_POSTINSTALL_ENV_VARIABLE_NAME, LAUNCHPAD_ERROR_FILE } from "../../utilities/constants.js";
 import { ERROR_BANNER, FriendlyError } from "../../utilities/fail.js";
