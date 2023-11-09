@@ -9,14 +9,14 @@ import { ConfigProperties } from "./config-properties.js";
 export function serializeConfig(config: NewConfig) {
     const header = [
         "#-----------------------------------------------------------------------------------------------------------------------",
-        "# This is a generated generated file. Do not edit. To make changes, run: launchpad init",
+        "# This file is auto-generated. Do not edit (unless fixing errors). To reconfigure the project, run: launchpad init",
         "#-----------------------------------------------------------------------------------------------------------------------",
     ];
     const properties = ConfigProperties.arrays.current.map(property => property.serialize(config));
     const maxKeyLength = properties.reduce((max, property) => Math.max(max, property?.key.length ?? 0), 0);
     const maxValueLength = properties.reduce((max, property) => Math.max(max, property?.value.length ?? 0), 0);
     const lines = properties.map(property => (property ? formatProperty(property, maxKeyLength, maxValueLength) : ""));
-    return [...header, "", ...lines.filter(line => line)].join("\n");
+    return [...header, "", ...lines.filter(line => line), ""].join("\n");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

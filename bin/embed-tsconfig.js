@@ -8,7 +8,7 @@ import { join } from "path";
 const SOURCE_PATH = "../resources/tsconfig";
 const FRAGMENTS_PATH = "../02-facets/";
 const TSCONFIG_TEMPLATES_TS = "../src/resources/embedded-tsconfig.ts";
-const TSCONFIG_DEFAULT_JSON_IN = "tsconfig.cli-application-esm.json";
+const TSCONFIG_DEFAULT_JSON_IN = "tsconfig.cli-app-esm.json";
 const TSCONFIG_DEFAULT_JSON_OUT = "../.launchpad/tsconfig.default.json";
 const INDENT = 4;
 
@@ -68,7 +68,7 @@ function normalizeTsconfig(fileName, json) {
         .sort()
         .forEach(key => (compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key])));
     const tsNode = 0 <= fileName.indexOf("-esm") ? { "ts-node": { esm: true } } : {};
-    return { compilerOptions: compilerOptionsOut, include: ["../src/**/*.ts"], ...tsNode };
+    return { compilerOptions: compilerOptionsOut, include: ["__SRC_DIR__/**/*.ts"], ...tsNode };
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ function normalizeTsconfig(fileName, json) {
 
 function normalizeTsconfigValue(value) {
     if ("string" === typeof value) {
-        if (value.startsWith(`${FRAGMENTS_PATH}$`)) {
+        if (value.startsWith(`${FRAGMENTS_PATH}__`)) {
             return value.substring(FRAGMENTS_PATH.length);
         } else if (value.startsWith(FRAGMENTS_PATH)) {
             return `../${value.substring(FRAGMENTS_PATH.length)}`;
@@ -104,7 +104,9 @@ function createTsconfigTemplateTs(outputPath, files) {
 function createTsconfigDefaultJsonFile(outputPath, files, sourceFileName) {
     const matchingFiles = files.filter(file => file.name === sourceFileName);
     if (1 === matchingFiles.length) {
-        writeFileSync(outputPath, JSON.stringify(matchingFiles[0].json, undefined, INDENT));
+        const stringified = JSON.stringify(matchingFiles[0].json, undefined, INDENT);
+        const populated = stringified.replace(/__SRC_DIR__/g, "../src").replace(/__OUT_DIR__/g, "../build");
+        writeFileSync(outputPath, populated);
     } else {
         throw new Error(`Failed to create ${outputPath} - source file ${sourceFileName} does not exist `);
     }

@@ -1,5 +1,5 @@
 export const TSCONFIG_JSON_TEMPLATES = {
-    "tsconfig.cli-application-cjs.json": {
+    "tsconfig.cli-app-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -9,7 +9,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "allowUnreachableCode": false,
             "allowUnusedLabels": false,
             "alwaysStrict": true,
-            "baseUrl": "../src",
+            "baseUrl": "__SRC_DIR__",
             "composite": false,
             "declaration": false,
             "declarationMap": false,
@@ -49,12 +49,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -64,16 +63,16 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es2022",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ]
     },
-    "tsconfig.cli-application-esm.json": {
+    "tsconfig.cli-app-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -122,12 +121,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -137,19 +135,19 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es2022",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ],
         "ts-node": {
             "esm": true
         }
     },
-    "tsconfig.cli-library-cjs.json": {
+    "tsconfig.cli-lib-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -159,7 +157,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "allowUnreachableCode": false,
             "allowUnusedLabels": false,
             "alwaysStrict": true,
-            "baseUrl": "../src",
+            "baseUrl": "__SRC_DIR__",
             "composite": false,
             "declaration": true,
             "declarationMap": true,
@@ -199,12 +197,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -214,16 +211,16 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es2022",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ]
     },
-    "tsconfig.cli-library-esm.json": {
+    "tsconfig.cli-lib-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": false,
             "allowImportingTsExtensions": false,
@@ -272,12 +269,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -287,19 +283,19 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es2022",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ],
         "ts-node": {
             "esm": true
         }
     },
-    "tsconfig.web-application-cjs.json": {
+    "tsconfig.web-app-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,
@@ -309,7 +305,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "allowUnreachableCode": false,
             "allowUnusedLabels": false,
             "alwaysStrict": true,
-            "baseUrl": "../src",
+            "baseUrl": "__SRC_DIR__",
             "composite": false,
             "declaration": false,
             "declarationMap": false,
@@ -347,12 +343,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -362,16 +357,16 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es6",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ]
     },
-    "tsconfig.web-application-esm.json": {
+    "tsconfig.web-app-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,
@@ -418,12 +413,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -433,19 +427,19 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es6",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ],
         "ts-node": {
             "esm": true
         }
     },
-    "tsconfig.web-library-cjs.json": {
+    "tsconfig.web-lib-cjs.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,
@@ -455,7 +449,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "allowUnreachableCode": false,
             "allowUnusedLabels": false,
             "alwaysStrict": true,
-            "baseUrl": "../src",
+            "baseUrl": "__SRC_DIR__",
             "composite": false,
             "declaration": true,
             "declarationMap": true,
@@ -493,12 +487,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -508,16 +501,16 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es6",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ]
     },
-    "tsconfig.web-library-esm.json": {
+    "tsconfig.web-lib-esm.json": {
         "compilerOptions": {
             "allowArbitraryExtensions": true,
             "allowImportingTsExtensions": false,
@@ -564,12 +557,11 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "noUncheckedIndexedAccess": true,
             "noUnusedLocals": true,
             "noUnusedParameters": true,
-            "outDir": "${OUT_DIR}",
+            "outDir": "__OUT_DIR__",
             "preserveConstEnums": true,
             "preserveSymlinks": false,
             "removeComments": true,
             "resolveJsonModule": true,
-            "rootDir": "../src",
             "skipLibCheck": true,
             "sourceMap": true,
             "strict": true,
@@ -579,13 +571,13 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictPropertyInitialization": true,
             "stripInternal": true,
             "target": "es6",
-            "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo",
+            "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": true
         },
         "include": [
-            "../src/**/*.ts"
+            "__SRC_DIR__/**/*.ts"
         ],
         "ts-node": {
             "esm": true

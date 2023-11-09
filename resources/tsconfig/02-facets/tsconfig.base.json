@@ -10,7 +10,7 @@
         "disableSourceOfProjectReferenceRedirect": false, //    Disable preferring source files instead of declaration files when referencing composite projects.
         "disableSolutionSearching": false, //                   Opt a project out of multi-project reference checking when editing.
         "disableReferencedProjectLoad": false, //               Reduce the number of projects loaded automatically by TypeScript.
-        "tsBuildInfoFile": "${OUT_DIR}/.tsbuildinfo", //        Specify the path to .tsbuildinfo incremental compilation file.
+        "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo", //        Specify the path to .tsbuildinfo incremental compilation file.
 
         //------------------------------------------------------------------------------------------------------------------
         // Language and environment
@@ -26,7 +26,7 @@
         // Modules
         //------------------------------------------------------------------------------------------------------------------
 
-        "rootDir": "./src", //                                  Specify the root folder within your source files.
+        // "rootDir": "", //                                    Specify the root folder within your source files.
         // "paths": {}, //                                      Specify a set of entries that re-map imports to additional lookup locations.
         // "rootDirs": [], //                                   Allow multiple folders to be treated as one when resolving modules.
         // "typeRoots": [], //                                  Specify multiple folders that act like './node_modules/@types'.
@@ -55,7 +55,7 @@
         "sourceMap": true, //                                   Create source map files for emitted JavaScript files.
         "inlineSourceMap": false, //                            Include sourcemap files inside the emitted JavaScript.
         // "outFile": "./", //                                  not applicable for modules | Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output.
-        "outDir": "${OUT_DIR}", //                              Specify an output folder for all emitted files.
+        "outDir": "__OUT_DIR__", //                              Specify an output folder for all emitted files.
         "removeComments": true, //                              Disable emitting comments.
         "noEmit": false, //                                     Disable emitting files from a compilation.
         "importHelpers": false, //                              don't emit downlevel helpers in each module - requires "npm install tslib" | Allow importing helper functions from tslib once per project, instead of including them per-file.
