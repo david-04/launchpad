@@ -25,7 +25,6 @@ export async function uplift(projectRoot: Path, configFile: Path, _options: Read
         fail(lines.flatMap(breakLine).join("\n"));
     } else {
         migrate({
-            canPromptUser: true,
             canRunPackageManagerCommands: true,
             oldConfig,
             newConfig: undefined,

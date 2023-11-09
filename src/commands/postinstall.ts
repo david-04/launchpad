@@ -19,7 +19,6 @@ export async function postinstall(projectRoot: Path, configFile: Path, _options:
             const oldConfig = parsedConfig?.validated;
             if (oldConfig && 0 !== oldConfig.version.compareTo(VERSION_NUMBER)) {
                 migrate({
-                    canPromptUser: false,
                     canRunPackageManagerCommands: false,
                     oldConfig,
                     newConfig: undefined,

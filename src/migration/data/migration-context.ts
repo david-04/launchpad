@@ -9,7 +9,6 @@ import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
 export class MigrationContext {
     public readonly projectRoot;
     public readonly canRunPackageManagerCommands;
-    public readonly canPromptUser;
     public readonly oldConfig;
     public readonly newConfig;
 
@@ -28,13 +27,11 @@ export class MigrationContext {
     public constructor(options: {
         projectRoot: Path;
         canRunPackageManagerCommands: boolean;
-        canPromptUser: boolean;
         oldConfig: OldPartialConfig | undefined;
         newConfig: NewConfig;
     }) {
         this.projectRoot = options.projectRoot;
         this.canRunPackageManagerCommands = options.canRunPackageManagerCommands;
-        this.canPromptUser = options.canPromptUser;
         this.oldConfig = options.oldConfig;
         this.newConfig = options.newConfig;
         this.files = new FileOrDirectoryCache(
