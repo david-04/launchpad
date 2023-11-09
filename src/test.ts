@@ -3,7 +3,7 @@ import { launchpad } from "./launchpad.js";
 async function main() {
     await addCommand("help", "--help");
     await addCommand("postinstall", "postinstall");
-    await addCommand("uplift", "postinstall");
+    await addCommand("uplift", "uplift");
 
     await addCommand("init", [
         "init",

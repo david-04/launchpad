@@ -23,6 +23,7 @@ export function migrate(options: MigrateOptions) {
     const skippedSteps = new Array<string>();
     const newConfig = options.newConfig ?? getNewConfig(options, options.oldConfig, skippedSteps);
     const context = new MigrationContext({ ...options, newConfig });
+    context.skippedSteps.push(...skippedSteps);
     console.log(context);
 }
 
@@ -30,7 +31,7 @@ export function migrate(options: MigrateOptions) {
 // Calculate the target configuration
 //----------------------------------------------------------------------------------------------------------------------
 
-function getNewConfig(options: MigrateOptions, oldConfig: OldConfig, _skippedStep: string[]): NewConfig {
+function getNewConfig(options: MigrateOptions, oldConfig: OldConfig, skippedStep: string[]): NewConfig {
     const packageJson = inspectPackageJson(options.projectRoot);
     return {
         artifact: oldConfig.artifact,
@@ -46,7 +47,7 @@ function getNewConfig(options: MigrateOptions, oldConfig: OldConfig, _skippedSte
         installationMode: oldConfig.installationMode,
         installDevDependencies: packageJson.hasDevDependencies,
         module: oldConfig.module,
-        packageManager: getPackageManager(oldConfig.packageManager, options.canRunPackageManagerCommands), // switch to default if possible
+        packageManager: getPackageManager(oldConfig.packageManager, options.canRunPackageManagerCommands, skippedStep),
         projectName: oldConfig.projectName,
         runtime: oldConfig.runtime,
         srcDir: oldConfig.srcDir,
@@ -71,11 +72,19 @@ function inspectPackageJson(projectRoot: Path) {
 
 function getPackageManager(
     oldPackageManager: OldConfig["packageManager"],
-    _canRunPackageManagerCommands: boolean
+    canRunPackageManagerCommands: boolean,
+    skippedSteps: string[]
 ): NewConfig["packageManager"] {
-    if (oldPackageManager.pinned || oldPackageManager.value === DEFAULT_PACKAGE_MANAGER.value) {
+    const defaultPackageManager: NewConfig["packageManager"] = DEFAULT_PACKAGE_MANAGER;
+    if (oldPackageManager.pinned || oldPackageManager.value === defaultPackageManager.value) {
+        return oldPackageManager;
+    } else if (
+        [oldPackageManager.value, defaultPackageManager.value].includes("yarn") &&
+        !canRunPackageManagerCommands
+    ) {
+        skippedSteps.push(`Switch package manger from ${oldPackageManager.value} to ${defaultPackageManager.value}`);
         return oldPackageManager;
     } else {
-        return oldPackageManager;
+        return defaultPackageManager;
     }
 }

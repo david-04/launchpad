@@ -241,8 +241,8 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         currentValues: [
             ["npm", undefined],
-            ["pnpm", undefined],
-            ["yarn", undefined],
+            ["pnpm", "must be installed globally"],
+            ["yarn", "modern Yarn without plug-and-play (classic Yarn must be installed globally)"],
         ] as const,
         obsoleteValues: [] as const,
     }),
