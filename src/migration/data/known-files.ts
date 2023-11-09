@@ -1,0 +1,14 @@
+export const GITIGNORE = ".gitignore";
+export const LAUNCHPAD = ".launchpad";
+export const LAUNCHPAD_MAKEFILE_DOCUMENTATION = `${LAUNCHPAD}/Makefile.documentation`;
+export const LAUNCHPAD_MAKEFILE_FOOTER = `${LAUNCHPAD}/Makefile.footer`;
+export const LAUNCHPAD_MAKEFILE_HEADER = `${LAUNCHPAD}/Makefile.header`;
+export const LAUNCHPAD_SETTINGS_CFG = `${LAUNCHPAD}/settings.cfg`;
+export const LAUNCHPAD_TSCONFIG_DEFAULT_JSON = `${LAUNCHPAD}/tsconfig.default.json`;
+export const MAKEFILE = "Makefile";
+export const NODE_MODULES = "node-modules";
+export const PACKAGE_JSON = "package.json";
+export const PACKAGE_LOCK_JSON = "package-lock.json";
+export const TSCONFIG_JSON = "tsconfig.json";
+export const VSCODE = ".vscode";
+export const VSCODE_SETTINGS_JSON = `${VSCODE}/settings.json`;

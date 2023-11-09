@@ -7,6 +7,7 @@ import { DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import { fail } from "../../utilities/fail.js";
 import type { Path } from "../../utilities/path.js";
+import { PACKAGE_JSON } from "../data/known-files.js";
 import type { MigrateOptions } from "../migrate.js";
 
 export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig, skippedStep: string[]): NewConfig {
@@ -37,7 +38,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
 }
 
 function inspectPackageJson(projectRoot: Path) {
-    const path = projectRoot.child("package.json");
+    const path = projectRoot.child(PACKAGE_JSON);
     try {
         const packageJson = path.existsAndIsFile() ? JSON.parse(path.loadFileContents()) : {};
         return {
