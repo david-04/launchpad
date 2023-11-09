@@ -6,5 +6,5 @@ import type { MigrationContext } from "../data/migration-context.js";
 //----------------------------------------------------------------------------------------------------------------------
 
 export function updateLaunchpadDirectory(context: MigrationContext) {
-    context.files.get(LAUNCHPAD_MAKEFILE_DOCUMENTATION).contents =
+    context.files.get(LAUNCHPAD_MAKEFILE_DOCUMENTATION).contents = "";
 }

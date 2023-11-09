@@ -7,7 +7,7 @@ import { join } from "path";
 
 const SOURCE_PATH = "../resources/tsconfig";
 const FRAGMENTS_PATH = "../02-facets/";
-const TSCONFIG_TEMPLATES_TS = "../src/resources/tsconfig-templates.ts";
+const TSCONFIG_TEMPLATES_TS = "../src/resources/embedded-tsconfig.ts";
 const TSCONFIG_DEFAULT_JSON_IN = "tsconfig.cli-application-esm.json";
 const TSCONFIG_DEFAULT_JSON_OUT = "../.launchpad/tsconfig.default.json";
 const INDENT = 4;

@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-echo Building tsconfig.json...
+echo Embedding tsconfig.json...
 
 SOURCE_DIR=../resources/tsconfig/03-compilations
 COMPILATIONS=$(cd "$SOURCE_DIR" && ls tsconfig.*.json)
@@ -15,6 +15,6 @@ for COMPILATION in $COMPILATIONS; do
 done
 
 # shellcheck disable=SC2086
-node build-tsconfig.js $COMPILATIONS
+node embed-tsconfig.js $COMPILATIONS
 
 cd "$OUTPUT_DIR" && rm -f "$COMPILATIONS"

@@ -10,6 +10,7 @@ autorun : tsc;
 # Help
 #-----------------------------------------------------------------------------------------------------------------------
 
+$(call lp.help.add-phony-target, embed, .............. embed resources)
 $(call lp.help.add-phony-target, tsconfig, ........... assemble the tsconfig.json templates)
 $(call lp.help.add-phony-target, version, ............ update version number and copyright years)
 $(call lp.help.add-phony-target, test.init, .......... run debug init)
@@ -23,13 +24,25 @@ $(call lp.help.add-phony-target, test.uplift, ........ run debug uplift)
 
 TSCONFIG_SRC_DIRECTORIES = resources/tsconfig/02-facets resources/tsconfig/03-compilations
 TSCONFIG_SRC_JSON        = $(wildcard $(foreach dir, $(TSCONFIG_SRC_DIRECTORIES), $(dir)/tsconfig*.json))
-TSCONFIG_SRC             = $(TSCONFIG_SRC_DIRECTORIES) $(TSCONFIG_SRC_JSON)
-TSCONFIG_TARGETS         = src/resources/tsconfig-templates.ts .launchpad/tsconfig.default.json
+TSCONFIG_SRC             = $(TSCONFIG_SRC_JSON)
+TSCONFIG_TARGETS         = src/resources/embedded-tsconfig.ts .launchpad/tsconfig.default.json
 
 tsconfig : $(TSCONFIG_TARGETS);
 
-$(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/build-tsconfig.sh  ./bin/build-tsconfig.js
-	./bin/build-tsconfig.sh
+$(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tsconfig.js
+	./bin/embed-tsconfig.sh
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Embed assets
+#-----------------------------------------------------------------------------------------------------------------------
+
+EMBEDDED_ASSETS_SOURCE = $(call lp.fn.wildcard, .launchpad, *)
+EMBEDDED_ASSETS_TARGET = src/resources/embedded-assets.ts
+
+embed : $(EMBEDDED_ASSETS_TARGET)
+
+$(EMBEDDED_ASSETS_TARGET) : $(EMBEDDED_ASSETS_SOURCE) bin/embed-assets.sh  bin/embed-assets.js $(TSCONFIG_TARGETS)
+	./bin/embed-assets.sh $@ $(sort $(patsubst bin/%, ,$^))
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Update version information
@@ -48,6 +61,7 @@ $(UPDATE_VERSION_INFO_TARGETS) : $(UPDATE_VERSION_INFO_SRC)
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.tsc.add-extra-prerequisites, $(TSCONFIG_TARGETS))
+$(call lp.tsc.add-extra-prerequisites, $(EMBEDDED_ASSETS_TARGET))
 $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +76,8 @@ $(call lp.bundle.add-bundle, src/launchpad.ts, dist/launchpad.mjs)
 
 $(call lp.format.exclude, resources/tsconfig/01-default)
 $(call lp.format.exclude, resources/tsconfig/02-facets)
-$(call lp.format.exclude, src/resources/tsconfig-templates.ts)
+$(call lp.format.exclude, src/resources/embedded-assets.ts)
+$(call lp.format.exclude, src/resources/embedded-tsconfig.ts)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Release
