@@ -1,5 +1,5 @@
 import { PINNED_SUFFIX } from "../utilities/constants.js";
-import type { ConfigError } from "./config-data-types.js";
+import { pinned, unpinned, type ConfigError } from "./config-data-types.js";
 import { Version } from "./version-number.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,14 +93,14 @@ export function createIntegerParser<T extends number>(name: string, min: number,
             return source
                 ? error(`"${value}" is not a valid value for ${source} (it must be a number/integer)`)
                 : error(`"${value}" is not a valid ${name} (it must be a number/integer)`);
-        } else if (parsed< min || max < parsed) {
+        } else if (parsed < min || max < parsed) {
             return source
                 ? error(`"${value}" is not a valid value for ${source} (it must be between ${min} and ${max})`)
                 : error(`"${value}" is not a valid ${name} (it must be between ${min} and ${max})`);
         } else {
             return parsed as T;
         }
-    }
+    };
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -130,9 +130,13 @@ export function createPinnableEnumParser<T extends string>(allowedValues: Readon
     const parser = createNonPinnableEnumParser(allowedValues);
     return (value: string, source: string | undefined) => {
         const trimmed = value.trim();
-        const pinned = trimmed.endsWith(PINNED_SUFFIX);
-        const unpinned = parser(pinned ? trimmed.substring(0, trimmed.length - PINNED_SUFFIX.length) : trimmed, source);
-        return "string" === typeof unpinned ? { value: unpinned, pinned } : (unpinned as ConfigError);
+        const isPinned = trimmed.endsWith(PINNED_SUFFIX);
+        const text = parser(isPinned ? trimmed.substring(0, trimmed.length - PINNED_SUFFIX.length) : trimmed, source);
+        if ("string" === typeof text) {
+            return isPinned ? pinned(text) : unpinned(text);
+        } else {
+            return text as ConfigError;
+        }
     };
 }
 

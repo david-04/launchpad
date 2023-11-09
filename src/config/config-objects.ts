@@ -68,8 +68,8 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
 // Datatypes
 //----------------------------------------------------------------------------------------------------------------------
 
-export type OldPartialConfig = ReturnType<typeof assembleConfig>;
-export type OldConfig = ReturnType<typeof validateConfig>;
+export type OldPartialConfig = Exclude<ReturnType<typeof assembleConfig>, undefined>;
+export type OldConfig = Exclude<ReturnType<typeof validateConfig>, undefined>;
 
 type NewConfigType<T extends keyof typeof ConfigProperties.currentAndInitOnly> = Exclude<
     ReturnType<(typeof ConfigProperties.currentAndInitOnly)[T]["parseNewValue"]>,

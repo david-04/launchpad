@@ -15,7 +15,7 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
     migrate({
         canPromptUser: true,
         canRunPackageManagerCommands: true,
-        oldConfig: parsedConfig,
+        oldConfig: parsedConfig?.validated ?? parsedConfig?.partial,
         newConfig,
         projectRoot,
     });

@@ -4,6 +4,27 @@ import { pinned, unpinned } from "../config/config-data-types.js";
 import type { ParsedConfig } from "../config/config-loader.js";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../config/config-objects.js";
 import { ConfigProperties } from "../config/config-properties.js";
+import {
+    DEFAULT_ARTIFACT,
+    DEFAULT_BUILD_DIR,
+    DEFAULT_BUNDLER,
+    DEFAULT_CREATE_DEBUG_MODULE,
+    DEFAULT_CREATE_MAKEFILE,
+    DEFAULT_CREATE_PROJECT_TEMPLATE,
+    DEFAULT_CREATE_VSCODE_SETTINGS,
+    DEFAULT_DEPENDENCIES_CLI,
+    DEFAULT_DEPENDENCIES_WEB,
+    DEFAULT_DIST_DIR,
+    DEFAULT_DTS_BUNDLER,
+    DEFAULT_FORMATTER,
+    DEFAULT_INSTALLATION_MODE,
+    DEFAULT_INSTALL_DEV_DEPENDENCIES,
+    DEFAULT_MODULE_SYSTEM,
+    DEFAULT_PACKAGE_MANAGER,
+    DEFAULT_RUNTIME,
+    DEFAULT_SRC_DIR,
+    DEFAULT_TAB_SIZE,
+} from "../config/default-config-values.js";
 import { VERSION_NUMBER } from "../resources/version-information.js";
 import { DEFAULT_ENUM, type DefaultEnum } from "./constants.js";
 import type { Path } from "./path.js";
@@ -11,11 +32,11 @@ import {
     createDefaultOption,
     findNonPinnableMatchingChoice,
     findPinnableMatchingChoice,
+    forcePinned,
     prompt,
     promptMultiSelect,
     promptYesNo,
     toChoice,
-    toPinned,
     toValidator,
     type ChoiceOptions,
 } from "./prompt.js";
@@ -57,9 +78,19 @@ export async function getNewConfig(
     const dependencies = await getDependencies(presets, { runtime });
     const installDevDependencies = await getInstallDevDependencies(presets);
     const createProjectTemplate = await getCreateProjectTemplate(presets);
-    const createDebugModule = getCreateFile(presets, createProjectTemplate, "createDebugModule", true);
-    const createMakefile = getCreateFile(presets, createProjectTemplate, "createMakefile", true);
-    const createVsCodeSettings = getCreateFile(presets, createProjectTemplate, "createVsCodeSettings", true);
+    const createDebugModule = getCreateFile(
+        presets,
+        createProjectTemplate,
+        "createDebugModule",
+        DEFAULT_CREATE_DEBUG_MODULE
+    );
+    const createMakefile = getCreateFile(presets, createProjectTemplate, "createMakefile", DEFAULT_CREATE_MAKEFILE);
+    const createVsCodeSettings = getCreateFile(
+        presets,
+        createProjectTemplate,
+        "createVsCodeSettings",
+        DEFAULT_CREATE_VSCODE_SETTINGS
+    );
     return {
         artifact,
         bundler,
@@ -137,8 +168,8 @@ async function getProjectName(presets: Presets, projectRoot: Path) {
 async function getArtifact(presets: Presets) {
     const FIELD = "artifact";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = "app";
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const defaultValue = DEFAULT_ARTIFACT;
+    const presetValue = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
@@ -157,7 +188,7 @@ async function getArtifact(presets: Presets) {
 async function getRuntime(presets: Presets): Promise<NewConfig["runtime"]> {
     const FIELD = "runtimeCli";
     type T = CommandLineConfig[typeof FIELD];
-    const preselectedValue: T = "cli";
+    const preselectedValue = DEFAULT_RUNTIME;
     const presetValue = DEFAULT_ENUM === presets.commandLineConfig[FIELD] ? "cli" : presets.commandLineConfig[FIELD];
     const oldValue = runtimeConfigToCli(presets.oldConfig?.["runtime"]);
     if (presetValue) {
@@ -195,8 +226,8 @@ function runtimeCliToConfig(value: Exclude<CommandLineConfig["runtimeCli"], unde
 async function getModule(presets: Presets) {
     const FIELD = "module";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = "esm";
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const defaultValue = DEFAULT_MODULE_SYSTEM;
+    const presetValue = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
@@ -215,8 +246,8 @@ async function getModule(presets: Presets) {
 async function getInstallationMode(presets: Presets) {
     const FIELD = "installationMode";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = "local";
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const defaultValue = DEFAULT_INSTALLATION_MODE;
+    const presetValue = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
@@ -235,12 +266,12 @@ async function getInstallationMode(presets: Presets) {
 async function getBundler(presets: Presets) {
     const FIELD = "bundler";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = unpinned("esbuild");
+    const defaultValue: T = DEFAULT_BUNDLER;
     const preselectedValue: T = pinned("disabled");
     const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
-        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+        return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
@@ -262,11 +293,11 @@ async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
     }
     const FIELD = "dtsBundler";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = unpinned("dts-bundle-generator");
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const defaultValue = DEFAULT_DTS_BUNDLER;
+    const presetValue = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
-        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+        return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
@@ -285,11 +316,11 @@ async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
 async function getFormatter(presets: Presets) {
     const FIELD = "formatter";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = unpinned("prettier");
+    const defaultValue: T = DEFAULT_FORMATTER;
     const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
-        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+        return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
@@ -308,7 +339,7 @@ async function getFormatter(presets: Presets) {
 async function getTabSize(presets: Presets) {
     const FIELD = "tabSize";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = 4;
+    const defaultValue: T = DEFAULT_TAB_SIZE;
     const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
@@ -337,11 +368,11 @@ async function getTabSize(presets: Presets) {
 async function getPackageManager(presets: Presets, config: Pick<NewConfig, "installationMode">) {
     const FIELD = "packageManager";
     type T = NewConfig[typeof FIELD];
-    const defaultValue: T = unpinned("npm");
+    const defaultValue: T = DEFAULT_PACKAGE_MANAGER;
     const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
-        return DEFAULT_ENUM === presetValue ? defaultValue : toPinned(presetValue);
+        return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
@@ -361,7 +392,7 @@ async function getPackageManager(presets: Presets, config: Pick<NewConfig, "inst
 
 async function getSrcDir(presets: Presets) {
     const FIELD = "srcDir";
-    const defaultDirectory = "src";
+    const defaultDirectory = DEFAULT_SRC_DIR;
     const preselectedDirectory = presets.commandLineConfig[FIELD];
     if (preselectedDirectory) {
         return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
@@ -385,7 +416,7 @@ async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" 
         return "";
     }
     const FIELD = "webAppDir";
-    const defaultDirectory = "dist";
+    const defaultDirectory = DEFAULT_DIST_DIR;
     const preselectedDirectory = presets.commandLineConfig[FIELD];
     if (preselectedDirectory) {
         return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
@@ -426,9 +457,9 @@ function getDefaultTscOutDir(
     config: Pick<NewConfig, "projectName" | "runtime" | "bundler" | "dtsBundler" | "webAppDir">
 ) {
     if ("web" === config.runtime.value) {
-        return "disabled" === config.bundler.value ? `${config.webAppDir}/js/${config.projectName}` : "build";
+        return "disabled" === config.bundler.value ? `${config.webAppDir}/js/${config.projectName}` : DEFAULT_BUILD_DIR;
     } else {
-        return "disabled" === config.bundler.value ? "dist" : "build";
+        return "disabled" === config.bundler.value ? DEFAULT_DIST_DIR : DEFAULT_BUILD_DIR;
     }
 }
 
@@ -441,7 +472,8 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
         return "";
     }
     const FIELD = "bundlerOutDir";
-    const defaultDirectory = "web" === config.runtime.value ? `${config.webAppDir}/js` : "dist";
+    const defaultDirectory =
+        "web" === config.runtime.value && config.webAppDir ? `${config.webAppDir}/js` : DEFAULT_DIST_DIR;
     const preselectedDirectory = presets.commandLineConfig[FIELD];
     if (preselectedDirectory) {
         return DEFAULT_ENUM === preselectedDirectory ? defaultDirectory : preselectedDirectory;
@@ -476,7 +508,8 @@ async function getDependencies(presets: Presets, config: Pick<NewConfig, "runtim
 }
 
 function getDependencyOptions(presets: Presets, config: Pick<NewConfig, "runtime">) {
-    const defaultOptionalDependencies = "web" === config.runtime.value ? [] : ["@types/node"];
+    const defaultOptionalDependencies =
+        "web" === config.runtime.value ? DEFAULT_DEPENDENCIES_WEB : DEFAULT_DEPENDENCIES_CLI;
     return toDependencyOptions({
         mandatory: toSet(presets.commandLineConfig.dependencies, []),
         preselected: toSet(presets.commandLineConfig.preselectedDependencies, []),
@@ -519,7 +552,7 @@ async function getInstallDevDependencies(presets: Presets) {
             message: "Install dev dependencies (compiler, bundler, formatter, ...)",
             yesHint: "Install locally",
             noHint: "Rely on globally installed versions",
-            default: true,
+            default: DEFAULT_INSTALL_DEV_DEPENDENCIES,
         });
     }
 }
@@ -540,7 +573,7 @@ async function getCreateProjectTemplate(presets: Presets) {
             message: "Create project template",
             yesHint: "Scaffold a minimal project",
             noHint: "Don't create any source files",
-            default: false,
+            default: DEFAULT_CREATE_PROJECT_TEMPLATE,
         });
     }
 }

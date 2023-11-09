@@ -14,8 +14,8 @@ export type ChoiceOptions<T> = ReadonlyArray<ChoiceOption<T>>;
 // Force-pin an enum value
 //----------------------------------------------------------------------------------------------------------------------
 
-export function toPinned<T>(value: PinnableEnumValue<T>) {
-    return { value: value.value, pinned: true };
+export function forcePinned<T>(value: PinnableEnumValue<T>) {
+    return { value: value.value, pinned: true } as const;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

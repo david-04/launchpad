@@ -1,5 +1,4 @@
-import type { ParsedConfig } from "../../config/config-loader.js";
-import type { NewConfig } from "../../config/config-objects.js";
+import type { NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import type { Path } from "../../utilities/path.js";
 import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
 
@@ -30,7 +29,7 @@ export class MigrationContext {
         projectRoot: Path;
         canRunPackageManagerCommands: boolean;
         canPromptUser: boolean;
-        oldConfig: ParsedConfig | undefined;
+        oldConfig: OldPartialConfig | undefined;
         newConfig: NewConfig;
     }) {
         this.projectRoot = options.projectRoot;
