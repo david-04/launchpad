@@ -42,8 +42,9 @@ function updateLaunchpadSettings(context: MigrationContext) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function updateLaunchpadTsConfigTemplate(context: MigrationContext) {
-    const { artifact, module, runtime } = context.newConfig;
-    const file = `tsconfig.${"node" === runtime.value ? "cli" : runtime.value}-${artifact}-${module}.json` as const;
+    const { artifact, moduleSystem, runtime } = context.newConfig;
+    const normalizedRuntime = "node" === runtime.value ? "cli" : runtime.value;
+    const file = `tsconfig.${normalizedRuntime}-${artifact}-${moduleSystem}.json` as const;
     const tsconfig = TSCONFIG_JSON_TEMPLATES[file];
     const stringified = JSON.stringify(tsconfig, undefined, context.newConfig.tabSize)
         .replaceAll("__SRC_DIR__", normalizeDirectory(context.newConfig.srcDir))

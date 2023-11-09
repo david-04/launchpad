@@ -1,6 +1,8 @@
 import type { NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import type { Path } from "../../utilities/path.js";
+import { PackageJsonOperations } from "../file-operations/package-json-operations.js";
 import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
+import { PACKAGE_JSON } from "./known-files.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Context information that's passed around when initializing and uplifting
@@ -13,12 +15,14 @@ export class MigrationContext {
     public readonly newConfig;
 
     public readonly skippedSteps = new Array<string>();
+    public readonly fileChanges = new Array<string>();
     public readonly errors = new Array<string>();
 
     public readonly preCommands = new Array<string>();
     public readonly files;
     public readonly directories;
     public readonly postCommands = new Array<string>();
+    public readonly fileOperations;
 
     //------------------------------------------------------------------------------------------------------------------
     // Initialization
@@ -44,5 +48,8 @@ export class MigrationContext {
             options.newConfig.tabSize,
             (root, path) => new Directory(root, path)
         );
+        this.fileOperations = {
+            packageJson: new PackageJsonOperations(this.files.get(PACKAGE_JSON)),
+        };
     }
 }

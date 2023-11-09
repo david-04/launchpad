@@ -64,7 +64,7 @@ export async function getNewConfig(
     const projectName = await getProjectName(presets, projectRoot);
     const artifact = await getArtifact(presets);
     const runtime = await getRuntime(presets);
-    const module = await getModule(presets);
+    const moduleSystem = await getModuleSystem(presets);
     const installationMode = await getInstallationMode(presets);
     const bundler = await getBundler(presets);
     const dtsBundler = await getDtsBundler(presets, bundler);
@@ -104,7 +104,7 @@ export async function getNewConfig(
         formatter,
         installationMode,
         installDevDependencies,
-        module,
+        moduleSystem,
         packageManager,
         projectName,
         runtime,
@@ -223,8 +223,8 @@ function runtimeCliToConfig(value: Exclude<CommandLineConfig["runtimeCli"], unde
 // Select the module system
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getModule(presets: Presets) {
-    const FIELD = "module";
+async function getModuleSystem(presets: Presets) {
+    const FIELD = "moduleSystem";
     type T = NewConfig[typeof FIELD];
     const defaultValue = DEFAULT_MODULE_SYSTEM;
     const presetValue = presets.commandLineConfig[FIELD];

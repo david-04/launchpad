@@ -5,13 +5,13 @@
 import type { NewConfig, OldConfig } from "../../config/config-objects.js";
 import { DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
-import { fail } from "../../utilities/fail.js";
-import type { Path } from "../../utilities/path.js";
+import { File } from "../data/file-cache.js";
 import { PACKAGE_JSON } from "../data/known-files.js";
+import { PackageJsonOperations } from "../file-operations/package-json-operations.js";
 import type { MigrateOptions } from "../migrate.js";
 
 export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig, skippedStep: string[]): NewConfig {
-    const packageJson = inspectPackageJson(options.projectRoot);
+    const packageJson = new PackageJsonOperations(new File(options.projectRoot, PACKAGE_JSON, oldConfig.tabSize));
     return {
         artifact: oldConfig.artifact,
         bundler: oldConfig.bundler,
@@ -24,8 +24,8 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         dtsBundler: oldConfig.dtsBundler,
         formatter: oldConfig.formatter,
         installationMode: oldConfig.installationMode,
-        installDevDependencies: packageJson.hasDevDependencies,
-        module: oldConfig.module,
+        installDevDependencies: packageJson.containsTypeScriptDependency(),
+        moduleSystem: oldConfig.moduleSystem,
         packageManager: getPackageManager(oldConfig.packageManager, options.canRunPackageManagerCommands, skippedStep),
         projectName: oldConfig.projectName,
         runtime: oldConfig.runtime,
@@ -35,18 +35,6 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         version: VERSION_NUMBER,
         webAppDir: oldConfig.webAppDir,
     };
-}
-
-function inspectPackageJson(projectRoot: Path) {
-    const path = projectRoot.child(PACKAGE_JSON);
-    try {
-        const packageJson = path.existsAndIsFile() ? JSON.parse(path.loadFileContents()) : {};
-        return {
-            hasDevDependencies: !!(packageJson?.dependencies?.typescript || packageJson?.dependencies?.typescript),
-        };
-    } catch (error) {
-        fail(`Failed to load ${path.path}: ${error}`);
-    }
 }
 
 function getPackageManager(

@@ -19,7 +19,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         dtsBundler: ConfigProperties.dtsBundler.parseOldValue(properties, addError),
         formatter: ConfigProperties.formatter.parseOldValue(properties, addError),
         installationMode: ConfigProperties.installationMode.parseOldValue(properties, addError),
-        module: ConfigProperties.module.parseOldValue(properties, addError),
+        moduleSystem: ConfigProperties.moduleSystem.parseOldValue(properties, addError),
         packageManager: ConfigProperties.packageManager.parseOldValue(properties, addError),
         projectName: ConfigProperties.projectName.parseOldValue(properties, addError),
         runtime: ConfigProperties.runtime.parseOldValue(properties, addError),
@@ -44,7 +44,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             dtsBundler: ConfigProperties.dtsBundler.assertOldValuePresent(config.dtsBundler),
             formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
             installationMode: ConfigProperties.installationMode.assertOldValuePresent(config.installationMode),
-            module: ConfigProperties.module.assertOldValuePresent(config.module),
+            moduleSystem: ConfigProperties.moduleSystem.assertOldValuePresent(config.moduleSystem),
             packageManager: ConfigProperties.packageManager.assertOldValuePresent(config.packageManager),
             projectName: ConfigProperties.projectName.assertOldValuePresent(config.projectName),
             runtime: ConfigProperties.runtime.assertOldValuePresent(config.runtime),
@@ -89,7 +89,7 @@ export type NewConfig = {
     formatter: NewConfigType<"formatter">;
     installationMode: NewConfigType<"installationMode">;
     installDevDependencies: NewConfigType<"installDevDependencies">;
-    module: NewConfigType<"module">;
+    moduleSystem: NewConfigType<"moduleSystem">;
     packageManager: NewConfigType<"packageManager">;
     projectName: NewConfigType<"projectName">;
     runtime: NewConfigType<"runtime">;
@@ -126,7 +126,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         formatter: ConfigProperties.formatter.parseFromCommandLine(properties),
         installationMode: ConfigProperties.installationMode.parseFromCommandLine(properties),
         installDevDependencies: ConfigProperties.installDevDependencies.parseFromCommandLine(properties),
-        module: ConfigProperties.module.parseFromCommandLine(properties),
+        moduleSystem: ConfigProperties.moduleSystem.parseFromCommandLine(properties),
         optionalDependencies: ConfigProperties.optionalDependencies.parseFromCommandLine(properties),
         packageManager: ConfigProperties.packageManager.parseFromCommandLine(properties),
         preselectedDependencies: ConfigProperties.preselectedDependencies.parseFromCommandLine(properties),

@@ -200,11 +200,11 @@ const CURRENT_CONFIG_PROPERTIES = {
     //
     //------------------------------------------------------------------------------------------------------------------
 
-    module: createNonPinnableEnumProperty({
+    moduleSystem: createNonPinnableEnumProperty({
         name: "module system",
         configFile: {
             currentKey: "LP_SETTINGS_MODULE_SYSTEM",
-            newConfigObjectName: "module",
+            newConfigObjectName: "moduleSystem",
         },
         commandLine: {
             option: "--module-system",
