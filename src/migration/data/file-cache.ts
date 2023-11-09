@@ -59,6 +59,10 @@ export class File {
         this.newContents = undefined === json ? json : File.serialize(json, this.tabSize);
     }
 
+    public get exists() {
+        return undefined !== this.originalContents;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Determine the status
     //------------------------------------------------------------------------------------------------------------------
