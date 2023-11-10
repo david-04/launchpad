@@ -1,6 +1,6 @@
 import type { NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import type { Path } from "../../utilities/path.js";
-import { PackageJsonOperations } from "../file-operations/package-json-operations.js";
+import { PackageJsonOperations } from "../files/package-json.js";
 import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
 import { PACKAGE_JSON } from "./known-files.js";
 
@@ -15,7 +15,6 @@ export class MigrationContext {
     public readonly newConfig;
 
     public readonly skippedSteps = new Array<string>();
-    public readonly fileChanges = new Array<string>();
     public readonly errors = new Array<string>();
 
     public readonly preCommands = new Array<string>();

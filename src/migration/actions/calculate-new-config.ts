@@ -1,16 +1,16 @@
-//----------------------------------------------------------------------------------------------------------------------
-// Calculate the target configuration
-//----------------------------------------------------------------------------------------------------------------------
-
 import type { NewConfig, OldConfig } from "../../config/config-objects.js";
 import { DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values.js";
 import { VERSION_NUMBER } from "../../resources/version-information.js";
 import { File } from "../data/file-cache.js";
 import { PACKAGE_JSON } from "../data/known-files.js";
-import { PackageJsonOperations } from "../file-operations/package-json-operations.js";
+import { PackageJsonOperations } from "../files/package-json.js";
 import type { MigrateOptions } from "../migrate.js";
 
-export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig, skippedStep: string[]): NewConfig {
+//----------------------------------------------------------------------------------------------------------------------
+// Calculate the target configuration
+//----------------------------------------------------------------------------------------------------------------------
+
+export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig, skippedSteps: string[]): NewConfig {
     const packageJson = new PackageJsonOperations(new File(options.projectRoot, PACKAGE_JSON, oldConfig.tabSize));
     return {
         artifact: oldConfig.artifact,
@@ -26,7 +26,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         installationMode: oldConfig.installationMode,
         installDevDependencies: packageJson.containsTypeScriptDependency(),
         moduleSystem: oldConfig.moduleSystem,
-        packageManager: getPackageManager(oldConfig.packageManager, options.canRunPackageManagerCommands, skippedStep),
+        packageManager: calculateNewPackageManager(options, oldConfig, skippedSteps),
         projectName: oldConfig.projectName,
         runtime: oldConfig.runtime,
         srcDir: oldConfig.srcDir,
@@ -37,12 +37,18 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
     };
 }
 
-function getPackageManager(
-    oldPackageManager: OldConfig["packageManager"],
-    canRunPackageManagerCommands: boolean,
+//----------------------------------------------------------------------------------------------------------------------
+// Calculate the
+//----------------------------------------------------------------------------------------------------------------------
+
+function calculateNewPackageManager(
+    options: MigrateOptions,
+    oldConfig: OldConfig,
     skippedSteps: string[]
 ): NewConfig["packageManager"] {
-    const defaultPackageManager: NewConfig["packageManager"] = DEFAULT_PACKAGE_MANAGER;
+    const oldPackageManager = oldConfig.packageManager;
+    const canRunPackageManagerCommands = options.canRunPackageManagerCommands;
+    const defaultPackageManager = DEFAULT_PACKAGE_MANAGER;
     if (oldPackageManager.pinned || oldPackageManager.value === defaultPackageManager.value) {
         return oldPackageManager;
     } else if (

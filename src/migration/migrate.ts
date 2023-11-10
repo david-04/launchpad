@@ -1,6 +1,7 @@
 import type { NewConfig, OldConfig, OldPartialConfig } from "../config/config-objects.js";
 import { calculateNewConfig } from "./actions/calculate-new-config.js";
 import { updateLaunchpadDirectory } from "./actions/update-launchpad-directory.js";
+import { updatePackageJson } from "./actions/update-package-json.js";
 import { MigrationContext } from "./data/migration-context.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -23,7 +24,6 @@ export function migrate(options: MigrateOptions) {
     const context = new MigrationContext({ ...options, newConfig });
     context.skippedSteps.push(...skippedSteps);
 
+    updatePackageJson(context);
     updateLaunchpadDirectory(context);
-
-    console.log(context);
 }
