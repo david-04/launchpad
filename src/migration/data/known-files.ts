@@ -9,6 +9,7 @@ export const MAKEFILE = "Makefile";
 export const NODE_MODULES = "node-modules";
 export const PACKAGE_JSON = "package.json";
 export const PACKAGE_LOCK_JSON = "package-lock.json";
+export const TSBUILDINFO = ".tsbuildinfo";
 export const TSCONFIG_JSON = "tsconfig.json";
 export const VSCODE = ".vscode";
 export const VSCODE_SETTINGS_JSON = `${VSCODE}/settings.json`;

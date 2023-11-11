@@ -1,30 +1,30 @@
 import type { File } from "../data/file-cache.js";
 
 //----------------------------------------------------------------------------------------------------------------------
+// Data types
+//----------------------------------------------------------------------------------------------------------------------
+
+interface DestructuredLine {
+    readonly original: string,
+    readonly normalized: string;
+    readonly glob: string;
+    readonly pattern: string;
+    readonly isCommentedOut: boolean;
+    readonly isNegated: boolean;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Wrapper for the package.json file
 //----------------------------------------------------------------------------------------------------------------------
 
 export class GitignoreOperations {
-    //
+    private static readonly CACHE = new Map<string, DestructuredLine>();
+
     //------------------------------------------------------------------------------------------------------------------
     // Initialization
     //------------------------------------------------------------------------------------------------------------------
 
     public constructor(public readonly file: File) {}
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Check if an entry exists
-    //------------------------------------------------------------------------------------------------------------------
-
-    private destructure(line: string) {
-        const trimmed = line.trim();
-        const isCommentedOut = trimmed.startsWith("#");
-        const isNegated = trimmed.match(/^#?\s*!/);
-        const glob = trimmed.replace(/^#?\s*!/, "");
-        const pattern = `${isNegated ? "!" : ""}${glob}`;
-        const normalized = `${isCommentedOut ? "# " : ""}${pattern}`;
-        return { original: line, normalized, glob, pattern, isCommentedOut, isNegated };
-    }
 
     //------------------------------------------------------------------------------------------------------------------
     // Getters and setters
@@ -38,25 +38,68 @@ export class GitignoreOperations {
         this.file.lines = lines.length ? lines : undefined;
     }
 
-    public add(pattern: string) {
-        const stringifiedLinesBeforeAdd = JSON.stringify(this.lines);
-        const normalizedPattern = this.destructure(pattern).normalized;
-        this.lines = this.lines
-            .map(line => this.destructure(line))
-            .map(line => (line.pattern === normalizedPattern && line.isCommentedOut ? line.pattern : line.original));
-        if (!this.lines.map(line => this.destructure(line)).some(line => line.normalized === normalizedPattern)) {
-            this.lines = [...this.lines, normalizedPattern];
+    //------------------------------------------------------------------------------------------------------------------
+    // Destructure/normalize a pattern
+    //------------------------------------------------------------------------------------------------------------------
+
+    private destructure(line: string) {
+        if (GitignoreOperations.CACHE.has(line)) {
+            return GitignoreOperations.CACHE.get(line)!;
         }
-        return stringifiedLinesBeforeAdd === JSON.stringify(this.lines);
+        const trimmed = line.trim();
+        const isCommentedOut = trimmed.startsWith("#");
+        const isNegated = !!trimmed.match(/^#?\s*!/);
+        const glob = trimmed.replace(/^#?\s*!/, "");
+        const pattern = `${isNegated ? "!" : ""}${glob}`;
+        const normalized = `${isCommentedOut ? "# " : ""}${pattern}`;
+        const result = { original: line, normalized, glob, pattern, isCommentedOut, isNegated } as const;
+        GitignoreOperations.CACHE.set(line, result);
+        return result;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Check if a pattern exists
+    //------------------------------------------------------------------------------------------------------------------
+
+    public containsActiveOrCommentedOut(pattern: string) {
+        return this.containsActive(pattern) || this.containsCommentedOut(pattern);
+    }
+
+    public containsCommentedOut(pattern: string) {
+        return this.lines.some(line => this.matches(line, "commented-out", pattern));
+    }
+
+    public containsActive(pattern: string) {
+        return this.lines.some(line => this.matches(line, "active", pattern));
+    }
+
+    private matches(line: string, type: "active" | "commented-out", pattern: string) {
+        const normalizedLine = this.destructure(line);
+        return (
+            normalizedLine.isCommentedOut === (type === "commented-out") &&
+            normalizedLine.normalized === this.destructure(pattern).normalized
+        );
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Add and remove patterns
+    //------------------------------------------------------------------------------------------------------------------
+
+    public add(pattern: string) {
+        if (this.containsActive(pattern)) {
+            return false;
+        } else {
+            this.lines = [...this.lines, this.destructure(pattern).normalized];
+            return true;
+        }
     }
 
     public remove(pattern: string) {
-        const stringifiedLinesBeforeRemove = JSON.stringify(this.lines);
-        const normalizedPattern = this.destructure(pattern).normalized;
-        this.lines = this.lines
-            .map(line => this.destructure(line))
-            .filter(line => line.normalized !== normalizedPattern)
-            .map(line => line.original);
-        return stringifiedLinesBeforeRemove === JSON.stringify(this.lines);
+        if (this.containsActive(pattern)) {
+            this.lines = this.lines.filter(line => this.matches(line, "active", pattern));
+            return true;
+        } else {
+            return false;
+        }
     }
 }

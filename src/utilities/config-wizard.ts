@@ -3,6 +3,7 @@ import type { Choice } from "prompts";
 import { pinned, unpinned } from "../config/config-data-types.js";
 import type { ParsedConfig } from "../config/config-loader.js";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../config/config-objects.js";
+import { createDirectoryParser } from "../config/config-parsers.js";
 import { ConfigProperties } from "../config/config-properties.js";
 import {
     DEFAULT_ARTIFACT,
@@ -484,7 +485,7 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
             initial: previousValue?.trim() || defaultDirectory,
             message: "Bundler output directory",
             format: input => input.trim(),
-            validate: toValidator(ConfigProperties[FIELD].parseNewValue),
+            validate: toValidator(createDirectoryParser("Bundler output directory", "mandatory")),
         });
     }
 }

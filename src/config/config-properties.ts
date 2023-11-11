@@ -94,8 +94,8 @@ const CURRENT_CONFIG_PROPERTIES = {
             placeholder: "<DIR>",
             description: "Bundler output directory",
         },
-        parseOldValue: createDirectoryParser("Bundler output directory", "optional"),
-        parseNewValue: createDirectoryParser("Bundler output directory", "optional"),
+        parseOldValue: createDirectoryParser("bundler output directory", "optional"),
+        parseNewValue: createDirectoryParser("bundler output directory", "optional"),
     }),
 
     //------------------------------------------------------------------------------------------------------------------
