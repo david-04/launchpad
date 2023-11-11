@@ -5,6 +5,7 @@ import { updateLaunchpadDirectory } from "./actions/update-launchpad-directory.j
 import { updatePackageJson } from "./actions/update-package-json.js";
 import { updatePackageManagerFiles } from "./actions/update-package-manager-files.js";
 import { updateTsconfigJson } from "./actions/update-tsconfig-json.js";
+import { updateVsCodeSettings } from "./actions/update-vscode-settings.js";
 import { MigrationContext, type MigrationContextOptions } from "./data/migration-context.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -31,6 +32,9 @@ export function migrate(options: MigrateOptions) {
     updatePackageJson(context);
     updatePackageManagerFiles(context);
     updateTsconfigJson(context);
+    updateVsCodeSettings(context);
 
     // project template + Makefile + debug module
+
+    // yarn set version latest => npm|yarn|pnpm|bun install/upgrade all
 }

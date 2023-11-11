@@ -2,8 +2,9 @@ import type { NewConfig, OldPartialConfig } from "../../config/config-objects.js
 import type { Path } from "../../utilities/path.js";
 import { GitignoreOperations } from "../files/gitignore.js";
 import { PackageJsonOperations } from "../files/package-json.js";
+import { VSCodeSettingsOperations } from "../files/vscode-settings.js";
 import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
-import { GITIGNORE, PACKAGE_JSON } from "./known-files.js";
+import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
@@ -54,8 +55,9 @@ export class MigrationContext {
             (root, path) => new Directory(root, path)
         );
         this.fileOperations = {
-            packageJson: new PackageJsonOperations(this.files.get(PACKAGE_JSON)),
             gitignore: new GitignoreOperations(this.files.get(GITIGNORE)),
+            packageJson: new PackageJsonOperations(this.files.get(PACKAGE_JSON)),
+            vscodeSettings: new VSCodeSettingsOperations(this.files.get(VSCODE_SETTINGS_JSON)),
         };
         this.skippedSteps.push(...options.skippedSteps);
     }
