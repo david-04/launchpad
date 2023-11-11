@@ -11,6 +11,7 @@ export function updatePackageJson(context: MigrationContext) {
     updatePackageJsonDevDependencies(context, packageJson);
     updatePackageJsonRuntimeDependencies(context, packageJson);
     updatePackageJsonPrettierConfiguration(context, packageJson);
+    updatePackageJsonPinnedPackageManager(context, packageJson);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,11 +80,17 @@ function addAndRemoveDevDependencies<const T extends string>(
     }
     if (installDevDependencies) {
         map[configuredValue]?.forEach(dependency => {
-            packageJson.addDevDependencyIfNotExists(dependency, "*");
+            if (packageJson.addDevDependencyIfNotExists(dependency, "*")) {
+                packageJson.file.logAdded(dependency);
+            }
             toRemove.delete(dependency);
         });
     }
-    toRemove.forEach(dependency => packageJson.removeDependencyIfExists(dependency));
+    toRemove.forEach(dependency => {
+        if (packageJson.removeDependencyIfExists(dependency)) {
+            packageJson.file.logRemoved(dependency);
+        }
+    });
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,7 +98,11 @@ function addAndRemoveDevDependencies<const T extends string>(
 //----------------------------------------------------------------------------------------------------------------------
 
 function updatePackageJsonRuntimeDependencies(context: MigrationContext, packageJson: PackageJsonOperations) {
-    context.newConfig.dependencies.forEach(dependency => packageJson.addDependencyIfNotExists(dependency, "*"));
+    context.newConfig.dependencies.forEach(dependency => {
+        if (packageJson.addDependencyIfNotExists(dependency, "*")) {
+            packageJson.file.logAdded(dependency);
+        }
+    });
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -139,4 +150,17 @@ function updatePackageJsonPrettierProperty<T extends keyof PackageJsonPrettier>(
     } else {
         return false;
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Update packager manager pins
+//----------------------------------------------------------------------------------------------------------------------
+
+function updatePackageJsonPinnedPackageManager(context: MigrationContext, packageJson: PackageJsonOperations) {
+    const settings = {
+        npm: { swpm: "npm" },
+        pnpm: { swpm: "pnpm" },
+        yarn: { swpm: "yarn@berry" },
+    } as const;
+    packageJson.json = { ...packageJson.json, ...settings[context.newConfig.packageManager.value] };
 }

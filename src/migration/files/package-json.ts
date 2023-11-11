@@ -17,6 +17,7 @@ export type PackageJson = PackageJsonObject & {
     readonly scripts?: { readonly [index: string]: string };
     readonly type?: "module" | "commonjs";
     readonly version?: string;
+    readonly swpm?: "npm" | "yarn" | "yarn@berry" | "pnpm" | "bun";
 };
 
 export type PackageJsonPrettier = {

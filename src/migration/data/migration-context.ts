@@ -30,10 +30,8 @@ export class MigrationContext {
     public readonly skippedSteps = new Array<string>();
     public readonly errors = new Array<string>();
 
-    public readonly preCommands = new Array<string>();
     public readonly files;
     public readonly directories;
-    public readonly postCommands = new Array<string>();
     public readonly fileOperations;
 
     //------------------------------------------------------------------------------------------------------------------
