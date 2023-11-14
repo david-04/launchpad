@@ -85,6 +85,13 @@ $(call lp.bundle.get-command-with-hooks  , Format... ) # get the command with al
 $(call lp.bundle.get-default-command     , Format... ) # get the built-in command (with an optional "echo")
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Run
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.run, build/main.js ) param1 param2           # run a compiled (or bundled) command-line script
+$(call lp.run, src/main.ts   ) param1 param2           # run a source file (e.g. via ts-node or bun)
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Clean
 #-----------------------------------------------------------------------------------------------------------------------
 

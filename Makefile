@@ -102,17 +102,14 @@ $(call lp.clean.bundles)
 # Run
 #-----------------------------------------------------------------------------------------------------------------------
 
-# run : $(LP_TSC_TARGETS)
-# 	node build/bin/launchpad-postinstall.js
-
 test.help : run-test.help;
 test.init : run-test.init;
 test.postinstall : run-test.postinstall;
 test.uplift : run-test.uplift;
 
-run-test.% :  $(LP_TSC_TARGETS)
+run-test.% : $(LP_TSC_TARGETS)
 	echo Running launchpad $*...
-	ts-node-esm build/test.js $*
+	$(call lp.run, build/test.js) $*
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets
