@@ -1,5 +1,8 @@
 import type { NewConfig, OldConfig, OldPartialConfig } from "../config/config-objects.js";
 import { calculateNewConfig } from "./actions/calculate-new-config.js";
+import { createDebugModule } from "./actions/create-debug-module.js";
+import { createMakefile } from "./actions/create-makefile.js";
+import { createProjectTemplate } from "./actions/create-project-template.js";
 import { updateGitignore } from "./actions/update-gitignore.js";
 import { updateLaunchpadDirectory } from "./actions/update-launchpad-directory.js";
 import { updatePackageJson } from "./actions/update-package-json.js";
@@ -34,7 +37,9 @@ export function migrate(options: MigrateOptions) {
     updateTsconfigJson(context);
     updateVsCodeSettings(context);
 
-    // project template + Makefile + debug module
+    createProjectTemplate(context);
+    createDebugModule(context);
+    createMakefile(context);
 
     // yarn set version latest => npm|yarn|pnpm|bun install/upgrade all
 }

@@ -36,13 +36,13 @@ $(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tscon
 # Embed assets
 #-----------------------------------------------------------------------------------------------------------------------
 
-EMBEDDED_ASSETS_SOURCE = $(call lp.fn.wildcard, .launchpad, *)
+EMBEDDED_ASSETS_SOURCE = $(call lp.fn.wildcard, .launchpad resources/templates, *)
 EMBEDDED_ASSETS_TARGET = src/resources/embedded-assets.ts
 
 embed : $(EMBEDDED_ASSETS_TARGET)
 
 $(EMBEDDED_ASSETS_TARGET) : $(EMBEDDED_ASSETS_SOURCE) bin/embed-assets.sh  bin/embed-assets.js $(TSCONFIG_TARGETS)
-	./bin/embed-assets.sh $@ $(sort $(patsubst bin/%, ,$^))
+	./bin/embed-assets.sh $@ $(sort $(patsubst bin/%, ,$(EMBEDDED_ASSETS_SOURCE)))
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Update version information

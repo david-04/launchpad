@@ -35,6 +35,8 @@ export class MigrationContext {
     public readonly directories;
     public readonly fileOperations;
 
+    public readonly mainModule;
+
     //------------------------------------------------------------------------------------------------------------------
     // Initialization
     //------------------------------------------------------------------------------------------------------------------
@@ -60,5 +62,6 @@ export class MigrationContext {
             vscodeSettings: new VSCodeSettingsOperations(this.files.get(VSCODE_SETTINGS_JSON)),
         };
         this.skippedSteps.push(...options.skippedSteps);
+        this.mainModule = `${options.newConfig.srcDir}/${options.newConfig.projectName}`;
     }
 }
