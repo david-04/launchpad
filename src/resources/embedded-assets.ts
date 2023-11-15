@@ -967,7 +967,7 @@ export const ASSETS = {
         "    </body>",
         "</html>",
         "",
-        "<script src=\"__JAVASCRIPT__\" charset=\"utf-8\" type=\"text/javascript\">",
+        "__IMPORT_JAVASCRIPT__",
         "",
     ].join("\n"),
 } as const;

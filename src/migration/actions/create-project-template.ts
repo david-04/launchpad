@@ -42,16 +42,16 @@ function createProjectTemplateWebHtml(context: MigrationContext) {
     if (!html.exists) {
         const contents = ASSETS["resources/templates/index.html"]
             .replaceAll("__PROJECT_NAME__", context.newConfig.projectName)
-            .replaceAll("__JAVASCRIPT__", getJsPath(context));
+            .replaceAll("__IMPORT_JAVASCRIPT__", getScriptTag(context));
         html.contents = adjustTabSize(contents, 4, context.newConfig.tabSize);
     }
 }
 
-function createProjectTemplateWebCss(context: MigrationContext) {
-    const css = context.files.get(`${context.newConfig.webAppDir}/index.css`);
-    if (!css.exists) {
-        css.contents = adjustTabSize(ASSETS["resources/templates/index.css"], 4, context.newConfig.tabSize);
-    }
+function getScriptTag(context: MigrationContext) {
+    const path = getJsPath(context);
+    return "esm" === context.newConfig.moduleSystem
+        ? `<script src="${path}" charset="utf-8" type="module"></script>`
+        : `<script src="${path}" charset="utf-8"></script>`;
 }
 
 function getJsPath(context: MigrationContext) {
@@ -60,4 +60,11 @@ function getJsPath(context: MigrationContext) {
     const jsDir = usesBundler ? context.newConfig.bundlerOutDir : context.newConfig.tscOutDir;
     const htmlDir = context.newConfig.webAppDir;
     return htmlDir === jsDir ? fileName : `${path.relative(htmlDir, jsDir)}/${fileName}`;
+}
+
+function createProjectTemplateWebCss(context: MigrationContext) {
+    const css = context.files.get(`${context.newConfig.webAppDir}/index.css`);
+    if (!css.exists) {
+        css.contents = adjustTabSize(ASSETS["resources/templates/index.css"], 4, context.newConfig.tabSize);
+    }
 }
