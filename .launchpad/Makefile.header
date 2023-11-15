@@ -153,11 +153,8 @@ $(call lp.fn.config.validate-enum, LP_SETTINGS_FORMATTER)
 LP_SETTINGS_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_PACKAGE_MANAGER)
 
-LP_SETTINGS_INSTALLATION_MODE_ENUMS="local", "temp", "global-auto-update" or "global"
+LP_SETTINGS_INSTALLATION_MODE_ENUMS="local", "temp", "bunx", "npx", "pnpm-dlx" or "yarn-dlx"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_INSTALLATION_MODE)
-ifeq "$(LP_SETTINGS_PACKAGE_MANAGER)-$(LP_SETTINGS_INSTALLATION_MODE)" "yarn-global-auto-update"
-    $(call lp.fn.config.fail, LP_SETTINGS_PACKAGE_MANAGER=yarn can't be combined with LP_SETTINGS_INSTALLATION_MODE=global-auto-update)
-endif
 
 $(call lp.fn.config.normalize.string, LP_SETTINGS_SRC_DIR)
 $(call lp.fn.config.assert.not-empty, LP_SETTINGS_SRC_DIR)

@@ -182,8 +182,10 @@ const CURRENT_CONFIG_PROPERTIES = {
         currentValues: [
             ["local", "install locally within the project"],
             ["global", "use a globally installed version but don't update it during uplifts"],
-            ["global-auto-update", "use a globally installed version and update it during uplifts"],
-            ["temp", "don't install launchpad, use npx/yarn dlx/pnpm exec/bunx"],
+            ["bunx", "temporary installation via bunx"],
+            ["npx", "temporary installation via npx"],
+            ["pnpm-dlx", "temporary installation via pnpm dlx"],
+            ["yarn-dlx", "temporary installation via yarn dlx"],
         ] as const,
         obsoleteValues: [] as const,
     }),
