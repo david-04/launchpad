@@ -177,12 +177,12 @@ const CURRENT_CONFIG_PROPERTIES = {
         commandLine: {
             option: "--installation-mode",
             description: "Location of the the launchpad npm package",
-            placeholder: "[local | global | global-auto-update | temp]",
+            placeholder: "[local | global | temp | npx | pnpm-dlx | yarn-dlx]",
         },
         currentValues: [
             ["local", "install locally within the project"],
-            ["global", "use a globally installed version but don't update it during uplifts"],
-            ["bunx", "temporary installation via bunx"],
+            ["global", "use a globally installed version (needs to be kept up-to-date manually)"],
+            ["temp", "temporary installation via this project's package manager"],
             ["npx", "temporary installation via npx"],
             ["pnpm-dlx", "temporary installation via pnpm dlx"],
             ["yarn-dlx", "temporary installation via yarn dlx"],
@@ -243,8 +243,8 @@ const CURRENT_CONFIG_PROPERTIES = {
         },
         currentValues: [
             ["npm", undefined],
-            ["pnpm", "must be installed globally"],
-            ["yarn", "modern Yarn without plug-and-play (classic Yarn must be installed globally)"],
+            ["pnpm", "use globally pre-installed pnpm"],
+            ["yarn", "localyl installed Yarn without Plug'n'Play (requires a globally pre-installed Yarn Classic)"],
         ] as const,
         obsoleteValues: [] as const,
     }),

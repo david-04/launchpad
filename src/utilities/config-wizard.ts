@@ -71,7 +71,7 @@ export async function getNewConfig(
     const dtsBundler = await getDtsBundler(presets, bundler);
     const formatter = await getFormatter(presets);
     const tabSize = await getTabSize(presets);
-    const packageManager = await getPackageManager(presets, { installationMode });
+    const packageManager = await getPackageManager(presets);
     const srcDir = await getSrcDir(presets);
     const webAppDir = await getWebAppDir(presets, { runtime, artifact });
     const tscOutDir = await getTscOutDir(presets, { projectName, runtime, bundler, dtsBundler, webAppDir });
@@ -366,7 +366,7 @@ async function getTabSize(presets: Presets) {
 // Select the package manager
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getPackageManager(presets: Presets, config: Pick<NewConfig, "installationMode">) {
+async function getPackageManager(presets: Presets) {
     const FIELD = "packageManager";
     type T = NewConfig[typeof FIELD];
     const defaultValue: T = DEFAULT_PACKAGE_MANAGER;
@@ -377,9 +377,7 @@ async function getPackageManager(presets: Presets, config: Pick<NewConfig, "inst
     } else {
         const options: ChoiceOptions<T> = [
             createDefaultOption(defaultValue.value),
-            ...ConfigProperties[FIELD].options
-                .filter(option => config.installationMode !== "global-auto-update" || option[0] === "yarn")
-                .map(array => [...array, pinned(array[0])] as const),
+            ...ConfigProperties[FIELD].options.map(array => [...array, pinned(array[0])] as const),
         ];
         const choices = toChoice(options);
         const initial = findPinnableMatchingChoice(options, oldValue, defaultValue);

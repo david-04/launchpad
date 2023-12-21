@@ -153,7 +153,7 @@ $(call lp.fn.config.validate-enum, LP_SETTINGS_FORMATTER)
 LP_SETTINGS_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_PACKAGE_MANAGER)
 
-LP_SETTINGS_INSTALLATION_MODE_ENUMS="local", "temp", "bunx", "npx", "pnpm-dlx" or "yarn-dlx"
+LP_SETTINGS_INSTALLATION_MODE_ENUMS="local", "global", "temp", "npx", "pnpm-dlx" or "yarn-dlx"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_INSTALLATION_MODE)
 
 $(call lp.fn.config.normalize.string, LP_SETTINGS_SRC_DIR)
