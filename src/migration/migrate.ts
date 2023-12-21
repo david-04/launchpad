@@ -15,7 +15,7 @@ import { MigrationContext, type MigrationContextOptions } from "./data/migration
 // Data types
 //----------------------------------------------------------------------------------------------------------------------
 
-export type MigrateOptions = Omit<MigrationContextOptions, "oldConfig" | "newConfig" | "skippedSteps"> &
+export type MigrateOptions = Omit<MigrationContextOptions, "oldConfig" | "newConfig"> &
     (
         | { oldConfig: OldPartialConfig | undefined; newConfig: NewConfig }
         | { oldConfig: OldConfig; newConfig: undefined }
@@ -26,9 +26,8 @@ export type MigrateOptions = Omit<MigrationContextOptions, "oldConfig" | "newCon
 //----------------------------------------------------------------------------------------------------------------------
 
 export function migrate(options: MigrateOptions) {
-    const skippedSteps = new Array<string>();
-    const newConfig = options.newConfig ?? calculateNewConfig(options, options.oldConfig, skippedSteps);
-    const context = new MigrationContext({ ...options, newConfig, skippedSteps });
+    const newConfig = options.newConfig ?? calculateNewConfig(options, options.oldConfig);
+    const context = new MigrationContext({ ...options, newConfig });
 
     updateGitignore(context);
     updateLaunchpadDirectory(context);

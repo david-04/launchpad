@@ -13,7 +13,6 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
     const commandLineConfig = parseCommandLineOptions(options);
     const newConfig = await getNewConfig(projectRoot, parsedConfig, commandLineConfig);
     migrate({
-        canRunPackageManagerCommands: true,
         oldConfig: parsedConfig?.validated ?? parsedConfig?.partial,
         newConfig,
         projectRoot,

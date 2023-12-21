@@ -12,10 +12,8 @@ import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files.js"
 
 export type MigrationContextOptions = {
     projectRoot: Path;
-    canRunPackageManagerCommands: boolean;
     oldConfig: OldPartialConfig | undefined;
     newConfig: NewConfig;
-    skippedSteps: ReadonlyArray<string>;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -24,11 +22,9 @@ export type MigrationContextOptions = {
 
 export class MigrationContext {
     public readonly projectRoot;
-    public readonly canRunPackageManagerCommands;
     public readonly oldConfig;
     public readonly newConfig;
 
-    public readonly skippedSteps = new Array<string>();
     public readonly errors = new Array<string>();
 
     public readonly files;
@@ -43,7 +39,6 @@ export class MigrationContext {
 
     public constructor(options: MigrationContextOptions) {
         this.projectRoot = options.projectRoot;
-        this.canRunPackageManagerCommands = options.canRunPackageManagerCommands;
         this.oldConfig = options.oldConfig;
         this.newConfig = options.newConfig;
         this.files = new FileOrDirectoryCache(
@@ -61,7 +56,6 @@ export class MigrationContext {
             packageJson: new PackageJsonOperations(this.files.get(PACKAGE_JSON)),
             vscodeSettings: new VSCodeSettingsOperations(this.files.get(VSCODE_SETTINGS_JSON)),
         };
-        this.skippedSteps.push(...options.skippedSteps);
         this.mainModule = `${options.newConfig.srcDir}/${options.newConfig.projectName}`;
     }
 }

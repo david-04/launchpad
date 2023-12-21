@@ -1,5 +1,4 @@
 import { init } from "./commands/init.js";
-import { postinstall } from "./commands/postinstall.js";
 import { uplift } from "./commands/uplift.js";
 import { ConfigProperties } from "./config/config-properties.js";
 import { VERSION_NUMBER } from "./resources/version-information.js";
@@ -16,12 +15,6 @@ const COMMANDS = [
         help: "init .......... initialize a new project or re-configure an existing one",
         getProjectRootDirectory: () => process.cwd(),
         execute: init,
-    },
-    {
-        name: "postinstall",
-        help: "",
-        getProjectRootDirectory: () => process.env["INIT_CWD"] ?? process.cwd(),
-        execute: postinstall,
     },
     {
         name: "uplift",

@@ -10,7 +10,7 @@ import type { MigrateOptions } from "../migrate.js";
 // Calculate the target configuration
 //----------------------------------------------------------------------------------------------------------------------
 
-export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig, skippedSteps: string[]): NewConfig {
+export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig): NewConfig {
     const packageJson = new PackageJsonOperations(new File(options.projectRoot, PACKAGE_JSON, oldConfig.tabSize));
     return {
         artifact: oldConfig.artifact,
@@ -26,7 +26,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         installationMode: oldConfig.installationMode,
         installDevDependencies: packageJson.containsTypeScriptDependency(),
         moduleSystem: oldConfig.moduleSystem,
-        packageManager: calculateNewPackageManager(options, oldConfig, skippedSteps),
+        packageManager: calculateNewPackageManager(oldConfig),
         projectName: oldConfig.projectName,
         runtime: oldConfig.runtime,
         srcDir: oldConfig.srcDir,
@@ -41,21 +41,10 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
 // Calculate the
 //----------------------------------------------------------------------------------------------------------------------
 
-function calculateNewPackageManager(
-    options: MigrateOptions,
-    oldConfig: OldConfig,
-    skippedSteps: string[]
-): NewConfig["packageManager"] {
+function calculateNewPackageManager(oldConfig: OldConfig): NewConfig["packageManager"] {
     const oldPackageManager = oldConfig.packageManager;
-    const canRunPackageManagerCommands = options.canRunPackageManagerCommands;
     const defaultPackageManager = DEFAULT_PACKAGE_MANAGER;
     if (oldPackageManager.pinned || oldPackageManager.value === defaultPackageManager.value) {
-        return oldPackageManager;
-    } else if (
-        [oldPackageManager.value, defaultPackageManager.value].includes("yarn") &&
-        !canRunPackageManagerCommands
-    ) {
-        skippedSteps.push(`Switch package manger from ${oldPackageManager.value} to ${defaultPackageManager.value}`);
         return oldPackageManager;
     } else {
         return defaultPackageManager;
