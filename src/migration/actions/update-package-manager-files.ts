@@ -8,13 +8,14 @@ export function updatePackageManagerFiles(context: MigrationContext) {
     configurePackageManagerFilesNpm(context);
     configurePackageManagerFilesYarn(context);
     configurePackageManagerFilesPnpm(context);
+    context.directories.get("node_modules/.ignored").delete();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // npm
 //----------------------------------------------------------------------------------------------------------------------
 
-export function configurePackageManagerFilesNpm(context: MigrationContext) {
+function configurePackageManagerFilesNpm(context: MigrationContext) {
     if ("npm" !== context.newConfig.packageManager.value) {
         context.files.get(".npmrc").delete();
         context.files.get("package-lock.json").delete();
@@ -25,7 +26,7 @@ export function configurePackageManagerFilesNpm(context: MigrationContext) {
 // pnpm
 //----------------------------------------------------------------------------------------------------------------------
 
-export function configurePackageManagerFilesPnpm(context: MigrationContext) {
+function configurePackageManagerFilesPnpm(context: MigrationContext) {
     if ("pnpm" !== context.newConfig.packageManager.value) {
         context.files.get(".npmrc").delete();
         context.files.get("pnpm-lock.yaml").delete();
@@ -36,7 +37,7 @@ export function configurePackageManagerFilesPnpm(context: MigrationContext) {
 // Yarn
 //----------------------------------------------------------------------------------------------------------------------
 
-export function configurePackageManagerFilesYarn(context: MigrationContext) {
+function configurePackageManagerFilesYarn(context: MigrationContext) {
     if ("yarn" !== context.newConfig.packageManager.value) {
         context.directories.get(".yarn").delete();
         context.files.get(".yarnrc.yml").delete();

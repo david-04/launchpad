@@ -11,7 +11,10 @@ export type PackageJsonArray = Array<PackageJsonValue | PackageJsonObject | Pack
 export type PackageJson = PackageJsonObject & {
     readonly dependencies?: { readonly [index: string]: string };
     readonly devDependencies?: { readonly [index: string]: string };
+    readonly peerDependencies?: { readonly [index: string]: string };
+    readonly optionalDependencies?: { readonly [index: string]: string };
     readonly name?: string;
+    readonly packageManager?: string;
     readonly prettier?: PackageJsonPrettier;
     readonly private?: boolean;
     readonly scripts?: { readonly [index: string]: string };

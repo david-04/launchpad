@@ -19,4 +19,5 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
         newConfig,
         projectRoot,
     });
+    console.log("✅ Successfully initialized the project");
 }

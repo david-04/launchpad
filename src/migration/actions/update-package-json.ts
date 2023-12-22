@@ -22,6 +22,7 @@ function updatePackageJsonGeneralMetadata(context: MigrationContext, packageJson
     updatePackageJsonName(context, packageJson);
     updatePackageJsonVersion(packageJson);
     updatePackageJsonPrivate(packageJson);
+    updatePackageJsonLicense(packageJson);
     updatePackageJsonModule(context, packageJson);
 }
 
@@ -43,6 +44,13 @@ function updatePackageJsonPrivate(packageJson: PackageJsonOperations) {
     if (!("private" in packageJson.json)) {
         packageJson.json = { ...packageJson.json, private: true };
         packageJson.file.logAdded("private");
+    }
+}
+
+function updatePackageJsonLicense(packageJson: PackageJsonOperations) {
+    if (!("license" in packageJson.json)) {
+        packageJson.json = { ...packageJson.json, license: "UNLICENSED" };
+        packageJson.file.logAdded("license");
     }
 }
 

@@ -27,4 +27,5 @@ export async function uplift(projectRoot: Path, configFile: Path, _options: Read
         console.log("Uplifting the project...");
         migrate({ operation: "uplift", oldConfig, newConfig: undefined, projectRoot });
     }
+    console.log("✅ Successfully uplifted the project");
 }
