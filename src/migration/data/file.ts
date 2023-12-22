@@ -101,6 +101,18 @@ export class File {
         return undefined !== this.originalContents && undefined === this.newContents;
     }
 
+    public getSummaryOfChanges() {
+        if (this.mustDelete()) {
+            return [`Deleted file ${this.absolutePath}`];
+        } else if (!this.mustCreateOrOverwrite()) {
+            return [];
+        } else if (undefined === this.originalContents) {
+            return [`Created file ${this.absolutePath}`];
+        } else {
+            return [`Updated file ${this.absolutePath}`];
+        }
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     // Serialize file contents into a string
     //------------------------------------------------------------------------------------------------------------------

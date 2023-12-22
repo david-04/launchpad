@@ -1,8 +1,8 @@
 import { loadConfigFile } from "../config/config-loader.js";
 import { migrate } from "../migration/migrate.js";
 import { fail } from "../utilities/fail.js";
-import { breakLine } from "../utilities/logging.js";
 import type { Path } from "../utilities/path.js";
+import { breakLine } from "../utilities/string-utilities.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Initialize a new project
@@ -24,10 +24,7 @@ export async function uplift(projectRoot: Path, configFile: Path, _options: Read
         }
         fail(lines.flatMap(breakLine).join("\n"));
     } else {
-        migrate({
-            oldConfig,
-            newConfig: undefined,
-            projectRoot,
-        });
+        console.log("Uplifting the project...");
+        migrate({ operation: "uplift", oldConfig, newConfig: undefined, projectRoot });
     }
 }

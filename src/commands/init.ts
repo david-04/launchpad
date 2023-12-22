@@ -12,7 +12,9 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
     const parsedConfig = loadConfigFile(configFile);
     const commandLineConfig = parseCommandLineOptions(options);
     const newConfig = await getNewConfig(projectRoot, parsedConfig, commandLineConfig);
+    console.log(parsedConfig ? "Re-initializing the project..." : "Initializing the project...");
     migrate({
+        operation: "initialize",
         oldConfig: parsedConfig?.validated ?? parsedConfig?.partial,
         newConfig,
         projectRoot,

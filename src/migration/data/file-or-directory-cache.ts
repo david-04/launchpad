@@ -54,4 +54,16 @@ export class FileOrDirectoryCache<T extends FileOrDirectory> {
         }
         return fileSystemOperations;
     }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Get a summary of changes
+    //------------------------------------------------------------------------------------------------------------------
+
+    public toSummaryOfChanges() {
+        const changes = new Array<string>();
+        for (const fileOrDirectory of this.filesOrDirectories.values()) {
+            changes.push(...fileOrDirectory.getSummaryOfChanges());
+        }
+        return changes;
+    }
 }

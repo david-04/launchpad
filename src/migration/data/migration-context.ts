@@ -1,5 +1,6 @@
 import type { NewConfig, OldPartialConfig } from "../../config/config-objects.js";
 import type { Path } from "../../utilities/path.js";
+import { ExternalCommand } from "../executor/external-command.js";
 import { GitignoreOperations } from "../files/gitignore.js";
 import { PackageJsonOperations } from "../files/package-json.js";
 import { VSCodeSettingsOperations } from "../files/vscode-settings.js";
@@ -13,6 +14,7 @@ import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files.js"
 //----------------------------------------------------------------------------------------------------------------------
 
 export type MigrationContextOptions = {
+    operation: "initialize" | "uplift";
     projectRoot: Path;
     oldConfig: OldPartialConfig | undefined;
     newConfig: NewConfig;
@@ -23,17 +25,21 @@ export type MigrationContextOptions = {
 //----------------------------------------------------------------------------------------------------------------------
 
 export class MigrationContext {
+    public readonly operation;
     public readonly mainModule;
     public readonly projectRoot;
     public readonly oldConfig;
     public readonly newConfig;
     public readonly fileOperations;
+    public readonly startedAt = new Date();
 
     public readonly files;
     public readonly directories;
+    public readonly externalCommands = new Array<ExternalCommand>();
 
     public manualActionRequired?: "rollback" | "complete";
-    public manualActionInstructions = new Array<string>();
+    public manualFileSystemInstructions = new Array<string>();
+    public manualCommandInstructions = new Array<string>();
     public activityLog = new Array<string>();
 
     //------------------------------------------------------------------------------------------------------------------
@@ -41,6 +47,7 @@ export class MigrationContext {
     //------------------------------------------------------------------------------------------------------------------
 
     public constructor(options: MigrationContextOptions) {
+        this.operation = options.operation;
         this.projectRoot = options.projectRoot;
         this.oldConfig = options.oldConfig;
         this.newConfig = options.newConfig;
@@ -60,5 +67,13 @@ export class MigrationContext {
             vscodeSettings: new VSCodeSettingsOperations(this.files.get(VSCODE_SETTINGS_JSON)),
         };
         this.mainModule = `${options.newConfig.srcDir}/${options.newConfig.projectName}`;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Add an external command
+    //------------------------------------------------------------------------------------------------------------------
+
+    public addExternalCommand(description: string, command: ReadonlyArray<string>) {
+        this.externalCommands.push(new ExternalCommand(description, this.projectRoot, command));
     }
 }

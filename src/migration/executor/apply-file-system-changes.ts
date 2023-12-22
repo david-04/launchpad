@@ -1,3 +1,4 @@
+import { fail } from "../../utilities/fail.js";
 import type { MigrationContext } from "../data/migration-context.js";
 import type { FileSystemOperation } from "./file-system-operation.js";
 
@@ -14,10 +15,10 @@ export type FileSystemOperations = Readonly<Record<"files" | "directories", Read
 export function applyFileSystemChanges(context: MigrationContext) {
     const operations: FileSystemOperations = {
         files: context.files.toFileSystemOperations(),
-        directories: context.files.toFileSystemOperations(),
+        directories: context.directories.toFileSystemOperations(),
     };
     prepareFileSystemChanges(context, operations);
-    if (undefined === context.manualActionRequired) {
+    if (!context.manualActionRequired) {
         finalizeFileSystemChanges(context, operations);
     }
 }
@@ -39,6 +40,9 @@ function prepareFileSystemChanges(context: MigrationContext, operations: FileSys
         context.activityLog.push(`Encountered an error: ${error}`);
         context.activityLog.push(`Rolling back changes...`);
         rollBackFileSystemChanges(context, operations);
+        if (!context.manualActionRequired) {
+            fail(`Failed to ${context.operation} the project: ${error}`);
+        }
     }
 }
 
@@ -56,7 +60,7 @@ function rollBackFileSystemChanges(context: MigrationContext, operations: FileSy
     } catch (error) {
         context.activityLog.push(`Encountered an error during the rollback: ${error}`);
         context.manualActionRequired = "rollback";
-        context.manualActionInstructions.push(
+        context.manualFileSystemInstructions.push(
             ...[...operations.directories, ...operations.files].flatMap(item => item.getRollbackInstructions())
         );
     }
@@ -76,7 +80,7 @@ function finalizeFileSystemChanges(context: MigrationContext, operations: FileSy
     } catch (error) {
         context.activityLog.push(`Encountered an error: ${error}`);
         context.manualActionRequired = "complete";
-        context.manualActionInstructions.push(
+        context.manualFileSystemInstructions.push(
             ...[...operations.directories, ...operations.files].flatMap(item => item.getCompletionInstructions())
         );
     }

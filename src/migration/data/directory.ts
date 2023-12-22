@@ -47,4 +47,14 @@ export class Directory {
     public mustDelete() {
         return this.exists && !this.shouldExist;
     }
+
+    public getSummaryOfChanges() {
+        if (this.mustDelete()) {
+            return [`Deleted directory ${this.absolutePath}`];
+        } else if (this.mustCreate()) {
+            return [`Created directory ${this.absolutePath}`];
+        } else {
+            return [];
+        }
+    }
 }
