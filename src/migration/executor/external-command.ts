@@ -1,3 +1,4 @@
+import { execFileSync } from "child_process";
 import { Path } from "../../utilities/path.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -24,6 +25,7 @@ export class ExternalCommand {
     //------------------------------------------------------------------------------------------------------------------
 
     public execute() {
-        console.log(this.workingDirectory);
+        const [cmd, ...args] = this.argv;
+        execFileSync(cmd ?? "", args, { cwd: this.workingDirectory, stdio: "inherit" });
     }
 }
