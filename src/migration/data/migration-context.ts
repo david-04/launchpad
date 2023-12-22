@@ -3,7 +3,9 @@ import type { Path } from "../../utilities/path.js";
 import { GitignoreOperations } from "../files/gitignore.js";
 import { PackageJsonOperations } from "../files/package-json.js";
 import { VSCodeSettingsOperations } from "../files/vscode-settings.js";
-import { Directory, File, FileOrDirectoryCache } from "./file-cache.js";
+import { Directory } from "./directory.js";
+import { FileOrDirectoryCache } from "./file-or-directory-cache.js";
+import { File } from "./file.js";
 import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files.js";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -21,17 +23,18 @@ export type MigrationContextOptions = {
 //----------------------------------------------------------------------------------------------------------------------
 
 export class MigrationContext {
+    public readonly mainModule;
     public readonly projectRoot;
     public readonly oldConfig;
     public readonly newConfig;
-
-    public readonly errors = new Array<string>();
+    public readonly fileOperations;
 
     public readonly files;
     public readonly directories;
-    public readonly fileOperations;
 
-    public readonly mainModule;
+    public manualActionRequired?: "rollback" | "complete";
+    public manualActionInstructions = new Array<string>();
+    public activityLog = new Array<string>();
 
     //------------------------------------------------------------------------------------------------------------------
     // Initialization

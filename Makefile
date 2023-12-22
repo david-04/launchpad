@@ -109,6 +109,7 @@ test.uplift : run-test.uplift;
 
 run-test.% : $(LP_TSC_TARGETS)
 	echo Running launchpad $*...
+	echo
 	$(call lp.run, build/test.js) $*
 
 #-----------------------------------------------------------------------------------------------------------------------

@@ -1,11 +1,11 @@
-import type { File } from "../data/file-cache.js";
+import type { File } from "../data/file.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
 //----------------------------------------------------------------------------------------------------------------------
 
 interface DestructuredLine {
-    readonly original: string,
+    readonly original: string;
     readonly normalized: string;
     readonly glob: string;
     readonly pattern: string;

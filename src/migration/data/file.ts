@@ -6,6 +6,7 @@ import type { Path } from "../../utilities/path.js";
 //----------------------------------------------------------------------------------------------------------------------
 
 export class File {
+    public readonly type = "file";
     public readonly absolutePath: Path;
     public readonly originalContents: string | undefined;
     private newContents: string | undefined;
@@ -113,83 +114,5 @@ export class File {
         } else {
             return normalize(JSON.stringify(contents, undefined, tabSize));
         }
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Representation of a directory
-//----------------------------------------------------------------------------------------------------------------------
-
-export class Directory {
-    public readonly absolutePath: Path;
-    public readonly exists: boolean;
-    private shouldExist: boolean;
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Initialization
-    //------------------------------------------------------------------------------------------------------------------
-
-    public constructor(projectRoot: Path, public readonly relativePath: string) {
-        this.absolutePath = projectRoot.child(relativePath);
-        if (this.absolutePath.existsAndIsFile()) {
-            fail(`${this.absolutePath.path} is a file (expected it to be a directory)`);
-        }
-        this.exists = this.absolutePath.exists();
-        this.shouldExist = this.exists;
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Getters and setters
-    //------------------------------------------------------------------------------------------------------------------
-
-    public create() {
-        this.shouldExist = true;
-    }
-
-    public delete() {
-        this.shouldExist = false;
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Determine the status
-    //------------------------------------------------------------------------------------------------------------------
-
-    public mustCreate() {
-        return !this.exists && this.shouldExist;
-    }
-
-    public mustDelete() {
-        return this.exists && !this.shouldExist;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// A cache to accumulate pending changes to files
-//----------------------------------------------------------------------------------------------------------------------
-
-export class FileOrDirectoryCache<T extends File | Directory> {
-    private readonly filesOrDirectories = new Map<string, T>();
-    private readonly instantiate;
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Initialization
-    //------------------------------------------------------------------------------------------------------------------
-
-    public constructor(
-        public readonly projectRoot: Path,
-        tabSize: number,
-        instantiate: (projectRoot: Path, relativePath: string, tabSize: number) => T
-    ) {
-        this.instantiate = (projectRoot: Path, relativePath: string) => instantiate(projectRoot, relativePath, tabSize);
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Retrieve or create a file or directory
-    //------------------------------------------------------------------------------------------------------------------
-
-    public get(path: string) {
-        const fileOrDirectory = this.filesOrDirectories.get(path) ?? this.instantiate(this.projectRoot, path);
-        this.filesOrDirectories.set(path, fileOrDirectory);
-        return fileOrDirectory;
     }
 }

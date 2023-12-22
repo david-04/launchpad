@@ -1,4 +1,4 @@
-import type { File } from "../data/file-cache.js";
+import type { File } from "../data/file.js";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Type definitions
