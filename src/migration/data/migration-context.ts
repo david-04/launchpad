@@ -26,7 +26,8 @@ export type MigrationContextOptions = {
 
 export class MigrationContext {
     public readonly operation;
-    public readonly mainModule;
+    public readonly mainModulePath;
+    public readonly debugModulePath;
     public readonly projectRoot;
     public readonly oldConfig;
     public readonly newConfig;
@@ -66,7 +67,8 @@ export class MigrationContext {
             packageJson: new PackageJsonOperations(this.files.get(PACKAGE_JSON)),
             vscodeSettings: new VSCodeSettingsOperations(this.files.get(VSCODE_SETTINGS_JSON)),
         };
-        this.mainModule = `${options.newConfig.srcDir}/${options.newConfig.projectName}`;
+        this.mainModulePath = `${options.newConfig.srcDir}/${options.newConfig.projectName}.ts`;
+        this.debugModulePath = `${options.newConfig.srcDir}/debug.ts`;
     }
 
     //------------------------------------------------------------------------------------------------------------------

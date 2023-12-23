@@ -5,9 +5,11 @@ import { fail } from "../utilities/fail";
 import { breakAndLog, createSeparator } from "../utilities/logging";
 import { breakLine } from "../utilities/string-utilities";
 import { calculateNewConfig } from "./actions/calculate-new-config";
-import { createDebugModule } from "./actions/create-debug-module";
+import { createIndexCss } from "./actions/create-index-css";
+import { createIndexHtml } from "./actions/create-index-html";
+import { createMainModule } from "./actions/create-main-module";
 import { createMakefile } from "./actions/create-makefile";
-import { createProjectTemplate } from "./actions/create-project-template";
+import { createDebugModule } from "./actions/createDebugModule";
 import { preparePackageManagerCommands } from "./actions/prepare-package-manager-commands";
 import { updateGitignore } from "./actions/update-gitignore";
 import { updateLaunchpadDirectory } from "./actions/update-launchpad-directory";
@@ -36,8 +38,7 @@ export type MigrateOptions = Omit<MigrationContextOptions, "oldConfig" | "newCon
 export function migrate(options: MigrateOptions) {
     const newConfig = options.newConfig ?? calculateNewConfig(options, options.oldConfig);
     const context = new MigrationContext({ ...options, newConfig });
-    prepareFileSystemChanges(context);
-    prepareExternalCommands(context);
+    prepareMigrationSteps(context);
     applyFileSystemChanges(context);
     if ("rollback" === context.manualActionRequired) {
         onFileSystemChangesRequireManualRollback(context);
@@ -53,23 +54,24 @@ export function migrate(options: MigrateOptions) {
 // Prepare the required file system updates
 //----------------------------------------------------------------------------------------------------------------------
 
-function prepareFileSystemChanges(context: MigrationContext) {
+function prepareMigrationSteps(context: MigrationContext) {
+    //
+    // config files
     updateGitignore(context);
     updateLaunchpadDirectory(context);
     updatePackageJson(context);
     updatePackageManagerFiles(context);
     updateTsconfigJson(context);
     updateVsCodeSettings(context);
-    createProjectTemplate(context);
+
+    // project template
+    createMainModule(context);
     createDebugModule(context);
+    createIndexHtml(context);
+    createIndexCss(context);
     createMakefile(context);
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-// Prepare external commands that need to be executed
-//----------------------------------------------------------------------------------------------------------------------
-
-function prepareExternalCommands(context: MigrationContext) {
+    // external commands
     preparePackageManagerCommands(context);
 }
 
