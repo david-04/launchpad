@@ -1,7 +1,7 @@
-import type { Path } from "../../utilities/path.js";
-import { FileSystemOperation } from "../executor/file-system-operation.js";
-import type { Directory } from "./directory.js";
-import { File } from "./file.js";
+import type { Path } from "../../utilities/path";
+import { FileSystemOperation } from "../executor/file-system-operation";
+import type { Directory } from "./directory";
+import { File } from "./file";
 
 export type FileOrDirectory = File | Directory;
 

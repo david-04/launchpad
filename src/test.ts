@@ -1,4 +1,4 @@
-import { launchpad } from "./launchpad.js";
+import { launchpad } from "./launchpad";
 
 async function main() {
     await addCommand("help", "--help");

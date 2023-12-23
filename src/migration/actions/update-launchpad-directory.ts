@@ -1,14 +1,14 @@
-import { serializeConfig } from "../../config/config-serializer.js";
-import { ASSETS } from "../../resources/embedded-assets.js";
-import { TSCONFIG_JSON_TEMPLATES } from "../../resources/embedded-tsconfig.js";
+import { serializeConfig } from "../../config/config-serializer";
+import { ASSETS } from "../../resources/embedded-assets";
+import { TSCONFIG_JSON_TEMPLATES } from "../../resources/embedded-tsconfig";
 import {
     LAUNCHPAD_MAKEFILE_DOCUMENTATION,
     LAUNCHPAD_MAKEFILE_FOOTER,
     LAUNCHPAD_MAKEFILE_HEADER,
     LAUNCHPAD_SETTINGS_CFG,
     LAUNCHPAD_TSCONFIG_DEFAULT_JSON,
-} from "../data/known-files.js";
-import type { MigrationContext } from "../data/migration-context.js";
+} from "../data/known-files";
+import type { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Update ./launchpad/*

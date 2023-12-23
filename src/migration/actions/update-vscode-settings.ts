@@ -1,6 +1,6 @@
-import type { NewConfig } from "../../config/config-objects.js";
-import type { MigrationContext } from "../data/migration-context.js";
-import { VSCodeSettingsOperations, type VsCodeLanguageId } from "../files/vscode-settings.js";
+import type { NewConfig } from "../../config/config-objects";
+import type { MigrationContext } from "../data/migration-context";
+import { VSCodeSettingsOperations, type VsCodeLanguageId } from "../files/vscode-settings";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Update the VSCode settings

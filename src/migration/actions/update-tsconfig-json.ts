@@ -1,5 +1,5 @@
-import { TSCONFIG_JSON } from "../data/known-files.js";
-import type { MigrationContext } from "../data/migration-context.js";
+import { TSCONFIG_JSON } from "../data/known-files";
+import type { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create tsconfig.json if it does not exist

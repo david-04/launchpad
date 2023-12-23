@@ -1,6 +1,6 @@
-import { PINNED_SUFFIX } from "../utilities/constants.js";
-import { pinned, unpinned, type ConfigError } from "./config-data-types.js";
-import { Version } from "./version-number.js";
+import { PINNED_SUFFIX } from "../utilities/constants";
+import { pinned, unpinned, type ConfigError } from "./config-data-types";
+import { Version } from "./version-number";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Parse the project name

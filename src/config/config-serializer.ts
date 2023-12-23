@@ -1,6 +1,6 @@
-import type { SerializationDetails } from "./config-data-types.js";
-import type { NewConfig } from "./config-objects.js";
-import { ConfigProperties } from "./config-properties.js";
+import type { SerializationDetails } from "./config-data-types";
+import type { NewConfig } from "./config-objects";
+import { ConfigProperties } from "./config-properties";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Serialize properties

@@ -1,8 +1,9 @@
 import { mkdirSync, renameSync, rmSync, writeFileSync } from "fs";
-import { LP_NEW_FILE_EXTENSION, LP_OLD_FILE_EXTENSION } from "../../utilities/constants.js";
-import { Path } from "../../utilities/path.js";
-import { Directory } from "../data/directory.js";
-import { type FileOrDirectory } from "../data/file-or-directory-cache.js";
+import { File } from "migration/data/file";
+import { LP_NEW_FILE_EXTENSION, LP_OLD_FILE_EXTENSION } from "../../utilities/constants";
+import { Path } from "../../utilities/path";
+import { Directory } from "../data/directory";
+import { type FileOrDirectory } from "../data/file-or-directory-cache";
 
 //----------------------------------------------------------------------------------------------------------------------
 // A class to create/update/rename/delete files and directories with rollback support
@@ -25,8 +26,8 @@ export class FileSystemOperation {
     public constructor(protected readonly fileOrDirectory: FileOrDirectory) {
         this.type = fileOrDirectory.type;
         this.path = fileOrDirectory.absolutePath;
-        this.newPath = new Path(`${this.path}${LP_NEW_FILE_EXTENSION}`);
-        this.oldPath = new Path(`${this.path}${LP_OLD_FILE_EXTENSION}`);
+        this.newPath = new Path(`${this.path.path}${LP_NEW_FILE_EXTENSION}`);
+        this.oldPath = new Path(`${this.path.path}${LP_OLD_FILE_EXTENSION}`);
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ export class FileSystemOperation {
     //------------------------------------------------------------------------------------------------------------------
 
     public getExistingConflictPaths() {
-        return [this.newPath, this.oldPath].flatMap(path => (path.exists() ? [this.path.path] : []));
+        return [this.newPath, this.oldPath].flatMap(path => (path.exists() ? [path.path] : []));
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -43,10 +44,12 @@ export class FileSystemOperation {
 
     public createNew(log: Array<string>) {
         try {
-            if (!this.fileOrDirectory.mustDelete) {
-                if (this.fileOrDirectory instanceof Directory) {
-                    mkdirSync(this.newPath.path, { recursive: true });
-                } else {
+            if (!this.fileOrDirectory.mustDelete()) {
+                const directory = this.fileOrDirectory instanceof Directory ? this.newPath : this.newPath.getParent();
+                if (!directory.exists()) {
+                    mkdirSync(directory.path, { recursive: true });
+                }
+                if (this.fileOrDirectory instanceof File) {
                     const contents = this.fileOrDirectory.contents ?? "";
                     writeFileSync(this.newPath.path, contents, { encoding: "utf-8", flag: "wx" });
                 }
@@ -80,7 +83,7 @@ export class FileSystemOperation {
 
     public renameNewToCurrent(log: Array<string>) {
         try {
-            if (!this.hasCreatedNew) {
+            if (this.hasCreatedNew) {
                 renameSync(this.newPath.path, this.path.path);
                 this.hasRenamedNewToCurrent;
                 log.push(`Renamed ${this.type} ${this.newPath.path} to ${this.path.path}`);

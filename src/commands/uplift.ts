@@ -1,8 +1,8 @@
-import { loadConfigFile } from "../config/config-loader.js";
-import { migrate } from "../migration/migrate.js";
-import { fail } from "../utilities/fail.js";
-import type { Path } from "../utilities/path.js";
-import { breakLine } from "../utilities/string-utilities.js";
+import { loadConfigFile } from "../config/config-loader";
+import { migrate } from "../migration/migrate";
+import { fail } from "../utilities/fail";
+import type { Path } from "../utilities/path";
+import { breakLine } from "../utilities/string-utilities";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Initialize a new project

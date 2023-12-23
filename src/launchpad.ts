@@ -1,9 +1,9 @@
-import { init } from "./commands/init.js";
-import { uplift } from "./commands/uplift.js";
-import { ConfigProperties } from "./config/config-properties.js";
-import { VERSION_NUMBER } from "./resources/version-information.js";
-import { fail, formatError } from "./utilities/fail.js";
-import { Path, getConfigFilePath } from "./utilities/path.js";
+import { init } from "./commands/init";
+import { uplift } from "./commands/uplift";
+import { ConfigProperties } from "./config/config-properties";
+import { VERSION_NUMBER } from "./resources/version-information";
+import { fail, formatError } from "./utilities/fail";
+import { Path, getConfigFilePath } from "./utilities/path";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Supported actions / command line arguments
@@ -39,7 +39,7 @@ export async function launchpad(argv: ReadonlyArray<string>) {
             return await findAndInvokeHandler(command, options);
         }
     } catch (error: unknown) {
-        console.error("ERROR:", formatError(error));
+        console.error("⛔ ERROR:", formatError(error));
         process.exit(1);
     }
 }

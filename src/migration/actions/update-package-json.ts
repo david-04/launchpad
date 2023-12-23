@@ -1,5 +1,5 @@
-import type { MigrationContext } from "../data/migration-context.js";
-import type { PackageJsonOperations, PackageJsonPrettier } from "../files/package-json.js";
+import type { MigrationContext } from "../data/migration-context";
+import type { PackageJsonOperations, PackageJsonPrettier } from "../files/package-json";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Update package.json

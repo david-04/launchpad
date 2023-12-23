@@ -1,10 +1,10 @@
 import { exit } from "process";
 import type { Choice } from "prompts";
-import { pinned, unpinned } from "../config/config-data-types.js";
-import type { ParsedConfig } from "../config/config-loader.js";
-import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../config/config-objects.js";
-import { createDirectoryParser } from "../config/config-parsers.js";
-import { ConfigProperties } from "../config/config-properties.js";
+import { pinned, unpinned } from "../config/config-data-types";
+import type { ParsedConfig } from "../config/config-loader";
+import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../config/config-objects";
+import { createDirectoryParser } from "../config/config-parsers";
+import { ConfigProperties } from "../config/config-properties";
 import {
     DEFAULT_ARTIFACT,
     DEFAULT_BUILD_DIR,
@@ -25,10 +25,10 @@ import {
     DEFAULT_RUNTIME,
     DEFAULT_SRC_DIR,
     DEFAULT_TAB_SIZE,
-} from "../config/default-config-values.js";
-import { VERSION_NUMBER } from "../resources/version-information.js";
-import { DEFAULT_ENUM, type DefaultEnum } from "./constants.js";
-import type { Path } from "./path.js";
+} from "../config/default-config-values";
+import { VERSION_NUMBER } from "../resources/version-information";
+import { DEFAULT_ENUM, type DefaultEnum } from "./constants";
+import type { Path } from "./path";
 import {
     createDefaultOption,
     findNonPinnableMatchingChoice,
@@ -40,7 +40,7 @@ import {
     toChoice,
     toValidator,
     type ChoiceOptions,
-} from "./prompt.js";
+} from "./prompt";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types

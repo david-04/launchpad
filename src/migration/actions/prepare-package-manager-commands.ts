@@ -1,4 +1,4 @@
-import type { MigrationContext } from "../data/migration-context.js";
+import type { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create package manager commands
@@ -28,13 +28,19 @@ function installOrUpgradeYarn(context: MigrationContext) {
 function upgradeAllPackagesToLatestVersion(context: MigrationContext) {
     const upgradeAllPackages = "Upgrading all packages to the latest version";
     const allPackages = getAllInstalledPackages(context);
-    if ("npm" === context.newConfig.packageManager.value) {
-        context.addExternalCommand(upgradeAllPackages, ["npm", "install", ...allPackages.map(pkg => `${pkg}@latest`)]);
-    } else if ("pnpm" === context.newConfig.packageManager.value) {
-        context.addExternalCommand(upgradeAllPackages, ["yarn", "up", "*@latest"]);
-    } else {
-        context.newConfig.packageManager.value satisfies "yarn";
-        context.addExternalCommand(upgradeAllPackages, ["pnpm", "up", "--latest"]);
+    if (allPackages.length) {
+        if ("npm" === context.newConfig.packageManager.value) {
+            context.addExternalCommand(upgradeAllPackages, [
+                "npm",
+                "install",
+                ...allPackages.map(pkg => `${pkg}@latest`),
+            ]);
+        } else if ("pnpm" === context.newConfig.packageManager.value) {
+            context.addExternalCommand(upgradeAllPackages, ["pnpm", "up", "--latest"]);
+        } else {
+            context.newConfig.packageManager.value satisfies "yarn";
+            context.addExternalCommand(upgradeAllPackages, ["yarn", "up", "*@latest"]);
+        }
     }
 }
 
@@ -44,7 +50,7 @@ function upgradeAllPackagesToLatestVersion(context: MigrationContext) {
 
 function getAllInstalledPackages(context: MigrationContext) {
     const packageJson = context.fileOperations.packageJson.json;
-    return ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"].map(section =>
+    return ["dependencies", "devDependencies", "peerDependencies", "optionalDependencies"].flatMap(section =>
         Object.keys(packageJson[section] ?? {})
     );
 }

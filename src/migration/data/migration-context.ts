@@ -1,13 +1,13 @@
-import type { NewConfig, OldPartialConfig } from "../../config/config-objects.js";
-import type { Path } from "../../utilities/path.js";
-import { ExternalCommand } from "../executor/external-command.js";
-import { GitignoreOperations } from "../files/gitignore.js";
-import { PackageJsonOperations } from "../files/package-json.js";
-import { VSCodeSettingsOperations } from "../files/vscode-settings.js";
-import { Directory } from "./directory.js";
-import { FileOrDirectoryCache } from "./file-or-directory-cache.js";
-import { File } from "./file.js";
-import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files.js";
+import type { NewConfig, OldPartialConfig } from "../../config/config-objects";
+import type { Path } from "../../utilities/path";
+import { ExternalCommand } from "../executor/external-command";
+import { GitignoreOperations } from "../files/gitignore";
+import { PackageJsonOperations } from "../files/package-json";
+import { VSCodeSettingsOperations } from "../files/vscode-settings";
+import { Directory } from "./directory";
+import { File } from "./file";
+import { FileOrDirectoryCache } from "./file-or-directory-cache";
+import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types

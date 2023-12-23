@@ -1,4 +1,4 @@
-import type { MigrationContext } from "../data/migration-context.js";
+import type { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Configure the package manager

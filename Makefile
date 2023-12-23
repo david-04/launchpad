@@ -29,7 +29,7 @@ TSCONFIG_TARGETS         = src/resources/embedded-tsconfig.ts .launchpad/tsconfi
 
 tsconfig : $(TSCONFIG_TARGETS);
 
-$(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tsconfig.js
+$(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tsconfig.mjs
 	./bin/embed-tsconfig.sh
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ EMBEDDED_ASSETS_TARGET = src/resources/embedded-assets.ts
 
 embed : $(EMBEDDED_ASSETS_TARGET)
 
-$(EMBEDDED_ASSETS_TARGET) : $(EMBEDDED_ASSETS_SOURCE) bin/embed-assets.sh  bin/embed-assets.js $(TSCONFIG_TARGETS)
+$(EMBEDDED_ASSETS_TARGET) : $(EMBEDDED_ASSETS_SOURCE) bin/embed-assets.sh  bin/embed-assets.mjs $(TSCONFIG_TARGETS)
 	./bin/embed-assets.sh $@ $(sort $(patsubst bin/%, ,$(EMBEDDED_ASSETS_SOURCE)))
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add-bundle, src/launchpad.ts, dist/launchpad.mjs)
+$(call lp.bundle.add-bundle, src/launchpad-cli.ts, dist/launchpad.js)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Format

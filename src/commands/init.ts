@@ -1,8 +1,8 @@
-import { parseCommandLineOptions } from "../config/command-line-parser.js";
-import { loadConfigFile } from "../config/config-loader.js";
-import { migrate } from "../migration/migrate.js";
-import { getNewConfig } from "../utilities/config-wizard.js";
-import type { Path } from "../utilities/path.js";
+import { parseCommandLineOptions } from "../config/command-line-parser";
+import { loadConfigFile } from "../config/config-loader";
+import { migrate } from "../migration/migrate";
+import { getNewConfig } from "../utilities/config-wizard";
+import type { Path } from "../utilities/path";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Initialize a new project

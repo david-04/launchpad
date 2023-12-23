@@ -1,6 +1,6 @@
 {
     "private": true,
-    "type": "module",
+    "type": "commonjs",
     "packageManager": "yarn@4.0.1",
     "devDependencies": {
         "@types/node": "^20"

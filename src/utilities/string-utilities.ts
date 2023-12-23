@@ -2,7 +2,7 @@
 // Reformat file content with a different tab size
 //----------------------------------------------------------------------------------------------------------------------
 
-import { MAX_LINE_LENGTH } from "./constants.js";
+import { MAX_LINE_LENGTH } from "./constants";
 
 export function adjustTabSize(contents: string, originalTabSize: number, newTabSize: number) {
     const regExp = new RegExp(`^(\t*) {${originalTabSize}}`, "g");

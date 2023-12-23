@@ -1,5 +1,5 @@
-import { fail } from "../../utilities/fail.js";
-import type { Path } from "../../utilities/path.js";
+import { fail } from "../../utilities/fail";
+import type { Path } from "../../utilities/path";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Representation of a single file that can be created/modified/deleted
@@ -46,7 +46,7 @@ export class File {
     }
 
     public get lines() {
-        return this.newContents?.replace(/(\n\s)+$/, "").split("\n");
+        return this.newContents?.replace(/(\s*\r?\n\s*)+$/, "").split(/\r?\n/);
     }
 
     public set lines(lines: ReadonlyArray<string> | undefined) {
@@ -103,13 +103,13 @@ export class File {
 
     public getSummaryOfChanges() {
         if (this.mustDelete()) {
-            return [`Deleted file ${this.absolutePath}`];
+            return [`Deleted file ${this.absolutePath.path}`];
         } else if (!this.mustCreateOrOverwrite()) {
             return [];
         } else if (undefined === this.originalContents) {
-            return [`Created file ${this.absolutePath}`];
+            return [`Created file ${this.absolutePath.path}`];
         } else {
-            return [`Updated file ${this.absolutePath}`];
+            return [`Updated file ${this.absolutePath.path}`];
         }
     }
 

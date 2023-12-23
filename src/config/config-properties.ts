@@ -1,4 +1,4 @@
-import { defaultMightChange } from "../utilities/constants.js";
+import { defaultMightChange } from "../utilities/constants";
 import {
     createBooleanProperty,
     createIntegerProperty,
@@ -7,8 +7,8 @@ import {
     createStringArrayProperty,
     createStringProperty,
     createVersionProperty,
-} from "./config-descriptor-factories.js";
-import { createDirectoryParser, parseProjectName, parseStringArray } from "./config-parsers.js";
+} from "./config-descriptor-factories";
+import { createDirectoryParser, parseProjectName, parseStringArray } from "./config-parsers";
 
 const CURRENT_CONFIG_PROPERTIES = {
     //

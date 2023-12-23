@@ -1,5 +1,5 @@
-import { unpinned } from "./config-data-types.js";
-import type { CommandLineConfig, NewConfig } from "./config-objects.js";
+import { unpinned } from "./config-data-types";
+import type { CommandLineConfig, NewConfig } from "./config-objects";
 
 export const DEFAULT_ARTIFACT = "app" satisfies NewConfig["artifact"];
 export const DEFAULT_BUILD_DIR = "build";

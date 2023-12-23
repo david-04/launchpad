@@ -8,6 +8,7 @@
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "alwaysStrict": true,
+        "baseUrl": "../src",
         "composite": false,
         "declaration": false,
         "declarationMap": false,
@@ -30,9 +31,9 @@
         "lib": [
             "es2022"
         ],
-        "module": "node16",
+        "module": "commonjs",
         "moduleDetection": "force",
-        "moduleResolution": "node16",
+        "moduleResolution": "node10",
         "newLine": "lf",
         "noEmit": false,
         "noEmitHelpers": false,
@@ -64,12 +65,9 @@
         "tsBuildInfoFile": "../build/.tsbuildinfo",
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true,
-        "verbatimModuleSyntax": true
+        "verbatimModuleSyntax": false
     },
     "include": [
         "../src/**/*.ts"
-    ],
-    "ts-node": {
-        "esm": true
-    }
+    ]
 }

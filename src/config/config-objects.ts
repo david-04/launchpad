@@ -4,8 +4,8 @@ import {
     type CommandLineOptions,
     type ConfigError,
     type ConfigFileProperty,
-} from "./config-data-types.js";
-import { ConfigProperties } from "./config-properties.js";
+} from "./config-data-types";
+import { ConfigProperties } from "./config-properties";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Parse available configuration properties into an old config object

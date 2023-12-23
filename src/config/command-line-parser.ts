@@ -1,6 +1,6 @@
-import { fail } from "../utilities/fail.js";
-import { assembleConfigFromCommandLineOptions } from "./config-objects.js";
-import { ConfigProperties } from "./config-properties.js";
+import { fail } from "../utilities/fail";
+import { assembleConfigFromCommandLineOptions } from "./config-objects";
+import { ConfigProperties } from "./config-properties";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Extract command line options

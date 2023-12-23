@@ -1,7 +1,7 @@
 import * as path from "path";
-import { ASSETS } from "../../resources/embedded-assets.js";
-import { adjustTabSize } from "../../utilities/string-utilities.js";
-import type { MigrationContext } from "../data/migration-context.js";
+import { ASSETS } from "../../resources/embedded-assets";
+import { adjustTabSize } from "../../utilities/string-utilities";
+import type { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create a project template

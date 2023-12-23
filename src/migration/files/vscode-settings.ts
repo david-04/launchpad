@@ -1,4 +1,4 @@
-import type { File } from "../data/file.js";
+import type { File } from "../data/file";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Default formatters

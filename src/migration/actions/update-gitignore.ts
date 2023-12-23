@@ -1,7 +1,7 @@
-import type { OldConfig } from "../../config/config-objects.js";
-import { TSBUILDINFO } from "../data/known-files.js";
-import type { MigrationContext } from "../data/migration-context.js";
-import type { GitignoreOperations } from "../files/gitignore.js";
+import type { OldConfig } from "../../config/config-objects";
+import { TSBUILDINFO } from "../data/known-files";
+import type { MigrationContext } from "../data/migration-context";
+import type { GitignoreOperations } from "../files/gitignore";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Update .gitignore

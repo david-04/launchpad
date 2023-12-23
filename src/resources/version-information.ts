@@ -1,4 +1,4 @@
-import { Version } from "../config/version-number.js";
+import { Version } from "../config/version-number";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Version information

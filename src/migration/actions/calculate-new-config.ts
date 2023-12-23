@@ -1,10 +1,10 @@
-import type { NewConfig, OldConfig } from "../../config/config-objects.js";
-import { DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values.js";
-import { VERSION_NUMBER } from "../../resources/version-information.js";
-import { File } from "../data/file.js";
-import { PACKAGE_JSON } from "../data/known-files.js";
-import { PackageJsonOperations } from "../files/package-json.js";
-import type { MigrateOptions } from "../migrate.js";
+import type { NewConfig, OldConfig } from "../../config/config-objects";
+import { DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values";
+import { VERSION_NUMBER } from "../../resources/version-information";
+import { File } from "../data/file";
+import { PACKAGE_JSON } from "../data/known-files";
+import { PackageJsonOperations } from "../files/package-json";
+import type { MigrateOptions } from "../migrate";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Calculate the target configuration

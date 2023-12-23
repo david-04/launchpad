@@ -1,7 +1,9 @@
 import { exit } from "process";
-import prompts, { type Choice, type PromptObject } from "prompts";
-import { unpinned, type ConfigError, type PinnableEnumValue } from "../config/config-data-types.js";
-import { defaultMightChange } from "./constants.js";
+import { type Choice, type PromptObject } from "prompts";
+import { unpinned, type ConfigError, type PinnableEnumValue } from "../config/config-data-types";
+import { defaultMightChange } from "./constants";
+
+const prompts = require("prompts");
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types

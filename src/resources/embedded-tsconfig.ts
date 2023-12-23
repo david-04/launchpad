@@ -66,7 +66,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
-            "verbatimModuleSyntax": true
+            "verbatimModuleSyntax": false
         },
         "include": [
             "__SRC_DIR__/**/*.ts"
@@ -214,7 +214,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
-            "verbatimModuleSyntax": true
+            "verbatimModuleSyntax": false
         },
         "include": [
             "__SRC_DIR__/**/*.ts"
@@ -360,7 +360,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
-            "verbatimModuleSyntax": true
+            "verbatimModuleSyntax": false
         },
         "include": [
             "__SRC_DIR__/**/*.ts"
@@ -504,7 +504,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
-            "verbatimModuleSyntax": true
+            "verbatimModuleSyntax": false
         },
         "include": [
             "__SRC_DIR__/**/*.ts"

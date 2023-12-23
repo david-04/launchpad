@@ -15,7 +15,7 @@ for COMPILATION in $COMPILATIONS; do
 done
 
 # shellcheck disable=SC2086
-node embed-tsconfig.js $COMPILATIONS
+node embed-tsconfig.mjs $COMPILATIONS
 
 # shellcheck disable=SC2086
 cd "$OUTPUT_DIR" && rm -f $COMPILATIONS

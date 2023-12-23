@@ -4,4 +4,4 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 echo Embedding assets...
-node embed-assets.js "$@"
+node embed-assets.mjs "$@"

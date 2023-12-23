@@ -1,5 +1,5 @@
-import { DEFAULT_ENUM, PINNED_SUFFIX } from "../utilities/constants.js";
-import { fail } from "../utilities/fail.js";
+import { DEFAULT_ENUM, PINNED_SUFFIX } from "../utilities/constants";
+import { fail } from "../utilities/fail";
 import {
     ValidationError,
     type AddError,
@@ -9,15 +9,15 @@ import {
     type ConfigFileProperties,
     type PinnableEnumValue,
     type SerializationDetails,
-} from "./config-data-types.js";
+} from "./config-data-types";
 import {
     createIntegerParser,
     createNonPinnableEnumParser,
     createPinnableEnumParser,
     parseBoolean,
     parseVersion,
-} from "./config-parsers.js";
-import type { Version } from "./version-number.js";
+} from "./config-parsers";
+import type { Version } from "./version-number";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
@@ -223,7 +223,9 @@ export function createBooleanProperty<KEY extends string>(property: BooleanPrope
     const parseOldValue = createOldValueParser<boolean>(matchesConfigFileKey, parseBoolean);
     const parseNewValue = parseBoolean;
     const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
-    const serialize = createSerializer<boolean, KEY>(property.configFile, (value: boolean) => value ? "true" : "false");
+    const serialize = createSerializer<boolean, KEY>(property.configFile, (value: boolean) =>
+        value ? "true" : "false"
+    );
     const assertOldValuePresent = createAssertPresentHandler<KEY, boolean>(property.name, property.configFile);
     return {
         commandLineInfo,
@@ -244,7 +246,7 @@ type IntegerPropertyDescriptor<KEY extends string> = {
     readonly name: string;
     readonly configFile?: ConfigFileDescriptor<KEY>;
     readonly commandLine?: CommandLineDescriptorWithPlaceholder;
-    readonly range: {min: number, max: number};
+    readonly range: { min: number; max: number };
 };
 
 export function createIntegerProperty<KEY extends string>(property: IntegerPropertyDescriptor<KEY>) {

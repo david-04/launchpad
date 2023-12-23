@@ -319,7 +319,8 @@ lp.bundle.append-command.any            =$(call lp.fn.var.append-with-separator,
 lp.bundle.append-command.message        =$(call lp.bundle.append-command.any, $(1), \
                                               echo "- $(strip $2)" \
                                           )
-lp.bundle.append-command.eslint         =$(call lp.bundle.append-command.any, $(1), \
+
+lp.bundle.append-command.esbuild        =$(call lp.bundle.append-command.any, $(1), \
                                               esbuild \
                                               "$(strip $(2))" \
                                               "--outfile=$(strip $(3))" \
@@ -353,9 +354,9 @@ lp.bundle.append-command.dts            =$(call lp.bundle.append-command.any, $(
 
 lp.bundle.append-command                =$(call lp.fn.var.append, __LP_BUNDLE_COUNT, x) \
                                          $(call lp.bundle.append-command.message, __LP_BUNDLE_DEFAULT_COMMAND_MSG, $(2)) \
-                                         $(call lp.bundle.append-command.eslint, __LP_BUNDLE_DEFAULT_COMMAND_MSG, $(1), $(2)) \
+                                         $(call lp.bundle.append-command.esbuild, __LP_BUNDLE_DEFAULT_COMMAND_MSG, $(1), $(2)) \
                                          $(call lp.bundle.append-command.dts, __LP_BUNDLE_DEFAULT_COMMAND_MSG, $(1), $(2)) \
-                                         $(call lp.bundle.append-command.eslint, __LP_BUNDLE_DEFAULT_COMMAND, $(1), $(2)) \
+                                         $(call lp.bundle.append-command.esbuild, __LP_BUNDLE_DEFAULT_COMMAND, $(1), $(2)) \
                                          $(call lp.bundle.append-command.dts, __LP_BUNDLE_DEFAULT_COMMAND, $(1), $(2))
 
 lp.bundle.add-bundle                    =$(call lp.fn.assert.param-not-empty, lp.bundle.add-bundle, $(1)) \
@@ -504,6 +505,8 @@ lp.run                                  =$(call lp.fn.if.equal, \
                                                 TypeScript,\
                                                 $(lp.run.typescript),\
                                                 $(lp.run.javascript)) $(1)
+
+LP_RUN=$(call lp.run)
 
 #-----------------------------------------------------------------------------------------------------------------------
 #

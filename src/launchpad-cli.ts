@@ -1,3 +1,3 @@
 import { launchpad } from "./launchpad";
 
-launchpad(["help"]);
+launchpad(process.argv.slice(2));

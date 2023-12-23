@@ -1,5 +1,5 @@
 import { execFileSync } from "child_process";
-import { Path } from "../../utilities/path.js";
+import { Path } from "../../utilities/path";
 
 //----------------------------------------------------------------------------------------------------------------------
 // An externally run command

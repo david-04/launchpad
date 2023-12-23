@@ -1,5 +1,5 @@
-import { fail } from "../../utilities/fail.js";
-import type { Path } from "../../utilities/path.js";
+import { fail } from "../../utilities/fail";
+import type { Path } from "../../utilities/path";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Representation of a directory
@@ -50,9 +50,9 @@ export class Directory {
 
     public getSummaryOfChanges() {
         if (this.mustDelete()) {
-            return [`Deleted directory ${this.absolutePath}`];
+            return [`Deleted directory ${this.absolutePath.path}`];
         } else if (this.mustCreate()) {
-            return [`Created directory ${this.absolutePath}`];
+            return [`Created directory ${this.absolutePath.path}`];
         } else {
             return [];
         }

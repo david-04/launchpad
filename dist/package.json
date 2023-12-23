@@ -1,6 +1,7 @@
 {
     "name": "@david-04/launchpad",
-    "type": "module",
+    "type": "commonjs",
     "version": "0.0.0",
-    "type": "module"
+    "bin": "./launchpad.js"
+
 }

@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { normalize, resolve } from "path";
-import { LAUNCHPAD_SETTINGS_CFG } from "../migration/data/known-files.js";
+import { LAUNCHPAD_SETTINGS_CFG } from "../migration/data/known-files";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Representation of a file system path (file or directory)
@@ -29,11 +29,15 @@ export class Path {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Construct a child path
+    // Construct a child path or get the parent
     //------------------------------------------------------------------------------------------------------------------
 
     public child(name: string) {
         return new Path(`${this.path}/${name}`);
+    }
+
+    public getParent() {
+        return new Path(this.path.substring(0, this.path.lastIndexOf("/")));
     }
 
     //------------------------------------------------------------------------------------------------------------------

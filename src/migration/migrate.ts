@@ -1,21 +1,22 @@
 import { writeFileSync } from "fs";
-import type { NewConfig, OldConfig, OldPartialConfig } from "../config/config-objects.js";
-import { ERROR_LOG_FILE } from "../utilities/constants.js";
-import { fail } from "../utilities/fail.js";
-import { breakAndLog, createSeparator } from "../utilities/logging.js";
-import { breakLine } from "../utilities/string-utilities.js";
-import { calculateNewConfig } from "./actions/calculate-new-config.js";
-import { createDebugModule } from "./actions/create-debug-module.js";
-import { createMakefile } from "./actions/create-makefile.js";
-import { createProjectTemplate } from "./actions/create-project-template.js";
-import { updateGitignore } from "./actions/update-gitignore.js";
-import { updateLaunchpadDirectory } from "./actions/update-launchpad-directory.js";
-import { updatePackageJson } from "./actions/update-package-json.js";
-import { updatePackageManagerFiles } from "./actions/update-package-manager-files.js";
-import { updateTsconfigJson } from "./actions/update-tsconfig-json.js";
-import { updateVsCodeSettings } from "./actions/update-vscode-settings.js";
-import { MigrationContext, type MigrationContextOptions } from "./data/migration-context.js";
-import { applyFileSystemChanges } from "./executor/apply-file-system-changes.js";
+import type { NewConfig, OldConfig, OldPartialConfig } from "../config/config-objects";
+import { ERROR_LOG_FILE } from "../utilities/constants";
+import { fail } from "../utilities/fail";
+import { breakAndLog, createSeparator } from "../utilities/logging";
+import { breakLine } from "../utilities/string-utilities";
+import { calculateNewConfig } from "./actions/calculate-new-config";
+import { createDebugModule } from "./actions/create-debug-module";
+import { createMakefile } from "./actions/create-makefile";
+import { createProjectTemplate } from "./actions/create-project-template";
+import { preparePackageManagerCommands } from "./actions/prepare-package-manager-commands";
+import { updateGitignore } from "./actions/update-gitignore";
+import { updateLaunchpadDirectory } from "./actions/update-launchpad-directory";
+import { updatePackageJson } from "./actions/update-package-json";
+import { updatePackageManagerFiles } from "./actions/update-package-manager-files";
+import { updateTsconfigJson } from "./actions/update-tsconfig-json";
+import { updateVsCodeSettings } from "./actions/update-vscode-settings";
+import { MigrationContext, type MigrationContextOptions } from "./data/migration-context";
+import { applyFileSystemChanges } from "./executor/apply-file-system-changes";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
@@ -69,7 +70,7 @@ function prepareFileSystemChanges(context: MigrationContext) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function prepareExternalCommands(context: MigrationContext) {
-    console.log(context);
+    preparePackageManagerCommands(context);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -175,7 +176,7 @@ function failMigration(context: MigrationContext) {
     try {
         createLogFile(context);
     } catch (ignored) {}
-    fail(`⛔ Failed to ${context.operation} the project`);
+    fail(`Failed to ${context.operation} the project`);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -188,7 +189,7 @@ function createLogFile(context: MigrationContext) {
     if (file.exists()) {
         lines.push("");
     }
-    lines.push(...createSeparator(`${context.startedAt.toISOString} ${context.operation}`));
+    lines.push(...createSeparator(`${context.startedAt.toISOString()} ${context.operation}`));
     if (context.activityLog.length) {
         lines.push("Performed the following actions:");
         lines.push("");

@@ -1,6 +1,6 @@
-import { fail } from "../../utilities/fail.js";
-import type { MigrationContext } from "../data/migration-context.js";
-import type { FileSystemOperation } from "./file-system-operation.js";
+import { fail } from "../../utilities/fail";
+import type { MigrationContext } from "../data/migration-context";
+import type { FileSystemOperation } from "./file-system-operation";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
@@ -17,9 +17,26 @@ export function applyFileSystemChanges(context: MigrationContext) {
         files: context.files.toFileSystemOperations(),
         directories: context.directories.toFileSystemOperations(),
     };
-    prepareFileSystemChanges(context, operations);
+    assertNoConflictingFiles(context, operations);
+    if (!context.manualActionRequired) {
+        prepareFileSystemChanges(context, operations);
+    }
     if (!context.manualActionRequired) {
         finalizeFileSystemChanges(context, operations);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Make sure that no .LP_NEW and .LP_OLD files stand in the way
+//----------------------------------------------------------------------------------------------------------------------
+
+function assertNoConflictingFiles(context: MigrationContext, operations: FileSystemOperations) {
+    const conflictingPaths = [operations.directories, operations.files].flatMap(filesOrDirectories =>
+        filesOrDirectories.flatMap(fileOrDirectory => fileOrDirectory.getExistingConflictPaths())
+    );
+    if (conflictingPaths.length) {
+        context.manualActionRequired = "rollback";
+        context.manualFileSystemInstructions.push(...conflictingPaths.map(item => `Delete ${item}`));
     }
 }
 
