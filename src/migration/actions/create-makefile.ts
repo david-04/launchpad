@@ -1,76 +1,46 @@
 import { NewConfig } from "config/config-objects";
 import type { MigrationContext } from "../data/migration-context";
 
-const SEPARATOR = "#" + new Array(119).fill("-").join("");
-
 //----------------------------------------------------------------------------------------------------------------------
 // Create a makefile
 //----------------------------------------------------------------------------------------------------------------------
 
 export function createMakefile(context: MigrationContext) {
     const makefile = context.files.get("Makefile");
-    if (!makefile.exists) {
-        makefile.lines = [...getHeader(), ...getAutorunTarget(context), ...getBundleSection(context), ...getFooter()];
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Header
-//----------------------------------------------------------------------------------------------------------------------
-
-function getHeader() {
-    return ["include .launchpad/Makefile.header", ...getSeparator("See .launchpad/Makefile.documentation for details")];
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Autorun target
-//----------------------------------------------------------------------------------------------------------------------
-
-function getAutorunTarget(context: MigrationContext) {
-    const prerequisites = context.newConfig.bundler.value === "disabled" ? "LP_TSC_TARGETS" : "LP_BUNDLE_TARGETS";
-    if (context.newConfig.runtime.value === "web") {
-        return [`autorun : $(${prerequisites});`];
-    } else {
-        return [`autorun : $(${prerequisites})`, `\t$(LP_RUN) ${getScriptToRun(context.newConfig)}`];
-    }
-}
-
-function getScriptToRun(config: NewConfig) {
-    if (config.bundler.value === "disabled") {
-        return `${config.tscOutDir}/${config.projectName}.js`;
-    } else {
-        return `${config.bundlerOutDir}/${config.projectName}.js`;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// Bundle
-//----------------------------------------------------------------------------------------------------------------------
-
-function getBundleSection(context: MigrationContext) {
-    if ("disabled" === context.newConfig.bundler.value) {
-        return [];
-    } else {
-        const { srcDir, projectName, bundlerOutDir } = context.newConfig;
-        return [
-            ...getSeparator("Bundle"),
-            `$(call lp.bundle.add-bundle, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js)`,
+    if (context.newConfig.createMakefile && !makefile.exists) {
+        makefile.lines = [
+            "include .launchpad/Makefile.header # see .launchpad/Makefile.documentation",
+            "",
+            ...getDefaultTarget(context.newConfig),
+            ...getBundleConfiguration(context.newConfig),
+            "include .launchpad/Makefile.footer",
         ];
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Footer
+// Default target
 //----------------------------------------------------------------------------------------------------------------------
 
-function getFooter() {
-    return [...getSeparator("Built-in default targets"), "include  .launchpad/Makefile.footer"];
+function getDefaultTarget({ bundler, runtime, tscOutDir, bundlerOutDir, projectName }: NewConfig) {
+    const prerequisites = bundler.value === "disabled" ? "LP_TSC_TARGETS" : "LP_BUNDLE_TARGETS";
+    if ("web" === runtime.value) {
+        return [`autorun : $(${prerequisites});`, ""];
+    } else {
+        const directory = "disabled" === bundler.value ? tscOutDir : bundlerOutDir;
+        const script = `${directory}/${projectName}.js`;
+        return [`autorun : $(${prerequisites})`, `\t$(lp.run, ${script})`, ""];
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Generate a separator
+// Bundle configuration
 //----------------------------------------------------------------------------------------------------------------------
 
-function getSeparator(title: string) {
-    return ["", SEPARATOR, `# ${title}`, SEPARATOR, ""];
+function getBundleConfiguration({ srcDir, projectName, bundlerOutDir, bundler }: NewConfig) {
+    if ("disabled" === bundler.value) {
+        return [];
+    } else {
+        return [`$(call lp.bundle.add-bundle, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js)`, ""];
+    }
 }

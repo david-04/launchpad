@@ -38,7 +38,7 @@ lp.fn.map.empty-to              =$(if $(strip $(1)),$(strip $(1)),$(strip $(2)))
 lp.fn.print.header              =$(info #-----------------------------------------------------------------------------------------------------------------------) \
                                  $(info # $(strip $(1))) \
                                  $(info #-----------------------------------------------------------------------------------------------------------------------)
-lp.fn.print.indented            =$(info $(__LP_EMPTY_STRING)  $(strip $(1)))
+lp.fn.print.indented            =$(info $(__LP_EMPTY_STRING)   $(strip $(1)))
 
 lp.fn.var.assign                =$(eval $(strip $(1))=$(strip $(2)))
 lp.fn.var.append                =$(if $(strip $(2)), $(eval $(strip $(1))$(if $(strip $(2)),+= ,)$(strip $(2))))
@@ -193,7 +193,8 @@ __LP_HELP_TARGETS          =$(call lp.help.add-builtin-target, bundle, bundle ..
 
 lp.help.disable            =$(call lp.fn.var.erase, __LP_HELP_ENABLED)
 lp.help.add-extra-dots     =$(call lp.fn.var.assign, __LP_EXTRA_DOTS, $(1))
-lp.help.add-target         =$(call lp.fn.var.append, __LP_HELP_TARGETS, $$(info $$(__LP_EMPTY_STRING) $$(__LP_EMPTY_STRING) $$(strip $(1)) $$(strip $(2))))
+#lp.help.add-target         =$(call lp.fn.var.append, __LP_HELP_TARGETS, $$(info $$(__LP_EMPTY_STRING) $$(__LP_EMPTY_STRING) $$(strip $(1)) $$(strip $(2))))
+lp.help.add-target         =$(call lp.fn.var.append, __LP_HELP_TARGETS, $$(call lp.fn.print.indented, $$(strip $(1)) $$(strip $(2))))
 lp.help.add-phony-target   =$(eval .PHONY: $(1)) $(call lp.help.add-target, $(strip $(1)) $(strip $(2)))
 lp.help.add-builtin-target =$(if $(call lp.$(strip $(1)).is-enabled),\
                                  $(call lp.fn.print.indented, $(strip $(2)) $(call lp.$(strip $(1)).get-description)) \
@@ -505,8 +506,6 @@ lp.run                                  =$(call lp.fn.if.equal, \
                                                 TypeScript,\
                                                 $(lp.run.typescript),\
                                                 $(lp.run.javascript)) $(1)
-
-LP_RUN=$(call lp.run)
 
 #-----------------------------------------------------------------------------------------------------------------------
 #

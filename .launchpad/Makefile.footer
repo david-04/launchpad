@@ -11,7 +11,6 @@
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(foreach name, $(call lp.help.get-phony-targets), lp.$(name)) : ;
-	$(info )
 	$(call lp.help.print-targets)
 
 ifeq "$(call lp.help.is-enabled)" "true"
