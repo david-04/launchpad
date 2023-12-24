@@ -23,13 +23,13 @@ export function createMakefile(context: MigrationContext) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function getDefaultTarget({ bundler, runtime, tscOutDir, bundlerOutDir, projectName }: NewConfig) {
-    const prerequisites = bundler.value === "disabled" ? "LP_TSC_TARGETS" : "LP_BUNDLE_TARGETS";
+    const prerequisites = bundler.value === "disabled" ? "LP_PREREQUISITE_TSC" : "LP_PREREQUISITE_BUNDLE";
     if ("web" === runtime.value) {
         return [`autorun : $(${prerequisites});`, ""];
     } else {
         const directory = "disabled" === bundler.value ? tscOutDir : bundlerOutDir;
         const script = `${directory}/${projectName}.js`;
-        return [`autorun : $(${prerequisites})`, `\t$(lp.run, ${script})`, ""];
+        return [`autorun : $(${prerequisites})`, `\t$(call lp.run, ${script})`, ""];
     }
 }
 

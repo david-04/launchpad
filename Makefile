@@ -99,21 +99,6 @@ $(call lp.clean.tsc-output)
 $(call lp.clean.bundles)
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Run
-#-----------------------------------------------------------------------------------------------------------------------
-
-test.help : run-test.help;
-test.init : run-test.init;
-test.postinstall : run-test.postinstall;
-test.uplift : run-test.uplift;
-
-run-test.% : $(LP_TSC_TARGETS)
-	echo Running launchpad $*...
-	echo
-	$(call lp.run, build/test.js) $*
-
-
-#-----------------------------------------------------------------------------------------------------------------------
 # Test
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -150,7 +135,7 @@ ADD_TEST=$(eval $(call ADD_TEST_2,$(strip $(1)),$(strip $(2))))
 define ADD_TEST_2
 .PHONY: test.$(1)
 $(eval TEST_TARGETS+= test.$(1))
-test.$(1) : $$(LP_BUNDLE_TARGETS)
+test.$(1) : $(LP_PREREQUISITE_BUNDLE)
 	$$(call TEST_INIT, $(1)) $(2)
 
 endef
@@ -190,10 +175,10 @@ $(call ADD_TEST, web-lib-esm-bundled , $(WEB) $(LIB) $(ESM) $(BUNDLER_LIB)		)
 test :;
 	$(foreach TARGET, test.all test.interactive $(TEST_TARGETS), $(info $()  $(TARGET)))
 
-test.all : $(LP_BUNDLE_TARGETS);
+test.all : $(LP_PREREQUISITE_BUNDLE);
 	make --silent --no-print-directory $(TEST_TARGETS)
 
-test.interactive : $(LP_BUNDLE_TARGETS)
+test.interactive : $(LP_PREREQUISITE_BUNDLE)
 	$(call TEST_INIT_INTERACTIVE, interactive)
 
 #-----------------------------------------------------------------------------------------------------------------------

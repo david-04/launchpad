@@ -29,7 +29,7 @@ $(call lp.tsc.overwrite-command          , tsc -b    ) # overwrite the command i
 $(call lp.tsc.get-command-with-hooks     , Compile...) # get the command with all hooks (with an optional "echo")
 $(call lp.tsc.get-default-command        , Compile...) # get the built-in command (with an optional "echo")
 
-$(LP_TSC_TARGETS)                                      # use as a prerequisite for targets that depend on "tsc"
+$(LP_PREREQUISITE_TSC)                                 # use as a prerequisite for targets that depend on "tsc"
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle
@@ -60,7 +60,7 @@ $(call lp.bundle.overwrite-command       , tsc -b    ) # overwrite the command i
 $(call lp.bundle.get-command-with-hooks  , Bundle... ) # get the command with all hooks (with an optional "echo")
 $(call lp.bundle.get-default-command     , Bundle... ) # get the built-in command (with an optional "echo")
 
-$(LP_BUNDLE_TARGETS)                                   # use as a prerequisite for targets that depend on "bundle"
+$(LP_PREREQUISITE_BUNDLE)                              # use as a prerequisite for targets that depend on "bundle"
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Format

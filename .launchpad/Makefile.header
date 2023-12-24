@@ -1,3 +1,5 @@
+.SECONDEXPANSION:
+
 #-----------------------------------------------------------------------------------------------------------------------
 # Files and directories
 #-----------------------------------------------------------------------------------------------------------------------
@@ -282,7 +284,7 @@ lp.tsc.get-default-command              =$(if $(1), echo $(1) && )$(strip $(__LP
 lp.tsc.get-effective-command            =$(strip $(__LP_TSC_EFFECTIVE_COMMAND))
 lp.tsc.get-command-with-hooks           =$(call lp.fn.get-command, tsc, $(1))
 
-LP_TSC_TARGETS                          =$(call lp.tsc.get-targets)
+LP_PREREQUISITE_TSC                     =$$(call lp.tsc.get-targets)
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
@@ -410,7 +412,7 @@ lp.bundle.get-default-command           =$(if $(1), echo $(1) && )$(call lp.fn.i
 lp.bundle.get-effective-command         =$(strip $(__LP_BUNDLE_EFFECTIVE_COMMAND))
 lp.bundle.get-command-with-hooks        =$(call lp.fn.get-command, bundle, $(1))
 
-LP_BUNDLE_TARGETS                       =$(call lp.bundle.get-targets)
+LP_PREREQUISITE_BUNDLE                  =$$(call lp.bundle.get-targets)
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
