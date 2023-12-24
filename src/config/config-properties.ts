@@ -88,6 +88,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         configFile: {
             currentKey: "LP_SETTINGS_BUNDLER_OUT_DIR",
             newConfigObjectName: "bundlerOutDir",
+            comment: "only applicable if bundling is enabled",
         },
         commandLine: {
             option: "--bundler-out-dir",
@@ -266,6 +267,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         configFile: {
             currentKey: "LP_SETTINGS_PROJECT_NAME",
             newConfigObjectName: "projectName",
+            comment: "the main module's file name",
         },
         commandLine: {
             option: "--project-name",
@@ -330,13 +332,13 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     //------------------------------------------------------------------------------------------------------------------
     //
-    //   ########    ###    ########         ######  ####  ######  ########
-    //      ##      ## ##   ##     ##       ##    ##  ##  ##    ## ##
-    //      ##     ##   ##  ##     ##       ##        ##  ##       ##
-    //      ##    ##     ## ########         ######   ##   ######  ######
-    //      ##    ######### ##     ##             ##  ##        ## ##
-    //      ##    ##     ## ##     ##       ##    ##  ##  ##    ## ##
-    //      ##    ##     ## ########         ######  ####  ######  ########
+    //   ########    ###    ########        ######  #### ######## ########
+    //      ##      ## ##   ##     ##      ##    ##  ##       ##  ##
+    //      ##     ##   ##  ##     ##      ##        ##      ##   ##
+    //      ##    ##     ## ########        ######   ##     ##    ######
+    //      ##    ######### ##     ##            ##  ##    ##     ##
+    //      ##    ##     ## ##     ##      ##    ##  ##   ##      ##
+    //      ##    ##     ## ########        ######  #### ######## ########
     //
     //------------------------------------------------------------------------------------------------------------------
 
@@ -345,6 +347,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         configFile: {
             currentKey: "LP_SETTINGS_TAB_SIZE",
             newConfigObjectName: "tabSize",
+            comment: "only applicable if code formatting is enabled",
         },
         commandLine: {
             option: "--tab-size",
@@ -371,6 +374,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         configFile: {
             currentKey: "LP_SETTINGS_TSC_OUT_DIR",
             newConfigObjectName: "tscOutDir",
+            comment: "directory for compiled JavaScript files",
         },
         commandLine: {
             option: "--tsc-out-dir",
@@ -418,6 +422,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         configFile: {
             currentKey: "LP_SETTINGS_WEB_APP_DIR",
             newConfigObjectName: "webAppDir",
+            comment: "only applicable for web applications",
         },
         commandLine: {
             option: "--web-app-dir",

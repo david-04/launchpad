@@ -78,7 +78,8 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
     const parseOldValue = createOldValueParser<ALL>(matchesConfigFileKey, createNonPinnableEnumParser(allValues));
     const parseNewValue = createNonPinnableEnumParser(currentValues);
     const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
-    const serialize = createSerializer<CURRENT, KEY>(property.configFile, (value: CURRENT) => value);
+    const values = currentValues.join(", ");
+    const serialize = createSerializer<CURRENT, KEY>(property.configFile, (value: CURRENT) => value, values);
     const assertOldValuePresent = createAssertPresentHandler<KEY, ALL>(property.name, property.configFile);
     const descriptor = {
         commandLineInfo,
@@ -119,8 +120,9 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
     );
     const parseNewValue = createPinnableEnumParser(currentValues);
     const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
+    const values = currentValues.join(", ");
     const render = (prop: PinnableEnumValue<CURRENT>) => [prop.value, prop.pinned ? PINNED_SUFFIX : ""].join("");
-    const serialize = createSerializer<PinnableEnumValue<CURRENT>, KEY>(property.configFile, render);
+    const serialize = createSerializer<PinnableEnumValue<CURRENT>, KEY>(property.configFile, render, values);
     const assertOldValuePresent = createAssertPresentHandler<KEY, PinnableEnumValue<ALL>>(
         property.name,
         property.configFile
@@ -352,13 +354,14 @@ function createOldValueParser<OLD>(
 
 function createSerializer<NEW, KEY extends string>(
     descriptor: ConfigFileDescriptor<KEY> | undefined,
-    render: (value: NEW) => string
+    render: (value: NEW) => string,
+    fallbackComment?: string
 ) {
     return (data: Record<KEY, NEW>) => {
         if (descriptor && "currentKey" in descriptor && "newConfigObjectName" in descriptor) {
             const key = descriptor.currentKey;
             const value = render(data[descriptor.newConfigObjectName]);
-            const comment = descriptor.comment ?? "";
+            const comment = descriptor.comment ?? fallbackComment ?? "";
             return { key, value, comment } as const;
         } else {
             return undefined;
