@@ -30,13 +30,10 @@ export async function uplift(projectRoot: Path, configFile: Path, _options: Read
         }
         fail(lines.flatMap(breakLine).join("\n"));
     } else {
-        console.log("Uplifting the project...");
+        const project = oldConfig.projectName ? `project ${oldConfig.projectName}` : "the project";
+        console.log(`Uplifting ${project}...`);
         migrate({ operation: "uplift", oldConfig, newConfig: undefined, projectRoot });
         console.log("");
-        if (oldConfig.projectName) {
-            console.log(`✅ Successfully uplifted project ${oldConfig.projectName}`);
-        } else {
-            console.log(`✅ Successfully uplifted the project`);
-        }
+        console.log(`✅ Successfully uplifted ${project}`);
     }
 }
