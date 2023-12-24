@@ -10,8 +10,8 @@ export function createDebugModule(context: MigrationContext) {
     if (context.newConfig.createDebugModule && !debugModule.exists) {
         if (mainModule.exists || context.newConfig.createProjectTemplate) {
             const importFileExtension = "esm" === context.newConfig.moduleSystem ? ".js" : "";
-            const importPath = `${context.newConfig.projectName}${importFileExtension}`;
-            debugModule.contents = `import from ${JSON.stringify(importPath)};`;
+            const importPath = `./${context.newConfig.projectName}${importFileExtension}`;
+            debugModule.contents = `import ${JSON.stringify(importPath)};`;
         } else {
             debugModule.contents = `console.log("This is the debug module");`;
         }

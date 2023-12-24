@@ -20,3 +20,4 @@
 /build
 /dist/launchpad.js*
 /resources/tsconfig/tsconfig.*.json
+/test

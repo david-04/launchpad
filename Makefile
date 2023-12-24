@@ -112,6 +112,90 @@ run-test.% : $(LP_TSC_TARGETS)
 	echo
 	$(call lp.run, build/test.js) $*
 
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Test
+#-----------------------------------------------------------------------------------------------------------------------
+
+DELETE_TEST_DIRECTORY=$(if $(wildcard ./test/$(strip $(1))), rm -rf ./test/$(strip $(1)), echo -n "")
+
+TEST_INIT_INTERACTIVE=\
+	$(call DELETE_TEST_DIRECTORY, $(1)) \
+	&& mkdir -p "./test/$(strip $(1))" \
+	&& cd "./test/$(strip $(1))" \
+	&& node ../../dist/launchpad.js init
+
+TEST_INIT=$(TEST_INIT_INTERACTIVE) --auto-selected-dependencies= \
+                                   --bundler-out-dir=default \
+                                   --create-debug-module=true \
+                                   --create-project-template=true \
+                                   --formatter=prettier \
+                                   --install-dev-dependencies=false \
+                                   --installation-mode=global \
+                                   --optional-dependencies= \
+                                   --package-manager=npm \
+                                   --preselected-dependencies= \
+                                   --project-name=default \
+                                   --src-dir=default \
+                                   --tab-size=4 \
+                                   --tsc-out-dir=default \
+                                   --web-app-dir=default
+
+
+
+TEST_TARGETS=
+
+ADD_TEST=$(eval $(call ADD_TEST_2,$(strip $(1)),$(strip $(2))))
+
+define ADD_TEST_2
+.PHONY: test.$(1)
+$(eval TEST_TARGETS+= test.$(1))
+test.$(1) : $$(LP_BUNDLE_TARGETS)
+	$$(call TEST_INIT, $(1)) $(2)
+
+endef
+
+CLI=--runtime=cli
+WEB=--runtime=web
+APP=--artifact=app
+LIB=--artifact=lib
+ESM=--module-system=esm
+CJS=--module-system=cjs
+BUNDLER_DISABLED=--bundler=disabled --dts-bundler=disabled
+BUNDLER_APP=--bundler=default --dts-bundler=disabled
+BUNDLER_LIB=--bundler=default --dts-bundler=default
+
+$(call ADD_TEST, cli-app-cjs         , $(CLI) $(APP) $(CJS) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, cli-app-cjs-bundled , $(CLI) $(APP) $(CJS) $(BUNDLER_APP)		)
+$(call ADD_TEST, cli-app-esm         , $(CLI) $(APP) $(ESM) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, cli-app-esm-bundled , $(CLI) $(APP) $(ESM) $(BUNDLER_APP)		)
+
+$(call ADD_TEST, cli-lib-cjs         , $(CLI) $(LIB) $(CJS) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, cli-lib-cjs-bundled , $(CLI) $(LIB) $(CJS) $(BUNDLER_LIB)		)
+$(call ADD_TEST, cli-lib-esm         , $(CLI) $(LIB) $(ESM) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, cli-lib-esm-bundled , $(CLI) $(LIB) $(ESM) $(BUNDLER_LIB)		)
+
+$(call ADD_TEST, web-app-cjs         , $(WEB) $(APP) $(CJS) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, web-app-cjs-bundled , $(WEB) $(APP) $(CJS) $(BUNDLER_APP)		)
+$(call ADD_TEST, web-app-esm         , $(WEB) $(APP) $(ESM) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, web-app-esm-bundled , $(WEB) $(APP) $(ESM) $(BUNDLER_APP)		)
+
+$(call ADD_TEST, web-lib-cjs         , $(WEB) $(LIB) $(CJS) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, web-lib-cjs-bundled , $(WEB) $(LIB) $(CJS) $(BUNDLER_LIB)		)
+$(call ADD_TEST, web-lib-esm         , $(WEB) $(LIB) $(ESM) $(BUNDLER_DISABLED)	)
+$(call ADD_TEST, web-lib-esm-bundled , $(WEB) $(LIB) $(ESM) $(BUNDLER_LIB)		)
+
+.PHONY: test test.all test.interactive
+
+test :;
+	$(foreach TARGET, test.all test.interactive $(TEST_TARGETS), $(info $()  $(TARGET)))
+
+test.all : $(LP_BUNDLE_TARGETS);
+	make --silent --no-print-directory $(TEST_TARGETS)
+
+test.interactive : $(LP_BUNDLE_TARGETS)
+	$(call TEST_INIT_INTERACTIVE, interactive)
+
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets
 #-----------------------------------------------------------------------------------------------------------------------
