@@ -39,5 +39,7 @@ function getRelativeJsMainModulePath(context: MigrationContext) {
     const jsDirectory = usesBundler ? context.newConfig.bundlerOutDir : context.newConfig.tscOutDir;
     const fileName = `${context.newConfig.projectName}.js`;
     const htmlDirectory = context.newConfig.webAppDir;
-    return htmlDirectory === jsDirectory ? fileName : `${relative(htmlDirectory, jsDirectory)}/${fileName}`;
+    const relativePath = relative(htmlDirectory, jsDirectory).replaceAll("\\", "/");
+    const normalizedRelativePath = relativePath ? `${relativePath}/` : "";
+    return htmlDirectory === jsDirectory ? fileName : `${normalizedRelativePath}${fileName}`;
 }
