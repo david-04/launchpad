@@ -82,13 +82,13 @@ export class File {
 
     public getSummaryOfChanges() {
         if (this.mustDelete()) {
-            return [`Deleted file ${this.absolutePath.path}`];
+            return [`Deleted ${this.absolutePath.path}`];
         } else if (!this.mustCreateOrOverwrite()) {
             return [];
         } else if (undefined === this.originalContents) {
-            return [`Created file ${this.absolutePath.path}`];
+            return [`Created ${this.absolutePath.path}`];
         } else {
-            return [`Updated file ${this.absolutePath.path}`];
+            return [`Updated ${this.absolutePath.path}`];
         }
     }
 

@@ -50,9 +50,9 @@ export class Directory {
 
     public getSummaryOfChanges() {
         if (this.mustDelete()) {
-            return [`Deleted directory ${this.absolutePath.path}`];
+            return [`Deleted ${this.absolutePath.path}`];
         } else if (this.mustCreate()) {
-            return [`Created directory ${this.absolutePath.path}`];
+            return [`Created ${this.absolutePath.path}`];
         } else {
             return [];
         }

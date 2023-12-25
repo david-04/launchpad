@@ -129,15 +129,13 @@ TEST_INIT=$(TEST_INIT_INTERACTIVE) --auto-selected-dependencies= \
 
 
 
-TEST_TARGETS=
-
 ADD_TEST=$(eval $(call ADD_TEST_2,$(strip $(1)),$(strip $(2))))
 
 define ADD_TEST_2
 .PHONY: test.$(1)
 $(eval TEST_TARGETS+= test.$(1))
 test.$(1) : $(LP_PREREQUISITE_BUNDLE)
-	$$(call TEST_INIT, $(1)) $(2)
+	$$(call TEST_INIT, $(1)) $(2) # && make
 
 endef
 
