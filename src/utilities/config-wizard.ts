@@ -67,8 +67,8 @@ export async function getNewConfig(
     const runtime = await getRuntime(presets);
     const moduleSystem = await getModuleSystem(presets);
     const installationMode = await getInstallationMode(presets);
-    const bundler = await getBundler(presets);
-    const dtsBundler = await getDtsBundler(presets, bundler);
+    const bundler = await getBundler(presets, artifact);
+    const dtsBundler = await getDtsBundler(presets, artifact, bundler);
     const formatter = await getFormatter(presets);
     const tabSize = await getTabSize(presets);
     const packageManager = await getPackageManager(presets);
@@ -199,7 +199,7 @@ async function getRuntime(presets: Presets): Promise<NewConfig["runtime"]> {
         const choices = toChoice(options);
         const initial = findNonPinnableMatchingChoice(options, oldValue, preselectedValue);
         return runtimeCliToConfig(
-            await prompt<Exclude<T, "default" | undefined>>({ type: "select", message: "Artifact", choices, initial })
+            await prompt<Exclude<T, "default" | undefined>>({ type: "select", message: "Runtime", choices, initial })
         );
     }
 }
@@ -264,11 +264,11 @@ async function getInstallationMode(presets: Presets) {
 // Select the bundler
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getBundler(presets: Presets) {
+async function getBundler(presets: Presets, artifact: NewConfig["artifact"]) {
     const FIELD = "bundler";
     type T = NewConfig[typeof FIELD];
     const defaultValue: T = DEFAULT_BUNDLER;
-    const preselectedValue: T = pinned("disabled");
+    const preselectedValue: T = "lib" === artifact ? DEFAULT_BUNDLER : pinned("disabled");
     const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
@@ -288,13 +288,13 @@ async function getBundler(presets: Presets) {
 // Select the DTS bundler
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getDtsBundler(presets: Presets, bundler: NewConfig["bundler"]) {
+async function getDtsBundler(presets: Presets, artifact: NewConfig["artifact"], bundler: NewConfig["bundler"]) {
     if ("disabled" === bundler.value) {
         return pinned("disabled");
     }
     const FIELD = "dtsBundler";
     type T = NewConfig[typeof FIELD];
-    const defaultValue = DEFAULT_DTS_BUNDLER;
+    const defaultValue = "lib" === artifact ? DEFAULT_DTS_BUNDLER : pinned("disabled");
     const presetValue = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
