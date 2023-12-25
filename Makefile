@@ -97,19 +97,18 @@ $(call lp.format.exclude, src/resources/embedded-tsconfig.ts)
 
 $(call lp.clean.tsc-output)
 $(call lp.clean.bundles)
-$(call lp.clean.files, ./test)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Test
 #-----------------------------------------------------------------------------------------------------------------------
 
-DELETE_TEST_DIRECTORY=$(if $(wildcard ./test/$(strip $(1))), rm -rf ./test/$(strip $(1)), echo -n "")
+DELETE_TEST_DIRECTORY=$(if $(wildcard ../launchpad-test/$(strip $(1))), rm -rf ../launchpad-test/$(strip $(1)), echo -n "")
 
 TEST_INIT_INTERACTIVE=\
 	$(call DELETE_TEST_DIRECTORY, $(1)) \
-	&& mkdir -p "./test/$(strip $(1))" \
-	&& cd "./test/$(strip $(1))" \
-	&& node ../../dist/launchpad.js init
+	&& mkdir -p "../launchpad-test/$(strip $(1))" \
+	&& cd "../launchpad-test/$(strip $(1))" \
+	&& node ../../launchpad/dist/launchpad.js init
 
 TEST_INIT=$(TEST_INIT_INTERACTIVE) --auto-selected-dependencies= \
                                    --bundler-out-dir=default \

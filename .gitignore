@@ -21,4 +21,3 @@
 /dist/launchpad.js*
 /dist/launchpad.d.ts
 /resources/tsconfig/tsconfig.*.json
-/test
