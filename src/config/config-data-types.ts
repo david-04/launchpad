@@ -19,7 +19,7 @@ export class ValidationError extends Error {
 export type CommandLineOption = {
     readonly key: string;
     readonly value: string;
-}
+};
 
 export type CommandLineOptions = ReadonlyArray<CommandLineOption>;
 

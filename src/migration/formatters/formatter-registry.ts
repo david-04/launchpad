@@ -1,4 +1,5 @@
 import { NewConfig, OldConfig } from "config/config-objects";
+import { Biome } from "./biome";
 import { Formatter } from "./formatter";
 import { NoFormatter } from "./no-formatter";
 import { Prettier } from "./prettier";
@@ -10,6 +11,7 @@ import { Prettier } from "./prettier";
 const FORMATTERS = {
     disabled: new NoFormatter(),
     prettier: new Prettier(),
+    biome: new Biome(),
 } as const satisfies Record<NewConfig["formatter"]["value"] | OldConfig["formatter"]["value"], Formatter>;
 
 //----------------------------------------------------------------------------------------------------------------------

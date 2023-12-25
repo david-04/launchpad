@@ -531,8 +531,8 @@ function toDependencyOptions(dependencies: Record<"mandatory" | "preselected" | 
     return {
         autoSelected: [...dependencies.mandatory],
         interactive: [
-            ...Array.from(preselected).map(value => ({ value, title: value, selected: true } as const)),
-            ...Array.from(optional).map(value => ({ value, title: value, selected: false } as const)),
+            ...Array.from(preselected).map(value => ({ value, title: value, selected: true }) as const),
+            ...Array.from(optional).map(value => ({ value, title: value, selected: false }) as const),
         ].sort((a, b) => a.value.localeCompare(b.value)) as Choice[],
     } as const;
 }

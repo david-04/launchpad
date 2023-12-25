@@ -31,7 +31,7 @@ function updateDevDependencies(config: NewConfig, packageJson: PackageJsonOperat
     addOrRemove("always", { always: ["typescript", "ts-node"] });
     addOrRemove(config.bundler.value, { disabled: [], esbuild: ["esbuild"] });
     addOrRemove(config.dtsBundler.value, { disabled: [], "dts-bundle-generator": ["dts-bundle-generator"] });
-    addOrRemove(config.formatter.value, { disabled: [], prettier: ["prettier"] });
+    addOrRemove(config.formatter.value, { disabled: [], prettier: ["prettier"], biome: ["@biomejs/biome"] });
 }
 
 function addAndRemoveDevDependencies<const T extends string>(

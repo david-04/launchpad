@@ -17,31 +17,12 @@ export type PackageJson = PackageJsonObject & {
     readonly peerDependencies?: { readonly [index: string]: string };
     readonly name?: string;
     readonly packageManager?: string;
-    readonly prettier?: PackageJsonPrettier;
+    readonly prettier?: PackageJsonObject;
     readonly private?: boolean;
     readonly scripts?: { readonly [index: string]: string };
     readonly type?: "module" | "commonjs";
     readonly version?: string;
     readonly swpm?: "npm" | "yarn" | "yarn@berry" | "pnpm" | "bun";
-};
-
-export type PackageJsonPrettier = {
-    readonly arrowParens?: "avoid" | "always";
-    readonly bracketSameLine?: boolean;
-    readonly bracketSpacing?: boolean;
-    readonly embeddedLanguageFormatting?: "off" | "auto";
-    readonly endOfLine?: "lf" | "crlf" | "cr" | "auto";
-    readonly htmlWhitespaceSensitivity?: "css" | "strict" | "ignore";
-    readonly jsxSingleQuote?: boolean;
-    readonly printWidth?: number;
-    readonly proseWrap?: "always" | "never" | "preserve";
-    readonly quoteProps?: "as-needed" | "consistent" | "preserve";
-    readonly semi?: boolean;
-    readonly singleAttributePerLine?: boolean;
-    readonly singleQuote?: boolean;
-    readonly tabWidth?: number;
-    readonly trailingComma?: "all" | "es5" | "none";
-    readonly useTabs?: boolean;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,14 +47,6 @@ export class PackageJsonOperations {
 
     public set json(json: PackageJson) {
         this.file.json = json;
-    }
-
-    public getPrettierConfiguration() {
-        return this.json.prettier ?? {};
-    }
-
-    public setPrettierConfiguration(config: PackageJsonPrettier) {
-        this.file.json = { ...this.json, prettier: config } as const satisfies PackageJson;
     }
 
     //------------------------------------------------------------------------------------------------------------------

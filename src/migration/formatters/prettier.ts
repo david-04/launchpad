@@ -1,6 +1,30 @@
 import { MigrationContext } from "migration/data/migration-context";
-import { PackageJsonOperations, PackageJsonPrettier } from "migration/files/package-json";
 import { Formatter } from "./formatter";
+
+//----------------------------------------------------------------------------------------------------------------------
+// Default Prettier configuration
+//----------------------------------------------------------------------------------------------------------------------
+
+function getDefaultPrettierConfiguration(tabSize: number) {
+    return {
+        arrowParens: "avoid",
+        bracketSameLine: false,
+        bracketSpacing: true,
+        embeddedLanguageFormatting: "auto",
+        endOfLine: "lf",
+        htmlWhitespaceSensitivity: "css",
+        jsxSingleQuote: false,
+        printWidth: 120,
+        proseWrap: "preserve",
+        quoteProps: "consistent",
+        semi: true,
+        singleAttributePerLine: false,
+        singleQuote: false,
+        tabWidth: tabSize,
+        trailingComma: "es5",
+        useTabs: false,
+    } as const;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // Prettier code formatter
@@ -34,34 +58,13 @@ export class Prettier extends Formatter {
 
 function updatePrettierConfigurationExcludingVsCode(context: MigrationContext) {
     const { packageJson } = context.fileOperations;
-    setProperty(packageJson, "arrowParens", "avoid");
-    setProperty(packageJson, "bracketSameLine", false);
-    setProperty(packageJson, "bracketSpacing", true);
-    setProperty(packageJson, "embeddedLanguageFormatting", "auto");
-    setProperty(packageJson, "endOfLine", "lf");
-    setProperty(packageJson, "htmlWhitespaceSensitivity", "css");
-    setProperty(packageJson, "jsxSingleQuote", false);
-    setProperty(packageJson, "printWidth", 120);
-    setProperty(packageJson, "proseWrap", "preserve");
-    setProperty(packageJson, "quoteProps", "as-needed");
-    setProperty(packageJson, "semi", true);
-    setProperty(packageJson, "singleAttributePerLine", false);
-    setProperty(packageJson, "singleQuote", false);
-    setProperty(packageJson, "tabWidth", context.newConfig.tabSize, "overwrite");
-    setProperty(packageJson, "trailingComma", "es5");
-    setProperty(packageJson, "useTabs", false);
-}
-
-function setProperty<T extends keyof PackageJsonPrettier>(
-    packageJson: PackageJsonOperations,
-    key: T,
-    value: PackageJsonPrettier[T],
-    overwrite?: "overwrite"
-) {
-    const prettierConfig = packageJson.getPrettierConfiguration();
-    if (prettierConfig[key] !== value || overwrite === "overwrite") {
-        packageJson.setPrettierConfiguration({ ...prettierConfig, [key]: value });
-    }
+    packageJson.json = {
+        ...packageJson.json,
+        prettier: {
+            ...packageJson.json.prettier,
+            ...getDefaultPrettierConfiguration(context.newConfig.tabSize),
+        },
+    };
 }
 
 //----------------------------------------------------------------------------------------------------------------------

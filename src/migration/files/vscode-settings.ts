@@ -38,7 +38,6 @@ export type VSCodeSettings = VSCodeSettingsObject & Readonly<Record<`[${VsCodeLa
 const FORMAT_ON_SAVE = "editor.formatOnSave";
 const DEFAULT_FORMATTER = "editor.defaultFormatter";
 
-
 //----------------------------------------------------------------------------------------------------------------------
 // Wrapper for the package.json file
 //----------------------------------------------------------------------------------------------------------------------
