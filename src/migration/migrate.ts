@@ -12,6 +12,7 @@ import { createIndexCss } from "./actions/create-index-css";
 import { createIndexHtml } from "./actions/create-index-html";
 import { createMainModule } from "./actions/create-main-module";
 import { createMakefile } from "./actions/create-makefile";
+import { createOutputDirectories } from "./actions/create-output-directories";
 import { createTsconfigJson } from "./actions/create-tsconfig-json";
 import { installOrUpgradeNpmPackages } from "./actions/install-or-upgrade-npm-packages";
 import { recreateLaunchpadDirectoryMakefiles } from "./actions/recreate-launchpad-directory-makefiles";
@@ -86,6 +87,9 @@ function prepareMigrationSteps(context: MigrationContext) {
     createIndexCss(context);
     createMainModule(context);
     createMakefile(context);
+
+    // output directories
+    createOutputDirectories(context);
 
     // code formatter
     configureFormatter(context);
