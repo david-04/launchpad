@@ -8,7 +8,7 @@ import type { File } from "../data/file";
 // Type definitions
 //----------------------------------------------------------------------------------------------------------------------
 
-const VSCODE_LANGUAGE_IDS = [
+export const VSCODE_LANGUAGE_IDS = [
     "css",
     "html",
     "json",
@@ -35,6 +35,10 @@ export type VSCodeSettingsLanguage = VSCodeSettingsObject & {
 
 export type VSCodeSettings = VSCodeSettingsObject & Readonly<Record<`[${VsCodeLanguageId}]`, VSCodeSettingsLanguage>>;
 
+const FORMAT_ON_SAVE = "editor.formatOnSave";
+const DEFAULT_FORMATTER = "editor.defaultFormatter";
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // Wrapper for the package.json file
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,31 +64,40 @@ export class VSCodeSettingsOperations {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Formatter
+    // Set or remove the formatter
     //------------------------------------------------------------------------------------------------------------------
 
-    public setFormatters(formatters: Partial<Record<VsCodeLanguageId, string>>) {
-        for (const languageId of VSCODE_LANGUAGE_IDS) {
-            const formatter = formatters[languageId];
-            formatter ? this.setFormatter(languageId, formatter) : this.removeFormatter(languageId);
+    public setFormatter(languageId: VsCodeLanguageId, formatter: string) {
+        const key = VSCodeSettingsOperations.languageIdToJsonKey(languageId);
+        this.json = { ...this.json, [key]: { ...this.json[key], DEFAULT_FORMATTER: formatter } };
+    }
+
+    public removeFormatter(languageId: VsCodeLanguageId) {
+        const key = VSCodeSettingsOperations.languageIdToJsonKey(languageId);
+        if (this.json[key]) {
+            const languageSettings = { ...this.json[key] };
+            delete languageSettings[DEFAULT_FORMATTER];
+            this.json = { ...this.json, [key]: languageSettings };
         }
     }
 
-    private setFormatter(language: VsCodeLanguageId, formatter: string) {
-        this.json = {
-            ...this.json,
-            [`[${language}]`]: {
-                ...this.json[`[${language}]`],
-                "editor.defaultFormatter": formatter,
-            },
-        };
+    //------------------------------------------------------------------------------------------------------------------
+    // Enable format-on-save
+    //------------------------------------------------------------------------------------------------------------------
+
+    public enableFormatOnSaveIfNotSet(languageId: VsCodeLanguageId) {
+        const key = VSCodeSettingsOperations.languageIdToJsonKey(languageId);
+        const json = this.json;
+        if (!(key in json) || !(FORMAT_ON_SAVE in json[key])) {
+            this.json = { ...json, [key]: { ...json[key], [FORMAT_ON_SAVE]: true } };
+        }
     }
 
-    private removeFormatter(language: VsCodeLanguageId) {
-        if (this.json[`[${language}]`]) {
-            const languageSettings = { ...this.json[`[${language}]`] };
-            delete languageSettings["editor.defaultFormatter"];
-            this.json = { ...this.json, [`[${language}]`]: languageSettings };
-        }
+    //------------------------------------------------------------------------------------------------------------------
+    // Convert a language ID to the respective VSCode settings key
+    //------------------------------------------------------------------------------------------------------------------
+
+    private static languageIdToJsonKey(languageId: VsCodeLanguageId) {
+        return `[${languageId}]` as const;
     }
 }

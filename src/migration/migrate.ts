@@ -5,18 +5,24 @@ import { fail } from "../utilities/fail";
 import { breakAndLog, createSeparator } from "../utilities/logging";
 import { breakLine } from "../utilities/string-utilities";
 import { calculateNewConfig } from "./actions/calculate-new-config";
+import { configureFormatter } from "./actions/configure-formatter";
+import { configurePackageManager } from "./actions/configure-package-manager";
 import { createDebugModule } from "./actions/create-debug-module";
 import { createIndexCss } from "./actions/create-index-css";
 import { createIndexHtml } from "./actions/create-index-html";
 import { createMainModule } from "./actions/create-main-module";
 import { createMakefile } from "./actions/create-makefile";
-import { preparePackageManagerCommands } from "./actions/prepare-package-manager-commands";
-import { updateGitignore } from "./actions/update-gitignore";
-import { updateLaunchpadDirectory } from "./actions/update-launchpad-directory";
-import { updatePackageJson } from "./actions/update-package-json";
-import { updatePackageManagerFiles } from "./actions/update-package-manager-files";
-import { updateTsconfigJson } from "./actions/update-tsconfig-json";
-import { updateVsCodeSettings } from "./actions/update-vscode-settings";
+import { createTsconfigJson } from "./actions/create-tsconfig-json";
+import { installOrUpgradeNpmPackages } from "./actions/install-or-upgrade-npm-packages";
+import { recreateLaunchpadDirectoryMakefiles } from "./actions/recreate-launchpad-directory-makefiles";
+import { recreateLaunchpadDirectorySettings } from "./actions/recreate-launchpad-directory-settings";
+import { recreateLaunchpadDirectoryTsConfig } from "./actions/recreate-launchpad-directory-tsconfig";
+import { updateGitignoreBundlerOutput } from "./actions/update-gitignore-bundler-output";
+import { updateGitignorePackageManager } from "./actions/update-gitignore-package-manager";
+import { updateGitignoreTscOutput } from "./actions/update-gitignore-tsc-output";
+import { updatePackageJsonDependencies } from "./actions/update-package-json-dependencies";
+import { updatePackageJsonMetadata } from "./actions/update-package-json-metadata";
+import { updatePackageJsonPackageManager } from "./actions/update-package-json-package-manager";
 import { MigrationContext, type MigrationContextOptions } from "./data/migration-context";
 import { applyFileSystemChanges } from "./executor/apply-file-system-changes";
 
@@ -56,23 +62,39 @@ export function migrate(options: MigrateOptions) {
 
 function prepareMigrationSteps(context: MigrationContext) {
     //
-    // config files
-    updateGitignore(context);
-    updateLaunchpadDirectory(context);
-    updatePackageJson(context);
-    updatePackageManagerFiles(context);
-    updateTsconfigJson(context);
-    updateVsCodeSettings(context);
+    // .launchpad/*
+    recreateLaunchpadDirectoryMakefiles(context);
+    recreateLaunchpadDirectorySettings(context);
+    recreateLaunchpadDirectoryTsConfig(context);
+
+    // .gitignore
+    updateGitignoreBundlerOutput(context);
+    updateGitignorePackageManager(context);
+    updateGitignoreTscOutput(context);
+
+    // package.json
+    updatePackageJsonDependencies(context);
+    updatePackageJsonMetadata(context);
+    updatePackageJsonPackageManager(context);
+
+    // tsconfig.json
+    createTsconfigJson(context);
 
     // project template
-    createMainModule(context);
     createDebugModule(context);
     createIndexHtml(context);
     createIndexCss(context);
+    createMainModule(context);
     createMakefile(context);
 
-    // external commands
-    preparePackageManagerCommands(context);
+    // code formatter
+    configureFormatter(context);
+
+    // package manager
+    configurePackageManager(context);
+
+    // install and upgrade npm packages
+    installOrUpgradeNpmPackages(context);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

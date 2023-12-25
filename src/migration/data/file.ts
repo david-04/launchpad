@@ -10,11 +10,6 @@ export class File {
     public readonly absolutePath: Path;
     public readonly originalContents: string | undefined;
     private newContents: string | undefined;
-    private readonly logMessages = {
-        added: new Array<string>(),
-        updated: new Array<string>(),
-        removed: new Array<string>(),
-    } as const;
 
     //------------------------------------------------------------------------------------------------------------------
     // Initialization
@@ -71,22 +66,6 @@ export class File {
 
     public delete() {
         this.contents = undefined;
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Deposit log messages
-    //------------------------------------------------------------------------------------------------------------------
-
-    public logAdded(...items: string[]) {
-        this.logMessages.added.push(...items);
-    }
-
-    public logUpdated(...items: string[]) {
-        this.logMessages.updated.push(...items);
-    }
-
-    public logRemoved(...items: string[]) {
-        this.logMessages.removed.push(...items);
     }
 
     //------------------------------------------------------------------------------------------------------------------

@@ -5,7 +5,7 @@ import type { MigrationContext } from "../data/migration-context";
 // Create tsconfig.json if it does not exist
 //----------------------------------------------------------------------------------------------------------------------
 
-export function updateTsconfigJson(context: MigrationContext) {
+export function createTsconfigJson(context: MigrationContext) {
     const tsconfigJson = context.files.get(TSCONFIG_JSON);
     if (!tsconfigJson.exists) {
         tsconfigJson.json = {

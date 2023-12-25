@@ -8,11 +8,13 @@ export type PackageJsonValue = string | number | boolean;
 export type PackageJsonObject = { [index: string]: PackageJsonValue | PackageJsonObject | PackageJsonArray };
 export type PackageJsonArray = Array<PackageJsonValue | PackageJsonObject | PackageJsonArray>;
 
+export const DEPENDENCY_KEYS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies"] as const;
+
 export type PackageJson = PackageJsonObject & {
     readonly dependencies?: { readonly [index: string]: string };
     readonly devDependencies?: { readonly [index: string]: string };
-    readonly peerDependencies?: { readonly [index: string]: string };
     readonly optionalDependencies?: { readonly [index: string]: string };
+    readonly peerDependencies?: { readonly [index: string]: string };
     readonly name?: string;
     readonly packageManager?: string;
     readonly prettier?: PackageJsonPrettier;
@@ -55,7 +57,7 @@ export class PackageJsonOperations {
     public constructor(public readonly file: File) {}
 
     //------------------------------------------------------------------------------------------------------------------
-    // Get and set the whole JSON
+    // Getters and setters
     //------------------------------------------------------------------------------------------------------------------
 
     public get json(): PackageJson {
@@ -66,24 +68,41 @@ export class PackageJsonOperations {
         this.file.json = json;
     }
 
-    //------------------------------------------------------------------------------------------------------------------
-    // Prettier configuration
-    //------------------------------------------------------------------------------------------------------------------
-
-    public get PrettierConfig() {
-        return this.json.prettier;
+    public getPrettierConfiguration() {
+        return this.json.prettier ?? {};
     }
 
-    public setPrettierConfig(config: PackageJsonPrettier) {
+    public setPrettierConfiguration(config: PackageJsonPrettier) {
         this.file.json = { ...this.json, prettier: config } as const satisfies PackageJson;
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Delete properties
+    //------------------------------------------------------------------------------------------------------------------
+
+    public deletePrettierConfiguration() {
+        this.deleteProperty("prettier");
+    }
+
+    public deleteProperty(name: string) {
+        const json = { ...this.json };
+        const temp = json as unknown;
+        if (temp && "object" === typeof temp && name in temp) {
+            delete (temp as { [index: string]: unknown })[name];
+        }
+        this.json = json;
     }
 
     //------------------------------------------------------------------------------------------------------------------
     // Dependencies
     //------------------------------------------------------------------------------------------------------------------
 
+    public getAllDependencies() {
+        return DEPENDENCY_KEYS.map(key => this.json[key]).flatMap(value => Object.keys(value ?? {}));
+    }
+
     public containsDependency(name: string) {
-        return [this.json.dependencies, this.json.devDependencies].some(dependencies => name in (dependencies ?? {}));
+        return DEPENDENCY_KEYS.map(key => this.json[key]).some(dependencies => name in (dependencies ?? {}));
     }
 
     public containsTypeScriptDependency() {
@@ -101,7 +120,7 @@ export class PackageJsonOperations {
         }).length;
     }
 
-    public addDependencyIfNotExists(name: string, version: string) {
+    public addDependencyIfMissing(name: string, version: string) {
         if (this.containsDependency(name)) {
             return false;
         } else {
@@ -110,7 +129,7 @@ export class PackageJsonOperations {
         }
     }
 
-    public addDevDependencyIfNotExists(name: string, version: string) {
+    public addDevDependencyIfMissing(name: string, version: string) {
         if (this.containsDependency(name)) {
             return false;
         } else {
