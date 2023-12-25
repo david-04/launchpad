@@ -411,7 +411,7 @@ async function getSrcDir(presets: Presets) {
 //----------------------------------------------------------------------------------------------------------------------
 
 async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" | "artifact">) {
-    if ("web" !== config.runtime.value || "app" !== config.artifact) {
+    if ("web" !== config.runtime.value) {
         return "";
     }
     const FIELD = "webAppDir";
