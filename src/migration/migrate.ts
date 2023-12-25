@@ -179,7 +179,7 @@ function executeExternalCommands(context: MigrationContext) {
         const stringifiedCommand = command.argv.join(" ");
         if (!context.manualActionRequired) {
             try {
-                breakAndLog("- ", command.description);
+                breakAndLog("- ", `${command.description}...`);
                 command.execute();
                 context.activityLog.push(`Ran command: ${stringifiedCommand}`);
             } catch (error) {

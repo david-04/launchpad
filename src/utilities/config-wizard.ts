@@ -199,7 +199,7 @@ async function getRuntime(presets: Presets): Promise<NewConfig["runtime"]> {
         const choices = toChoice(options);
         const initial = findNonPinnableMatchingChoice(options, oldValue, preselectedValue);
         return runtimeCliToConfig(
-            await prompt<Exclude<T, "default" | undefined>>({ type: "select", message: "Bundler", choices, initial })
+            await prompt<Exclude<T, "default" | undefined>>({ type: "select", message: "Artifact", choices, initial })
         );
     }
 }

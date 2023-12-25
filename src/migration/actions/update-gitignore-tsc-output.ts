@@ -14,7 +14,5 @@ export function updateGitignoreTscOutput(context: MigrationContext) {
     if (oldTscOutDir && oldTscOutDir !== newTscOutDir) {
         allGlobs.forEach(glob => context.fileOperations.gitignore.remove(`/${oldTscOutDir}/${glob}`));
     }
-    if (!oldTscOutDir || oldTscOutDir !== newTscOutDir) {
-        currentGlobs.forEach(glob => context.fileOperations.gitignore.add(`/${oldTscOutDir}/${glob}`));
-    }
+    currentGlobs.forEach(glob => context.fileOperations.gitignore.add(`/${newTscOutDir}/${glob}`));
 }

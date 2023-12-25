@@ -86,20 +86,12 @@ export class GitignoreOperations {
     //------------------------------------------------------------------------------------------------------------------
 
     public add(pattern: string) {
-        if (this.containsActive(pattern)) {
-            return false;
-        } else {
+        if (!this.containsActive(pattern)) {
             this.lines = [...this.lines, this.destructure(pattern).normalized];
-            return true;
         }
     }
 
     public remove(pattern: string) {
-        if (this.containsActive(pattern)) {
-            this.lines = this.lines.filter(line => this.matches(line, "active", pattern));
-            return true;
-        } else {
-            return false;
-        }
+        this.lines = this.lines.filter(line => this.matches(line, "active", pattern));
     }
 }
