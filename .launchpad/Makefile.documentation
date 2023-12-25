@@ -41,8 +41,10 @@ $(call lp.bundle.enable-source-maps                  ) # enable source-map gener
 $(call lp.bundle.disable-source-maps                 ) # disable source-map generation
 $(call lp.bundle.enable-inline-sources               ) # include sources in source maps (enables source maps as well)
 $(call lp.bundle.disable-inline-sources              ) # do not include sources in source maps
-$(call lp.bundle.enabled-dts                         ) # generate d.ts typings for each bundle
+$(call lp.bundle.enable-dts                          ) # generate d.ts typings for each bundle
+$(call lp.bundle.enable-dts-only-for-targets, target ) # only bundle d.ts files when building one of those targets
 $(call lp.bundle.disable-dts                         ) # do not generate d.ts typings
+$(call lp.bundle.disable-dts-only-for-targets, test  ) # don't bundle d.ts files when building one of those targets
 
 $(call lp.bundle.disable                             ) # disable the "bundle" target ("lp.bundle" remains active)
 

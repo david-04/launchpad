@@ -97,6 +97,7 @@ $(call lp.format.exclude, src/resources/embedded-tsconfig.ts)
 
 $(call lp.clean.tsc-output)
 $(call lp.clean.bundles)
+$(call lp.clean.files, ./test)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Test

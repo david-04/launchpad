@@ -41,6 +41,11 @@ function getBundleConfiguration({ srcDir, projectName, bundlerOutDir, bundler }:
     if ("disabled" === bundler.value) {
         return [];
     } else {
-        return [`$(call lp.bundle.add-bundle, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js)`, ""];
+        return [
+            "# $(call lp.bundle.enable-dts-only-for-targets, release)",
+            "",
+            `$(call lp.bundle.add-bundle, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js)`,
+            "",
+        ];
     }
 }

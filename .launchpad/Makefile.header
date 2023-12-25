@@ -385,12 +385,32 @@ lp.bundle.overwrite-after-hooks         =$(call lp.fn.var.assign, __LP_BUNDLE_EF
 lp.bundle.overwrite-command             =$(call lp.fn.assert.param-not-empty, lp.bundle.overwrite-command, $(1)) \
                                          $(call lp.fn.var.assign, __LP_BUNDLE_EFFECTIVE_COMMAND, $(1))
 
+
 lp.bundle.enable-source-maps            =$(call lp.fn.var.assign, __LP_BUNDLE_SOURCE_MAPS_ENABLED, true)
 lp.bundle.disable-source-maps           =$(call lp.fn.var.erase, __LP_BUNDLE_SOURCE_MAPS_ENABLED) $(call lp.bundle.disable-inline-sources)
 lp.bundle.enable-inline-sources         =$(call lp.fn.var.assign, __LP_BUNDLE_INLINE_SOURCES_ENABLED, true) $(call lp.bundle.enable-source-maps)
 lp.bundle.disable-inline-sources        =$(call lp.fn.var.erase, __LP_BUNDLE_INLINE_SOURCES_ENABLED)
-lp.bundle.enabled-dts                   =$(call lp.fn.var.assign, __LP_BUNDLER_DTS_BUNDLER, $(if $(LP_SETTINGS_DTS_BUNDLER), $(LP_SETTINGS_DTS_BUNDLER), $(__LP_DEFAULT_DTS_BUNDLER)))
-lp.bundle.disable-dts                   =$(call lp.fn.var.erase, __LP_BUNDLE_DTS_BUNDLER)
+
+lp.bundle.assert-no-bundles-yet         =$(if $(__LP_BUNDLE_COUNT),\
+                                              $(error Calls to $(strip $(1)) must come before any calls to lp.bundle.add-bundle), \
+                                              $(2) \
+                                         )
+lp.bundle.enable-dts                    =$(call lp.bundle.assert-no-bundles-yet, \
+                                                lp.bundle.enable-dts, \
+                                                $(call lp.fn.var.assign, __LP_BUNDLER_DTS_BUNDLER, $(if $(LP_SETTINGS_DTS_BUNDLER), $(LP_SETTINGS_DTS_BUNDLER), $(__LP_DEFAULT_DTS_BUNDLER))) \
+                                          )
+lp.bundle.enable-dts-only-for-targets   =$(call lp.bundle.assert-no-bundles-yet, \
+                                                lp.bundle.enable-dts-only-for-targets, \
+                                                $(if $(filter $(1), $(MAKECMDGOALS)), $(call lp.bundle.enable-dts), $(call lp.bundle.disable-dts)) \
+                                          )
+lp.bundle.disable-dts                   =$(call lp.bundle.assert-no-bundles-yet, \
+                                                lp.bundle.disable-dts, \
+                                                $(call lp.fn.var.erase, __LP_BUNDLE_DTS_BUNDLER) \
+                                          )
+lp.bundle.disable-dts-only-for-targets  =$(call lp.bundle.assert-no-bundles-yet,\
+                                                lp.bundle.disable-dts-only-for-targets, \
+                                                $(if $(filter $(1), $(MAKECMDGOALS)), $(call lp.bundle.disable-dts), $(call lp.bundle.enable-dts)) \
+                                          )
 
 lp.bundle.get-phony-targets             =bundle
 lp.bundle.get-name                      =Bundle
