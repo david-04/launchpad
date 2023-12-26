@@ -14,7 +14,7 @@ import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files";
 //----------------------------------------------------------------------------------------------------------------------
 
 export type MigrationContextOptions = {
-    operation: "initialize" | "uplift";
+    operation: "init" | "uplift";
     projectRoot: Path;
     oldConfig: OldPartialConfig | undefined;
     newConfig: NewConfig;

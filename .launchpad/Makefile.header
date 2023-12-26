@@ -161,6 +161,14 @@ $(call lp.fn.config.validate-enum, LP_SETTINGS_INSTALLATION_MODE)
 $(call lp.fn.config.normalize.string, LP_SETTINGS_SRC_DIR)
 $(call lp.fn.config.assert.not-empty, LP_SETTINGS_SRC_DIR)
 
+LP_SETTINGS_UPLIFT_DEPENDENCIES_ENUMS="true" or "false"
+$(call lp.fn.config.validate-enum, LP_SETTINGS_UPLIFT_DEPENDENCIES)
+ifeq "$(LP_SETTINGS_UPLIFT_DEPENDENCIES)" "false"
+    LP_SETTINGS_UPLIFT_DEPENDENCIES=
+endif
+
+$(call lp.fn.config.normalize.boolean, LP_SETTINGS_UPLIFT_DEPENDENCIES)
+
 $(call lp.fn.config.normalize.string, LP_SETTINGS_TSC_OUT_DIR)
 ifeq "$(LP_SETTINGS_TSC_OUT_DIR)" ""
     $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty)

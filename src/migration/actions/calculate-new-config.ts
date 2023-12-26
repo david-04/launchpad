@@ -32,6 +32,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         srcDir: oldConfig.srcDir,
         tabSize: oldConfig.tabSize,
         tscOutDir: oldConfig.tscOutDir,
+        upliftDependencies: oldConfig.upliftDependencies,
         version: VERSION_NUMBER,
         webAppDir: oldConfig.webAppDir,
     };

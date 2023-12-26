@@ -32,7 +32,7 @@ import { applyFileSystemChanges } from "./executor/apply-file-system-changes";
 //----------------------------------------------------------------------------------------------------------------------
 
 export type MigrateOptions = Omit<MigrationContextOptions, "oldConfig" | "newConfig"> & {
-    operation: "initialize" | "uplift";
+    operation: "init" | "uplift";
 } & (
         | { oldConfig: OldPartialConfig | undefined; newConfig: NewConfig }
         | { oldConfig: OldConfig; newConfig: undefined }

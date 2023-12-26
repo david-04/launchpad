@@ -124,9 +124,8 @@ TEST_INIT=$(TEST_INIT_INTERACTIVE) --auto-selected-dependencies= \
                                    --src-dir=default \
                                    --tab-size=4 \
                                    --tsc-out-dir=default \
+                                   --uplift-dependencies=true \
                                    --web-app-dir=default
-
-
 
 ADD_TEST=$(eval $(call ADD_TEST_2,$(strip $(1)),$(strip $(2))))
 

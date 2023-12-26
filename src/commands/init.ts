@@ -15,7 +15,7 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
     const { projectName } = newConfig;
     console.log(parsedConfig ? `Re-initializing project ${projectName}...` : `Initializing project ${projectName}...`);
     migrate({
-        operation: "initialize",
+        operation: "init",
         oldConfig: parsedConfig?.validated ?? parsedConfig?.partial,
         newConfig,
         projectRoot,

@@ -14,6 +14,7 @@ export const DEFAULT_DIST_DIR = "dist";
 export const DEFAULT_DTS_BUNDLER = unpinned("dts-bundle-generator") satisfies NewConfig["dtsBundler"];
 export const DEFAULT_FORMATTER = unpinned("prettier") satisfies NewConfig["formatter"];
 export const DEFAULT_INSTALL_DEV_DEPENDENCIES = true;
+export const DEFAULT_UPLIFT_DEPENDENCIES = true;
 export const DEFAULT_INSTALLATION_MODE = "local" satisfies NewConfig["installationMode"];
 export const DEFAULT_MODULE_SYSTEM = "esm" satisfies NewConfig["moduleSystem"];
 export const DEFAULT_PACKAGE_MANAGER = unpinned("npm") satisfies NewConfig["packageManager"];

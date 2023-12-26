@@ -26,6 +26,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
         tabSize: ConfigProperties.tabSize.parseOldValue(properties, addError),
         tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
+        upliftDependencies: ConfigProperties.upliftDependencies.parseOldValue(properties, addError),
         version: ConfigProperties.version.parseOldValue(properties, addError),
         webAppDir: ConfigProperties.webAppDir.parseOldValue(properties, addError),
     } as const satisfies { [K in keyof typeof ConfigProperties.currentAndObsolete]: unknown };
@@ -51,6 +52,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             srcDir: ConfigProperties.srcDir.assertOldValuePresent(config.srcDir),
             tabSize: ConfigProperties.tabSize.assertOldValuePresent(config.tabSize),
             tscOutDir: ConfigProperties.tscOutDir.assertOldValuePresent(config.tscOutDir),
+            upliftDependencies: ConfigProperties.upliftDependencies.assertOldValuePresent(config.upliftDependencies),
             version: ConfigProperties.version.assertOldValuePresent(config.version),
             webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.webAppDir),
         } as const satisfies typeof config;
@@ -96,6 +98,7 @@ export type NewConfig = {
     srcDir: NewConfigType<"srcDir">;
     tabSize: NewConfigType<"tabSize">;
     tscOutDir: NewConfigType<"tscOutDir">;
+    upliftDependencies: NewConfigType<"upliftDependencies">;
     version: NewConfigType<"version">;
     webAppDir: NewConfigType<"webAppDir">;
 };
@@ -135,6 +138,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
         tabSize: ConfigProperties.tabSize.parseFromCommandLine(properties),
         tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
+        upliftDependencies: ConfigProperties.upliftDependencies.parseFromCommandLine(properties),
         webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),
     } as const satisfies Omit<{ [K in keyof NewConfigCli]: NewConfigCli[K] | undefined | "default" }, "version">;
 }

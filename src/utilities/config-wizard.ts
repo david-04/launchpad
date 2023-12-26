@@ -25,6 +25,7 @@ import {
     DEFAULT_RUNTIME,
     DEFAULT_SRC_DIR,
     DEFAULT_TAB_SIZE,
+    DEFAULT_UPLIFT_DEPENDENCIES,
 } from "../config/default-config-values";
 import { VERSION_NUMBER } from "../resources/version-information";
 import { DEFAULT_ENUM, type DefaultEnum } from "./constants";
@@ -78,6 +79,7 @@ export async function getNewConfig(
     const bundlerOutDir = await getBundlerOutDir(presets, { runtime, bundler, webAppDir });
     const dependencies = await getDependencies(presets, { runtime });
     const installDevDependencies = await getInstallDevDependencies(presets);
+    const upliftDependencies = await getUpliftDependencies(presets);
     const createProjectTemplate = await getCreateProjectTemplate(presets);
     const createDebugModule = getCreateFile(
         presets,
@@ -112,6 +114,7 @@ export async function getNewConfig(
         srcDir,
         tabSize,
         tscOutDir,
+        upliftDependencies,
         version,
         webAppDir,
     };
@@ -552,6 +555,25 @@ async function getInstallDevDependencies(presets: Presets) {
             yesHint: "Install locally",
             noHint: "Rely on globally installed versions",
             default: DEFAULT_INSTALL_DEV_DEPENDENCIES,
+        });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Uplift dependencies
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getUpliftDependencies(presets: Presets) {
+    const FIELD = "upliftDependencies";
+    const preselectedOption = presets.commandLineConfig[FIELD];
+    if (undefined !== preselectedOption) {
+        return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
+    } else {
+        return promptYesNo({
+            message: "Uplift dependencies",
+            yesHint: "Upgrade all npm packages during uplifts",
+            noHint: "Only upgrade launchpad itself during uplifts",
+            default: DEFAULT_UPLIFT_DEPENDENCIES,
         });
     }
 }
