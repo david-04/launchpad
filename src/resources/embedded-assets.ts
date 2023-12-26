@@ -965,7 +965,13 @@ export const ASSETS = {
     ].join("\n"),
     ".launchpad/uplift.bat": [
         "@echo off",
+        "",
         "cd /D \"%~dp0\\..\"",
+        "",
+        "if not exist \".\\.launchpad\" (",
+        "    echo \"⛔ ERROR: .launchpad/uplift.bat must be run from the project root directory\"",
+        ")",
+        "",
         "echo This is .launchpad/uplift.bat",
         "",
     ].join("\n"),

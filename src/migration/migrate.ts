@@ -18,6 +18,7 @@ import { installOrUpgradeNpmPackages } from "./actions/install-or-upgrade-npm-pa
 import { recreateLaunchpadDirectoryMakefiles } from "./actions/recreate-launchpad-directory-makefiles";
 import { recreateLaunchpadDirectorySettings } from "./actions/recreate-launchpad-directory-settings";
 import { recreateLaunchpadDirectoryTsConfig } from "./actions/recreate-launchpad-directory-tsconfig";
+import { recreateLaunchpadDirectoryUpliftScripts } from "./actions/recreate-launchpad-directory-uplift-scripts";
 import { updateGitignoreBundlerOutput } from "./actions/update-gitignore-bundler-output";
 import { updateGitignorePackageManager } from "./actions/update-gitignore-package-manager";
 import { updateGitignoreTscOutput } from "./actions/update-gitignore-tsc-output";
@@ -67,6 +68,7 @@ function prepareMigrationSteps(context: MigrationContext) {
     recreateLaunchpadDirectoryMakefiles(context);
     recreateLaunchpadDirectorySettings(context);
     recreateLaunchpadDirectoryTsConfig(context);
+    recreateLaunchpadDirectoryUpliftScripts(context);
 
     // .gitignore
     updateGitignoreBundlerOutput(context);

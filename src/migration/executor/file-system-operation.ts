@@ -51,7 +51,8 @@ export class FileSystemOperation {
                 }
                 if (this.fileOrDirectory instanceof File) {
                     const contents = this.fileOrDirectory.contents ?? "";
-                    writeFileSync(this.newPath.path, contents, { encoding: "utf-8", flag: "wx" });
+                    const mode = this.fileOrDirectory.shouldBeExecutable() ? 0o777 : 0o666;
+                    writeFileSync(this.newPath.path, contents, { encoding: "utf-8", flag: "wx", mode });
                 }
                 log.push(`Created ${this.type} ${this.newPath.path}`);
                 this.hasCreatedNew = true;

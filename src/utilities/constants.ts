@@ -13,6 +13,8 @@ export const ERROR_LOG_FILE = "LAUNCHPAD.ERROR";
 export const MAX_LINE_LENGTH = 120;
 export const SEPARATOR_LINE = new Array(MAX_LINE_LENGTH).fill("-").join("");
 
+export const LAUNCHPAD_PACKAGE_NAME = "@david-04/launchpad";
+
 export function defaultMightChange(defaultValue: string) {
-    return `currently ${defaultValue}, might change in future uplifts`;
+    return `currently ${defaultValue} (might change in future uplifts)`;
 }

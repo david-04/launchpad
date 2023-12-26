@@ -7,7 +7,7 @@ import {
 import type { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
-// Recreate the .launchpad/Makefiles.*
+// Recreate .launchpad/Makefiles.*
 //----------------------------------------------------------------------------------------------------------------------
 
 export function recreateLaunchpadDirectoryMakefiles(context: MigrationContext) {

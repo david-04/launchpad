@@ -10,6 +10,8 @@ export type PackageManagerDescriptor = {
     readonly swpmIdentifier: PackageJson["swpm"] | undefined;
     readonly installCommand: ReadonlyArray<string>;
     readonly upgradeAllCommand: ReadonlyArray<string> | undefined;
+    readonly launchpadDlxCommand: ReadonlyArray<string>;
+    readonly launchpadLocalCommand: ReadonlyArray<string>;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -21,6 +23,8 @@ export class PackageManager {
     public readonly swpmIdentifier;
     public readonly installCommand;
     public readonly upgradeAllPackagesCommand;
+    public readonly launchpadDlxCommand;
+    public readonly launchpadLocalCommand;
 
     public constructor(
         descriptor: PackageManagerDescriptor,
@@ -32,5 +36,7 @@ export class PackageManager {
         this.swpmIdentifier = descriptor.swpmIdentifier;
         this.installCommand = descriptor.installCommand;
         this.upgradeAllPackagesCommand = descriptor.upgradeAllCommand;
+        this.launchpadDlxCommand = descriptor.launchpadDlxCommand;
+        this.launchpadLocalCommand = descriptor.launchpadLocalCommand;
     }
 }

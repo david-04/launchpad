@@ -1,4 +1,5 @@
 import { MigrationContext } from "migration/data/migration-context";
+import { LAUNCHPAD_PACKAGE_NAME } from "utilities/constants";
 import { PackageManager } from "./package-manager";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -25,6 +26,8 @@ export class Yarn extends PackageManager {
                 swpmIdentifier: "yarn@berry",
                 installCommand: ["yarn", "install"],
                 upgradeAllCommand: ["yarn", "up", "*@latest"],
+                launchpadDlxCommand: ["yarn", "dlx", `${LAUNCHPAD_PACKAGE_NAME}@latest`],
+                launchpadLocalCommand: ["yarn", "run", "--binaries-only", "launchpad"],
             },
             createOrUpdateYarnConfiguration,
             removeYarnConfigurationAndArtifacts,

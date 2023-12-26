@@ -1,4 +1,5 @@
 import { MigrationContext } from "migration/data/migration-context";
+import { LAUNCHPAD_PACKAGE_NAME } from "utilities/constants";
 import { PackageManager } from "./package-manager";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -16,6 +17,8 @@ export class Pnpm extends PackageManager {
                 swpmIdentifier: "pnpm",
                 installCommand: ["pnpm", "install"],
                 upgradeAllCommand: ["pnpm", "up", "--latest"],
+                launchpadDlxCommand: ["pnpm", "dlx", `${LAUNCHPAD_PACKAGE_NAME}@latest`],
+                launchpadLocalCommand: ["pnpm", "exec", "launchpad"],
             },
             createOrUpdatePnpmConfiguration,
             removePnpmConfigurationAndArtifacts,

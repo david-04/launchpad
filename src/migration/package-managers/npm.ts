@@ -1,4 +1,5 @@
 import { MigrationContext } from "migration/data/migration-context";
+import { LAUNCHPAD_PACKAGE_NAME } from "utilities/constants";
 import { PackageManager } from "./package-manager";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -16,6 +17,8 @@ export class Npm extends PackageManager {
                 swpmIdentifier: "npm",
                 installCommand: ["npm", "install"],
                 upgradeAllCommand: undefined,
+                launchpadDlxCommand: ["npm", "exec", "--", `${LAUNCHPAD_PACKAGE_NAME}@latest`],
+                launchpadLocalCommand: ["npm", "exec", "--no", "--", `${LAUNCHPAD_PACKAGE_NAME}`],
             },
             createOrUpdateNpmConfiguration,
             removeNpmConfigurationAndArtifacts,

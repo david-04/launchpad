@@ -10,6 +10,7 @@ export class File {
     public readonly absolutePath: Path;
     public readonly originalContents: string | undefined;
     private newContents: string | undefined;
+    private executable = false;
 
     //------------------------------------------------------------------------------------------------------------------
     // Initialization
@@ -66,6 +67,14 @@ export class File {
 
     public delete() {
         this.contents = undefined;
+    }
+
+    public makeExecutable() {
+        this.executable = true;
+    }
+
+    public shouldBeExecutable() {
+        return this.executable;
     }
 
     //------------------------------------------------------------------------------------------------------------------
