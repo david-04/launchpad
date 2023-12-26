@@ -24,14 +24,18 @@ export class Formatter {
 
     public applyToVsCodeSettings(context: MigrationContext) {
         const { vscodeSettings } = context.fileOperations;
-        for (const languageId of VSCODE_LANGUAGE_IDS) {
-            const formatter = this.supportedLanguageIds.includes(languageId) ? this.vsCodeFormatterId : undefined;
-            if (formatter) {
-                vscodeSettings.setFormatter(languageId, formatter);
-            } else {
-                vscodeSettings.removeFormatter(languageId);
+        if (context.newConfig.createVsCodeSettings || vscodeSettings.file.exists) {
+            for (const languageId of VSCODE_LANGUAGE_IDS) {
+                const formatter = this.supportedLanguageIds.includes(languageId) ? this.vsCodeFormatterId : undefined;
+                if (formatter) {
+                    vscodeSettings.setFormatter(languageId, formatter);
+                } else {
+                    vscodeSettings.removeFormatter(languageId);
+                }
+                if (!vscodeSettings.file.exists) {
+                    vscodeSettings.enableFormatOnSaveIfNotSet(languageId);
+                }
             }
-            vscodeSettings.enableFormatOnSaveIfNotSet(languageId);
         }
     }
 }

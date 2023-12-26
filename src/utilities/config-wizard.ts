@@ -12,7 +12,6 @@ import {
     DEFAULT_CREATE_DEBUG_MODULE,
     DEFAULT_CREATE_MAKEFILE,
     DEFAULT_CREATE_PROJECT_TEMPLATE,
-    DEFAULT_CREATE_VSCODE_SETTINGS,
     DEFAULT_DEPENDENCIES_CLI,
     DEFAULT_DEPENDENCIES_WEB,
     DEFAULT_DIST_DIR,
@@ -88,12 +87,7 @@ export async function getNewConfig(
         DEFAULT_CREATE_DEBUG_MODULE
     );
     const createMakefile = getCreateFile(presets, createProjectTemplate, "createMakefile", DEFAULT_CREATE_MAKEFILE);
-    const createVsCodeSettings = getCreateFile(
-        presets,
-        createProjectTemplate,
-        "createVsCodeSettings",
-        DEFAULT_CREATE_VSCODE_SETTINGS
-    );
+    const createVsCodeSettings = await getCreateVsCodeSettings(presets, formatter);
     return {
         artifact,
         bundler,
@@ -595,6 +589,27 @@ async function getCreateProjectTemplate(presets: Presets) {
             yesHint: "Scaffold a minimal project",
             noHint: "Don't create any source files",
             default: DEFAULT_CREATE_PROJECT_TEMPLATE,
+        });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Create VSCode settings
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getCreateVsCodeSettings(presets: Presets, formatter: NewConfig["formatter"]) {
+    const FIELD = "createVsCodeSettings";
+    const preselectedOption = presets.commandLineConfig[FIELD];
+    const defaultValue = "disabled" !== formatter.value;
+    if (undefined !== preselectedOption) {
+        return DEFAULT_ENUM === preselectedOption ? defaultValue : preselectedOption;
+    } else {
+        const formatterName = "disabled" === formatter.value ? "VSCode's default formatter" : formatter.value;
+        return promptYesNo({
+            message: "Create VSCode settings",
+            yesHint: `Enable auto-formatting with ${formatterName}`,
+            noHint: "Don't maintain formatter settings",
+            default: defaultValue,
         });
     }
 }
