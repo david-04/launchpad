@@ -322,6 +322,7 @@ __LP_BUNDLE_EFFECTIVE_COMMAND           =$(call lp.bundle.get-default-command)
 __LP_BUNDLE_COUNT                       =
 __LP_BUNDLE_SOURCE_MAPS_ENABLED         =$(call lp.bundle.is-enabled)
 __LP_BUNDLE_INLINE_SOURCES_ENABLED      =$(call lp.fn.if.equal, $(LP_SETTINGS_ARTIFACT), app, false, true)
+__LP_BUNDLE_MINIFICATION_ENABLED        =$(call lp.bundle.is-enabled)
 __LP_BUNDLE_DTS_BUNDLER                 =$(LP_SETTINGS_DTS_BUNDLER)
 
 lp.bundle.append-command.any            =$(call lp.fn.var.append-with-separator, \
@@ -336,7 +337,7 @@ lp.bundle.append-command.esbuild        =$(call lp.bundle.append-command.any, $(
                                               "$(strip $(2))" \
                                               "--outfile=$(strip $(3))" \
                                               --bundle \
-                                              --minify \
+                                              $(if $(__LP_BUNDLE_MINIFICATION_ENABLED),--minify) \
                                               --format=$(LP_SETTINGS_MODULE_SYSTEM) \
                                               $(call lp.fn.if.equal, $(LP_SETTINGS_RUNTIME), web, \
                                                    --platform=browser \
@@ -396,6 +397,8 @@ lp.bundle.overwrite-command             =$(call lp.fn.assert.param-not-empty, lp
 
 lp.bundle.enable-source-maps            =$(call lp.fn.var.assign, __LP_BUNDLE_SOURCE_MAPS_ENABLED, true)
 lp.bundle.disable-source-maps           =$(call lp.fn.var.erase, __LP_BUNDLE_SOURCE_MAPS_ENABLED) $(call lp.bundle.disable-inline-sources)
+lp.bundle.enable-minification           =$(call lp.fn.var.assign, __LP_BUNDLE_MINIFICATION_ENABLED, true)
+lp.bundle.disable-minification          =$(call lp.fn.var.erase, __LP_BUNDLE_MINIFICATION_ENABLED)
 lp.bundle.enable-inline-sources         =$(call lp.fn.var.assign, __LP_BUNDLE_INLINE_SOURCES_ENABLED, true) $(call lp.bundle.enable-source-maps)
 lp.bundle.disable-inline-sources        =$(call lp.fn.var.erase, __LP_BUNDLE_INLINE_SOURCES_ENABLED)
 

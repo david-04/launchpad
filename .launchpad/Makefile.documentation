@@ -37,6 +37,8 @@ $(LP_PREREQUISITE_TSC)                                 # use as a prerequisite f
 
 $(call lp.bundle.add-bundle, src/lib.ts, dist/lib.js ) # add a bundle
 
+$(call lp.bundle.enable-minification                 ) # enable minification of bundles
+$(call lp.bundle.disable-minification                ) # disable minification of bundles
 $(call lp.bundle.enable-source-maps                  ) # enable source-map generation
 $(call lp.bundle.disable-source-maps                 ) # disable source-map generation
 $(call lp.bundle.enable-inline-sources               ) # include sources in source maps (enables source maps as well)

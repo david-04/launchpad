@@ -53,6 +53,7 @@ function getBundleSection({ srcDir, projectName, bundlerOutDir, bundler }: NewCo
     } else {
         return [
             ...getSpacedSeparator("Bundling"),
+            "$(call lp.bundle.enable-minification)",
             "# $(call lp.bundle.enable-dts-only-for-targets, release)",
             "",
             `$(call lp.bundle.add-bundle, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js)`,
