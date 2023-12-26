@@ -68,6 +68,8 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
+$(call lp.bundle.disable-minification)
+
 $(call lp.bundle.add-bundle, src/launchpad-cli.ts, dist/launchpad.js)
 
 #-----------------------------------------------------------------------------------------------------------------------
