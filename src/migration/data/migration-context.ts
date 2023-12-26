@@ -15,6 +15,7 @@ import { GITIGNORE, PACKAGE_JSON, VSCODE_SETTINGS_JSON } from "./known-files";
 
 export type MigrationContextOptions = {
     operation: "init" | "uplift";
+    upliftDependenciesOverride: boolean;
     projectRoot: Path;
     oldConfig: OldPartialConfig | undefined;
     newConfig: NewConfig;
@@ -33,6 +34,7 @@ export class MigrationContext {
     public readonly newConfig;
     public readonly fileOperations;
     public readonly startedAt = new Date();
+    public readonly upliftDependenciesOverride;
 
     public readonly files;
     public readonly directories;
@@ -52,6 +54,7 @@ export class MigrationContext {
         this.projectRoot = options.projectRoot;
         this.oldConfig = options.oldConfig;
         this.newConfig = options.newConfig;
+        this.upliftDependenciesOverride = options.upliftDependenciesOverride;
         this.files = new FileOrDirectoryCache(
             options.projectRoot,
             options.newConfig.tabSize,

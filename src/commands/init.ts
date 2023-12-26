@@ -19,6 +19,7 @@ export async function init(projectRoot: Path, configFile: Path, options: Readonl
         oldConfig: parsedConfig?.validated ?? parsedConfig?.partial,
         newConfig,
         projectRoot,
+        upliftDependenciesOverride: false,
     });
     console.log("");
     console.log(`✅ Successfully initialized project ${newConfig.projectName}`);

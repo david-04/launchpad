@@ -34,6 +34,7 @@ import { applyFileSystemChanges } from "./executor/apply-file-system-changes";
 
 export type MigrateOptions = Omit<MigrationContextOptions, "oldConfig" | "newConfig"> & {
     operation: "init" | "uplift";
+    upliftDependenciesOverride: boolean;
 } & (
         | { oldConfig: OldPartialConfig | undefined; newConfig: NewConfig }
         | { oldConfig: OldConfig; newConfig: undefined }

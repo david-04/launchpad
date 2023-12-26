@@ -8,7 +8,8 @@ import { breakLine } from "../utilities/string-utilities";
 // Initialize a new project
 //----------------------------------------------------------------------------------------------------------------------
 
-export async function uplift(projectRoot: Path, configFile: Path, _options: ReadonlyArray<string>) {
+export async function uplift(projectRoot: Path, configFile: Path, options: ReadonlyArray<string>) {
+    const commandLineOptions = parseCommandLineOptions(options);
     const parsedConfig = loadConfigFile(configFile);
     const oldConfig = parsedConfig?.validated;
     if (!parsedConfig) {
@@ -32,8 +33,24 @@ export async function uplift(projectRoot: Path, configFile: Path, _options: Read
     } else {
         const project = oldConfig.projectName ? `project ${oldConfig.projectName}` : "the project";
         console.log(`Uplifting ${project}...`);
-        migrate({ operation: "uplift", oldConfig, newConfig: undefined, projectRoot });
+        migrate({ operation: "uplift", oldConfig, newConfig: undefined, projectRoot, ...commandLineOptions });
         console.log("");
         console.log(`✅ Successfully uplifted ${project}`);
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Parse command line options
+//----------------------------------------------------------------------------------------------------------------------
+
+function parseCommandLineOptions(options: ReadonlyArray<string>) {
+    const result = { upliftDependenciesOverride: false };
+    for (const option of options.map(option => option.trim())) {
+        if (["all", "a", "--all", "-all", "-a"].includes(option)) {
+            result.upliftDependenciesOverride = true;
+        } else if (option) {
+            fail(`Invalid command line option: "${option}"`);
+        }
+    }
+    return result as Readonly<typeof result>;
 }

@@ -10,12 +10,13 @@ export function installOrUpgradeNpmPackages(context: MigrationContext) {
     if (dependencies.length) {
         const hasNodeModules = context.directories.get("node_modules").exists;
         const packageManager = getPackageManager(context);
-        if ("uplift" === context.operation && context.newConfig.upliftDependencies) {
+        const { operation, upliftDependenciesOverride } = context;
+        if ("uplift" === operation && (context.newConfig.upliftDependencies || upliftDependenciesOverride)) {
             context.addExternalCommand(
                 "Upgrading all dependencies",
                 packageManager.upgradeAllPackagesCommand ?? packageManager.getUpgradePackagesCommand(dependencies)
             );
-        } else if ("uplift" !== context.operation || !hasNodeModules) {
+        } else if ("uplift" !== operation || !hasNodeModules) {
             context.addExternalCommand("Installing dependencies", packageManager.installCommand);
         }
     }
