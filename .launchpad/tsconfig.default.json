@@ -28,9 +28,6 @@
         "inlineSourceMap": false,
         "inlineSources": false,
         "isolatedModules": true,
-        "lib": [
-            "es2022"
-        ],
         "module": "commonjs",
         "moduleDetection": "force",
         "moduleResolution": "node10",

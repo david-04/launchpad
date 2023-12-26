@@ -29,9 +29,6 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSourceMap": false,
             "inlineSources": false,
             "isolatedModules": true,
-            "lib": [
-                "es2022"
-            ],
             "module": "commonjs",
             "moduleDetection": "force",
             "moduleResolution": "node10",
@@ -101,9 +98,6 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSourceMap": false,
             "inlineSources": false,
             "isolatedModules": true,
-            "lib": [
-                "es2022"
-            ],
             "module": "node16",
             "moduleDetection": "force",
             "moduleResolution": "node16",
@@ -177,9 +171,6 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSourceMap": false,
             "inlineSources": false,
             "isolatedModules": true,
-            "lib": [
-                "es2022"
-            ],
             "module": "commonjs",
             "moduleDetection": "force",
             "moduleResolution": "node10",
@@ -249,9 +240,6 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSourceMap": false,
             "inlineSources": false,
             "isolatedModules": true,
-            "lib": [
-                "es2022"
-            ],
             "module": "node16",
             "moduleDetection": "force",
             "moduleResolution": "node16",
