@@ -102,81 +102,85 @@ $(call lp.clean.bundles)
 # Test
 #-----------------------------------------------------------------------------------------------------------------------
 
-DELETE_TEST_DIRECTORY=$(if $(wildcard ../launchpad-test/$(strip $(1))), rm -rf ../launchpad-test/$(strip $(1)), echo -n "")
+CREATE_AND_GO_TO_TEST_DIRECTORY=$(if $(wildcard ../launchpad-test/$(strip $(1))), \
+                                    rm -rf ../launchpad-test/$(strip $(1)), \
+                                    echo -n "" \
+                                ) \
+                             && mkdir -p "../launchpad-test/$(strip $(1))" \
+	                         && cd "../launchpad-test/$(strip $(1))"
 
-TEST_INIT_INTERACTIVE=\
-	$(call DELETE_TEST_DIRECTORY, $(1)) \
-	&& mkdir -p "../launchpad-test/$(strip $(1))" \
-	&& cd "../launchpad-test/$(strip $(1))" \
-	&& node ../../launchpad/dist/launchpad.js init
+ADD_TEST=$(eval $(call TEST_RULE,$(strip $(1)),$(strip $(2))))
 
-TEST_INIT=$(TEST_INIT_INTERACTIVE) --auto-selected-dependencies= \
-                                   --bundler-out-dir=default \
-                                   --create-debug-module=true \
-                                   --create-project-template=true \
-                                   --formatter=prettier \
-                                   --install-dev-dependencies=false \
-                                   --installation-mode=global \
-                                   --optional-dependencies= \
-                                   --package-manager=npm \
-                                   --preselected-dependencies= \
-                                   --project-name=default \
-                                   --src-dir=default \
-                                   --tab-size=4 \
-                                   --tsc-out-dir=default \
-                                   --uplift-dependencies=true \
-                                   --web-app-dir=default
-
-ADD_TEST=$(eval $(call ADD_TEST_2,$(strip $(1)),$(strip $(2))))
-
-define ADD_TEST_2
-.PHONY: test.$(1)
-$(eval TEST_TARGETS+= test.$(1))
-test.$(1) : $(LP_PREREQUISITE_BUNDLE)
-	$$(call TEST_INIT, $(1)) $(2) # && make
-
+define TEST_RULE
+.PHONY: test.$(strip $(1))
+$(eval TEST_TARGETS+= test.$(strip $(1)))
+test.$(strip $(1)) : $(LP_PREREQUISITE_BUNDLE)
+	   echo "------------------------------------------------------------------------------------------------------------------------" \
+	&& echo Running test for $(strip $(1)) \
+	&& echo "------------------------------------------------------------------------------------------------------------------------" \
+	&& echo "" \
+	&& $(call CREATE_AND_GO_TO_TEST_DIRECTORY, $(1)) \
+	&& node ../../launchpad/dist/launchpad.js $(2)
 endef
 
-CLI=--runtime=cli
-WEB=--runtime=web
-APP=--artifact=app
-LIB=--artifact=lib
-ESM=--module-system=esm
-CJS=--module-system=cjs
-BUNDLER_DISABLED=--bundler=disabled --dts-bundler=disabled
-BUNDLER_APP=--bundler=default --dts-bundler=disabled
-BUNDLER_LIB=--bundler=default --dts-bundler=default
+DEFAULT_OPTIONS  = --auto-selected-dependencies= \
+                   --bundler-out-dir=default \
+                   --create-debug-module=true \
+                   --create-project-template=true \
+                   --create-makefile=true \
+                   --create-vscode-settings=true \
+                   --formatter=prettier \
+                   --install-dev-dependencies=false \
+                   --installation-mode=global \
+                   --optional-dependencies= \
+                   --package-manager=npm \
+                   --preselected-dependencies= \
+                   --project-name=default \
+                   --src-dir=default \
+                   --tab-size=4 \
+                   --tsc-out-dir=default \
+                   --uplift-dependencies=true \
+                   --web-app-dir=default
+CLI              = --runtime=cli
+WEB              = --runtime=web
+APP              = --artifact=app
+LIB              = --artifact=lib
+ESM              = --module-system=esm
+CJS              = --module-system=cjs
+BUNDLER_DISABLED = --bundler=disabled --dts-bundler=disabled
+BUNDLER_APP      = --bundler=default --dts-bundler=disabled
+BUNDLER_LIB      = --bundler=default --dts-bundler=default
 
-$(call ADD_TEST, cli-app-cjs         , $(CLI) $(APP) $(CJS) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, cli-app-cjs-bundled , $(CLI) $(APP) $(CJS) $(BUNDLER_APP)		)
-$(call ADD_TEST, cli-app-esm         , $(CLI) $(APP) $(ESM) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, cli-app-esm-bundled , $(CLI) $(APP) $(ESM) $(BUNDLER_APP)		)
+AND_MAKE        = && echo "" && make-plain --silent && echo ""
 
-$(call ADD_TEST, cli-lib-cjs         , $(CLI) $(LIB) $(CJS) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, cli-lib-cjs-bundled , $(CLI) $(LIB) $(CJS) $(BUNDLER_LIB)		)
-$(call ADD_TEST, cli-lib-esm         , $(CLI) $(LIB) $(ESM) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, cli-lib-esm-bundled , $(CLI) $(LIB) $(ESM) $(BUNDLER_LIB)		)
+$(call ADD_TEST, cli-app-cjs         , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, cli-app-cjs-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(CJS) $(BUNDLER_APP)      $(AND_MAKE) )
+$(call ADD_TEST, cli-app-esm         , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, cli-app-esm-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(ESM) $(BUNDLER_APP)      $(AND_MAKE) )
+$(call ADD_TEST, cli-lib-cjs         , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, cli-lib-cjs-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(CJS) $(BUNDLER_LIB)      $(AND_MAKE) )
+$(call ADD_TEST, cli-lib-esm         , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, cli-lib-esm-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(ESM) $(BUNDLER_LIB)      $(AND_MAKE) )
+$(call ADD_TEST, web-app-cjs         , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, web-app-cjs-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(CJS) $(BUNDLER_APP)      $(AND_MAKE) )
+$(call ADD_TEST, web-app-esm         , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, web-app-esm-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(ESM) $(BUNDLER_APP)      $(AND_MAKE) )
+$(call ADD_TEST, web-lib-cjs         , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, web-lib-cjs-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(CJS) $(BUNDLER_LIB)      $(AND_MAKE) )
+$(call ADD_TEST, web-lib-esm         , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
+$(call ADD_TEST, web-lib-esm-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(ESM) $(BUNDLER_LIB)      $(AND_MAKE) )
+$(call ADD_TEST, interactive         , init                                                                         )
 
-$(call ADD_TEST, web-app-cjs         , $(WEB) $(APP) $(CJS) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, web-app-cjs-bundled , $(WEB) $(APP) $(CJS) $(BUNDLER_APP)		)
-$(call ADD_TEST, web-app-esm         , $(WEB) $(APP) $(ESM) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, web-app-esm-bundled , $(WEB) $(APP) $(ESM) $(BUNDLER_APP)		)
-
-$(call ADD_TEST, web-lib-cjs         , $(WEB) $(LIB) $(CJS) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, web-lib-cjs-bundled , $(WEB) $(LIB) $(CJS) $(BUNDLER_LIB)		)
-$(call ADD_TEST, web-lib-esm         , $(WEB) $(LIB) $(ESM) $(BUNDLER_DISABLED)	)
-$(call ADD_TEST, web-lib-esm-bundled , $(WEB) $(LIB) $(ESM) $(BUNDLER_LIB)		)
-
-.PHONY: test test.all test.interactive
+.PHONY: test test.all
 
 test :;
-	$(foreach TARGET, test.all test.interactive $(TEST_TARGETS), $(info $()  $(TARGET)))
+	$(info $()  test.all)
+	$(info $()  test.interactive)
+	$(info $()  test.[cli|web]-[app|lib]-[cjs|esm])
+	$(info $()  test.[cli|web]-[app|lib]-[cjs|esm]-bundled)
 
-test.all : $(LP_PREREQUISITE_BUNDLE);
-	make --silent --no-print-directory $(TEST_TARGETS)
-
-test.interactive : $(LP_PREREQUISITE_BUNDLE)
-	$(call TEST_INIT_INTERACTIVE, interactive)
+test.all : $(filter-out test.interactive,$(TEST_TARGETS))
+	echo ✅ All tests have passed
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets
