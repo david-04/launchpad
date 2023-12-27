@@ -102,12 +102,15 @@ $(call lp.clean.bundles)
 # Test
 #-----------------------------------------------------------------------------------------------------------------------
 
-CREATE_AND_GO_TO_TEST_DIRECTORY=$(if $(wildcard ../launchpad-test/$(strip $(1))), \
-                                    rm -rf ../launchpad-test/$(strip $(1)), \
+TEST_DIRECTORY=./test
+TEST_PATH_TO_DIST_DIRECTORY=../dist
+
+CREATE_AND_GO_TO_TEST_DIRECTORY=$(if $(wildcard $(TEST_DIRECTORY)/$(strip $(1))), \
+                                    rm -rf "$(TEST_DIRECTORY)/$(strip $(1))", \
                                     echo -n "" \
                                 ) \
-                             && mkdir -p "../launchpad-test/$(strip $(1))" \
-	                         && cd "../launchpad-test/$(strip $(1))"
+                             && mkdir -p "$(TEST_DIRECTORY)/$(strip $(1))" \
+	                         && cd "$(TEST_DIRECTORY)/$(strip $(1))"
 
 ADD_TEST=$(eval $(call TEST_RULE,$(strip $(1)),$(strip $(2))))
 
@@ -120,7 +123,7 @@ test.$(strip $(1)) : $(LP_PREREQUISITE_BUNDLE)
 	&& echo "------------------------------------------------------------------------------------------------------------------------" \
 	&& echo "" \
 	&& $(call CREATE_AND_GO_TO_TEST_DIRECTORY, $(1)) \
-	&& node ../../launchpad/dist/launchpad.js $(2)
+	&& node "../$(TEST_PATH_TO_DIST_DIRECTORY)/launchpad.js" $(2)
 endef
 
 DEFAULT_OPTIONS  = --auto-selected-dependencies= \
