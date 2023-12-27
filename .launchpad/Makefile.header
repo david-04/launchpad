@@ -1,7 +1,15 @@
 .SECONDEXPANSION:
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Files and directories
+#
+#    ######   #######  ##    ##  ######  ########    ###    ##    ## ########  ######
+#   ##    ## ##     ## ###   ## ##    ##    ##      ## ##   ###   ##    ##    ##    ##
+#   ##       ##     ## ####  ## ##          ##     ##   ##  ####  ##    ##    ##
+#   ##       ##     ## ## ## ##  ######     ##    ##     ## ## ## ##    ##     ######
+#   ##       ##     ## ##  ####       ##    ##    ######### ##  ####    ##          ##
+#   ##    ## ##     ## ##   ### ##    ##    ##    ##     ## ##   ###    ##    ##    ##
+#    ######   #######  ##    ##  ######     ##    ##     ## ##    ##    ##     ######
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_HOME_DIR                  :=$(strip $(patsubst %/Makefile.header,%,$(lastword $(MAKEFILE_LIST))))
@@ -13,6 +21,14 @@ __LP_MAKEFILES                 :=Makefile $(foreach ext, header footer, $(__LP_H
 __LP_MAKEFILES_AND_SETTINGS    :=$(__LP_MAKEFILES) $(__LP_SETTINGS_CFG)
 __LP_TSCONFIG_JSON             :=tsconfig.json $(__LP_TSCONFIG_DEFAULT_JSON) $(wildcard tsconfig*.json)
 
+__LP_EMPTY_STRING               =#
+__LP_BLANK                      =$(__LP_EMPTY_STRING) $(__LP_EMPTY_STRING)#
+__LP_COMMA                      =,
+define __LP_LINE_BREAK
+
+
+endef
+
 #-----------------------------------------------------------------------------------------------------------------------
 #
 #    ######## ##     ## ##    ##  ######  ######## ####  #######  ##    ##  ######
@@ -23,18 +39,6 @@ __LP_TSCONFIG_JSON             :=tsconfig.json $(__LP_TSCONFIG_DEFAULT_JSON) $(w
 #    ##       ##     ## ##   ### ##    ##    ##     ##  ##     ## ##   ### ##    ##
 #    ##        #######  ##    ##  ######     ##    ####  #######  ##    ##  ######
 #
-#-----------------------------------------------------------------------------------------------------------------------
-
-__LP_EMPTY_STRING               =#
-__LP_BLANK                      =$(__LP_EMPTY_STRING) $(__LP_EMPTY_STRING)#
-__LP_COMMA                      =,
-define __LP_LINE_BREAK
-
-
-endef
-
-#-----------------------------------------------------------------------------------------------------------------------
-# General purpose functions
 #-----------------------------------------------------------------------------------------------------------------------
 
 lp.fn.assert.param-not-empty    =$(if $(strip $(2)),,$(error Missing parameter in $(if $(strip $(1)), call to $(strip $(1), function call))))
@@ -64,10 +68,6 @@ lp.fn.if-equal                  =$(if $(patsubst $(strip $(1)),,$(strip $(2))),$
 lp.fn.if-contains               =$(if $(filter $(strip $(2)),$(strip $(1))),$(strip $(3)),$(strip $(4)))
 lp.fn.if-not-contains           =$(call lp.fn.if-contains,$(1),$(2),$(4),$(3))
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Functions for normalizing and validating configuration properties
-#-----------------------------------------------------------------------------------------------------------------------
-
 lp.fn.config.normalize.string   =$(call lp.fn.var.assign, $(strip $(1)), $(strip $($(strip $(1)))))
 lp.fn.config.normalize.enum     =$(call lp.fn.var.assign, $(strip $(1)), $(strip $(patsubst %::pinned,%,$($(strip $(1))))))
 lp.fn.config.normalize.disabled =$(if $(filter disabled, $($(strip $(1)))),$(call lp.fn.var.erase, $(1)))
@@ -91,20 +91,16 @@ lp.fn.config.validate-enum      =$(call lp.fn.config.normalize.enum, $(1))\
                                  $(call lp.fn.config.assert.enum, $(1))\
                                  $(call lp.fn.config.normalize.disabled, $(1))
 
-#-----------------------------------------------------------------------------------------------------------------------
-# Functions for configuring and creating targets
-#-----------------------------------------------------------------------------------------------------------------------
+lp.fn.get-command               =$(strip $(if $(strip $(2)), echo "$(strip $(2))" && ) \
+                                     $(if $(call lp.$(strip $(1)).get-before-hooks), $(call lp.$(strip $(1)).get-before-hooks) &&) \
+                                     $(call lp.$(strip $(1)).get-effective-command) \
+                                     $(if $(call lp.$(strip $(1)).get-after-hooks), && $(call lp.$(strip $(1)).get-after-hooks)) \
+                                 )
 
-lp.fn.get-command           =$(strip $(if $(strip $(2)), echo "$(strip $(2))" && ) \
-                                 $(if $(call lp.$(strip $(1)).get-before-hooks), $(call lp.$(strip $(1)).get-before-hooks) &&) \
-                                 $(call lp.$(strip $(1)).get-effective-command) \
-                                 $(if $(call lp.$(strip $(1)).get-after-hooks), && $(call lp.$(strip $(1)).get-after-hooks)) \
-                             )
-
-lp.fn.declare-phony-targets =$(foreach target, \
-                                 $(call lp.$(strip $(1)).get-phony-targets), \
-                                 $(eval $(call lp.fn.declare-phony-target,$(target),$(call lp.$(strip $(1)).get-description),$(2))) \
-                              )
+lp.fn.declare-phony-targets     =$(foreach target, \
+                                     $(call lp.$(strip $(1)).get-phony-targets), \
+                                     $(eval $(call lp.fn.declare-phony-target,$(target),$(call lp.$(strip $(1)).get-description),$(2))) \
+                                  )
 
 define lp.fn.declare-phony-target
 #----
@@ -112,10 +108,10 @@ define lp.fn.declare-phony-target
 lp.$(1) $(1) : $(3);
 endef
 
-lp.fn.publicize-phony-targets=$(foreach target, \
-                                 $(call lp.$(strip $(1)).get-phony-targets), \
-                                 $(eval $(call lp.fn.publicize-phony-target,$(target),$(call lp.$(strip $(1)).get-description))) \
-                              )
+lp.fn.publicize-phony-targets   =$(foreach target, \
+                                    $(call lp.$(strip $(1)).get-phony-targets), \
+                                    $(eval $(call lp.fn.publicize-phony-target,$(target),$(call lp.$(strip $(1)).get-description))) \
+                                 )
 
 define lp.fn.publicize-phony-target
 #----
@@ -204,6 +200,7 @@ __LP_HELP_TARGETS          =$(call lp.help.add-builtin-target, bundle, bundle ..
                             $(call lp.help.add-builtin-target, format, format .............$(__LP_EXTRA_DOTS)) \
                             $(call lp.help.add-builtin-target, help,   help ...............$(__LP_EXTRA_DOTS)) \
                             $(call lp.help.add-builtin-target, tsc,    tsc ................$(__LP_EXTRA_DOTS))
+                            $(call lp.help.add-builtin-target, uplift, uplift .............$(__LP_EXTRA_DOTS))
 
 lp.help.disable            =$(call lp.fn.var.erase, __LP_HELP_ENABLED)
 lp.help.add-extra-dots     =$(call lp.fn.var.assign, __LP_EXTRA_DOTS, $(1))
@@ -229,35 +226,38 @@ lp.help.print-targets      =$(__LP_HELP_TARGETS)
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_DIAGNOSTICS_KEYWORDS=help info debug
+__LP_DIAGNOSTICS_ENABLED                =true
+__LP_DIAGNOSTICS_TARGET_NAMES           =help info debug
 
-lp.diagnostics.get-phony-targets =$(__LP_DIAGNOSTICS_KEYWORDS)
-lp.help.set-diagnostics-keywords=$(call lp.fn.var.assign, __LP_DIAGNOSTICS_KEYWORDS, $(1))
+lp.diagnostics.disable                  =$(call lp.fn.var.erase, __LP_DIAGNOSTICS_ENABLED)
+lp.diagnostics.set-target-names         =$(call lp.fn.var.assign, __LP_DIAGNOSTICS_TARGET_NAMES, $(1))
+lp.diagnostics.get-target-names         =$(__LP_DIAGNOSTICS_TARGET_NAMES)
 
-lp.fn.print.property       =$(info ) $(info $(strip $(1)):) $(info $(call lp.fn.map.empty-to, $(strip $(call $(2))), $(3)))
-lp.fn.print-diagnostics    =$(call lp.fn.print.header, $(call lp.$(strip $(1)).get-name) settings) \
-                            $(call lp.fn.print.property, Enabled                , lp.$(strip $(1)).is-enabled             , false  ) \
-                            $(call lp.fn.print.property, Phony names            , lp.$(strip $(1)).get-phony-targets      , <none> ) \
-                            $(call lp.fn.print.property, Targets                , lp.$(strip $(1)).get-targets            , <none> ) \
-                            $(call lp.fn.print.property, Prerequisites          , lp.$(strip $(1)).get-prerequisites      , <none> ) \
-                            $(if $(filter bundle,$(strip $(1))), \
-                                $(call lp.fn.print.property, Commands           , lp.$(strip $(1)).get-commands           , <none> ) \
-                                , \
-                                $(call lp.fn.print.property, Default command    , lp.$(strip $(1)).get-default-command    , <none> ) \
-                                $(call lp.fn.print.property, Before-hooks       , lp.$(strip $(1)).get-before-hooks       , <none> ) \
-                                $(call lp.fn.print.property, Effective command  , lp.$(strip $(1)).get-effective-command  , <none> ) \
-                                $(call lp.fn.print.property, After-hooks        , lp.$(strip $(1)).get-after-hooks        , <none> ) \
-                                $(call lp.fn.print.property, Command with hooks , lp.$(strip $(1)).get-command-with-hooks , <none> ) \
-                            )
+lp.diagnostics.is-enabled               =$(strip $(__LP_DIAGNOSTICS_ENABLED))
+
+
+lp.fn.print.property                    =$(info ) $(info $(strip $(1)):) $(info $(call lp.fn.map.empty-to, $(strip $(call $(2))), $(3)))
+lp.fn.print-diagnostics                 =$(call lp.fn.print.header, $(call lp.$(strip $(1)).get-name) settings) \
+                                         $(call lp.fn.print.property, Enabled                , lp.$(strip $(1)).is-enabled             , false  ) \
+                                         $(call lp.fn.print.property, Phony names            , lp.$(strip $(1)).get-phony-targets      , <none> ) \
+                                         $(call lp.fn.print.property, Targets                , lp.$(strip $(1)).get-targets            , <none> ) \
+                                         $(call lp.fn.print.property, Prerequisites          , lp.$(strip $(1)).get-prerequisites      , <none> ) \
+                                         $(if $(filter bundle,$(strip $(1))), \
+                                             $(call lp.fn.print.property, Commands           , lp.$(strip $(1)).get-commands           , <none> ) \
+                                             , \
+                                             $(call lp.fn.print.property, Default command    , lp.$(strip $(1)).get-default-command    , <none> ) \
+                                             $(call lp.fn.print.property, Before-hooks       , lp.$(strip $(1)).get-before-hooks       , <none> ) \
+                                             $(call lp.fn.print.property, Effective command  , lp.$(strip $(1)).get-effective-command  , <none> ) \
+                                             $(call lp.fn.print.property, After-hooks        , lp.$(strip $(1)).get-after-hooks        , <none> ) \
+                                             $(call lp.fn.print.property, Command with hooks , lp.$(strip $(1)).get-command-with-hooks , <none> ) \
+                                         )
 
 # $1=target, $2=shortcut
 define lp.fn.create-diagnostics-target
-.PHONY: lp.$(1).$(2) lp.$(2).$(1) $(if $(call lp.help.is-enabled), $(1).$(2) $(2).$(1))
-lp.$(1).$(2) lp.$(2).$(1) $(if $(call lp.help.is-enabled), $(1).$(2) $(2).$(1)) : ;
+.PHONY: lp.$(1).$(2) lp.$(2).$(1) $(if $(call lp.diagnostics.is-enabled), $(1).$(2) $(2).$(1))
+lp.$(1).$(2) lp.$(2).$(1) $(if $(call lp.diagnostics.is-enabled), $(1).$(2) $(2).$(1)) : ;
 	$$(call lp.fn.print-diagnostics, $(1))
 endef
-
-$(call lp.help.add-target, <target>.help, ...... show diangostic information (aliases: $(sort $(call lp.diagnostics.get-phony-targets))))
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
@@ -535,24 +535,48 @@ lp.format.get-files                     =$(wildcard $(sort $(strip $(__LP_FORMAT
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
-#    ########  ##     ## ##    ##
-#    ##     ## ##     ## ###   ##
-#    ##     ## ##     ## ####  ##
-#    ########  ##     ## ## ## ##
-#    ##   ##   ##     ## ##  ####
-#    ##    ##  ##     ## ##   ###
-#    ##     ##  #######  ##    ##
+#   ##     ## ########  ##       #### ######## ########
+#   ##     ## ##     ## ##        ##  ##          ##
+#   ##     ## ##     ## ##        ##  ##          ##
+#   ##     ## ########  ##        ##  ######      ##
+#   ##     ## ##        ##        ##  ##          ##
+#   ##     ## ##        ##        ##  ##          ##
+#    #######  ##        ######## #### ##          ##
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-lp.run.javascript                       =node
-lp.run.typescript                       =$(call lp.fn.if-equal, $(LP_SETTINGS_MODULE_SYSTEM), esm, ts-node-esm, ts-node)
+__LP_UPLIFT_ENABLED                     =true
+__LP_UPLIFT_DEFAULT_BEFORE_HOOKS        =
+__LP_UPLIFT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_UPLIFT_DEFAULT_BEFORE_HOOKS)
+__LP_UPLIFT_DEFAULT_AFTER_HOOKS         =
+__LP_UPLIFT_EFFECTIVE_AFTER_HOOKS       =$(__LP_UPLIFT_DEFAULT_AFTER_HOOKS)
+__LP_UPLIFT_DEFAULT_COMMAND             =.launchpad/uplift
+__LP_UPLIFT_EFFECTIVE_COMMAND           =$(__LP_UPLIFT_DEFAULT_COMMAND)
 
-lp.run                                  =$(call lp.fn.if-equal, \
-                                                $(patsubst %.ts,TypeScript,$(lastword $(strip $(1)))),\
-                                                TypeScript,\
-                                                $(lp.run.typescript),\
-                                                $(lp.run.javascript)) $(1)
+lp.uplift.disable                       =$(call lp.fn.var.erase, __LP_UPLIFT_ENABLED)
+lp.uplift.add-before-hook               =$(call lp.fn.var.append-with-separator, __LP_UPLIFT_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
+lp.uplift.overwrite-before-hooks        =$(call lp.fn.var.assign, __LP_UPLIFT_EFFECTIVE_BEFORE_HOOKS, $(1))
+lp.uplift.add-after-hook                =$(call lp.fn.var.append-with-separator, __LP_UPLIFT_EFFECTIVE_AFTER_HOOKS, &&, $(1))
+lp.uplift.overwrite-after-hooks         =$(call lp.fn.var.assign, __LP_UPLIFT_EFFECTIVE_AFTER_HOOKS, $(1))
+lp.uplift.overwrite-command             =$(call lp.fn.assert.param-not-empty, lp.uplift.overwrite-command, $(1)) \
+                                         $(call lp.fn.var.assign, __LP_UPLIFT_EFFECTIVE_COMMAND, $(1))
+
+lp.uplift.get-phony-targets             =uplift
+lp.uplift.get-name                      =Uplift
+lp.uplift.get-description               =uplift launchpad
+lp.uplift.is-enabled                    =$(strip $(__LP_UPLIFT_ENABLED))
+lp.uplift.get-default-prerequisites     =<n/a>
+lp.uplift.get-prerequisites             =
+lp.uplift.get-default-targets           =<n/a>
+lp.uplift.get-targets                   =
+lp.uplift.get-default-before-hook       =$(strip $(__LP_UPLIFT_DEFAULT_BEFORE_HOOKS))
+lp.uplift.get-before-hooks              =$(strip $(__LP_UPLIFT_EFFECTIVE_BEFORE_HOOKS))
+lp.uplift.get-default-after-hook        =$(strip $(__LP_UPLIFT_DEFAULT_AFTER_HOOKS))
+lp.uplift.get-after-hooks               =$(strip $(__LP_UPLIFT_EFFECTIVE_AFTER_HOOKS))
+lp.uplift.get-default-command           =$(if $(1), echo $(1) && )$(strip $(__LP_UPLIFT_DEFAULT_COMMAND))
+lp.uplift.get-effective-command         =$(strip $(__LP_UPLIFT_EFFECTIVE_COMMAND))
+lp.uplift.get-command-with-hooks        =$(call lp.fn.get-command, uplift, $(1))
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
@@ -604,3 +628,20 @@ lp.clean.get-files                      =$(strip $(sort \
                                                   $(patsubst %.js, %.js.map, $(call lp.bundle.get-targets)) \
                                               ) \
                                           ))
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#    ########  ##     ## ##    ##
+#    ##     ## ##     ## ###   ##
+#    ##     ## ##     ## ####  ##
+#    ########  ##     ## ## ## ##
+#    ##   ##   ##     ## ##  ####
+#    ##    ##  ##     ## ##   ###
+#    ##     ##  #######  ##    ##
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+__LP_RUN_JS                             =node
+__LP_RUN_TS                             =$(call lp.fn.if-equal, $(LP_SETTINGS_MODULE_SYSTEM), esm, ts-node-esm, ts-node)
+
+lp.run                                  =$(if $(filter %.ts,$(lastword $(strip $(1))),$(__LP_RUN_TS),$(__LP_RUN_TS)) $(1)

@@ -18,8 +18,6 @@ $(call lp.help.add-phony-target, test.help, .......... run debug help)
 $(call lp.help.add-phony-target, test.postinsatll, ... run debug postinstall)
 $(call lp.help.add-phony-target, test.uplift, ........ run debug uplift)
 
-$(call lp.help.set-diagnostics-keywords, dummy1 dummy2)
-
 #-----------------------------------------------------------------------------------------------------------------------
 # Embed tsconfig.json templates
 #-----------------------------------------------------------------------------------------------------------------------
@@ -70,7 +68,6 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.disable)
 $(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.js, minify)
 
 #-----------------------------------------------------------------------------------------------------------------------

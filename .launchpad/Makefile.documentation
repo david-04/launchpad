@@ -1,5 +1,13 @@
 #-----------------------------------------------------------------------------------------------------------------------
-# Help
+#
+#    ##     ## ######## ##       ########
+#    ##     ## ##       ##       ##     ##
+#    ##     ## ##       ##       ##     ##
+#    ######### ######   ##       ########
+#    ##     ## ##       ##       ##
+#    ##     ## ##       ##       ##
+#    ##     ## ######## ######## ##
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.help.disable                                          ) # disable the "help" target ("lp.help" remains active)
@@ -9,10 +17,31 @@ $(call lp.help.add-phony-target , run, ................ execute ) # register a t
 
 $(call lp.help.add-extra-dots   ,                      ...      ) # add more spacing/dots when printing built-in targets
 
-$(lp.help.set-diagnostics-keywords, help info dump config       ) # set aliases for diagnostics targets like tsc.help
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#   ########  ####    ###     ######   ##    ##  #######   ######  ######## ####  ######   ######
+#   ##     ##  ##    ## ##   ##    ##  ###   ## ##     ## ##    ##    ##     ##  ##    ## ##    ##
+#   ##     ##  ##   ##   ##  ##        ####  ## ##     ## ##          ##     ##  ##       ##
+#   ##     ##  ##  ##     ## ##   #### ## ## ## ##     ##  ######     ##     ##  ##        ######
+#   ##     ##  ##  ######### ##    ##  ##  #### ##     ##       ##    ##     ##  ##             ##
+#   ##     ##  ##  ##     ## ##    ##  ##   ### ##     ## ##    ##    ##     ##  ##    ## ##    ##
+#   ########  #### ##     ##  ######   ##    ##  #######   ######     ##    ####  ######   ######
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.diagnostics.disable                                   ) # disable diagnostics targets ("lp.*" remains active)
+$(call lp.diagnostics.set-target-names, help info config        ) # set aliases for diagnostics targets
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Compile
+#
+#    ######   #######  ##     ## ########  #### ##       ########
+#   ##    ## ##     ## ###   ### ##     ##  ##  ##       ##
+#   ##       ##     ## #### #### ##     ##  ##  ##       ##
+#   ##       ##     ## ## ### ## ########   ##  ##       ######
+#   ##       ##     ## ##     ## ##         ##  ##       ##
+#   ##    ## ##     ## ##     ## ##         ##  ##       ##
+#    ######   #######  ##     ## ##        #### ######## ########
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.tsc.disable                                ) # disable the "tsc" target ("lp.tsc" remains active)
@@ -34,7 +63,15 @@ $(call lp.tsc.get-default-command        , Compile...) # get the built-in comman
 $(LP_PREREQUISITE_TSC)                                 # use as a prerequisite for targets that depend on "tsc"
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Bundle
+#
+#    ########  ##     ## ##    ## ########  ##       ########
+#    ##     ## ##     ## ###   ## ##     ## ##       ##
+#    ##     ## ##     ## ####  ## ##     ## ##       ##
+#    ########  ##     ## ## ## ## ##     ## ##       ######
+#    ##     ## ##     ## ##  #### ##     ## ##       ##
+#    ##     ## ##     ## ##   ### ##     ## ##       ##
+#    ########   #######  ##    ## ########  ######## ########
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.bundle.add,                                  # add a file to be bundled
@@ -65,7 +102,15 @@ $(LP_PREREQUISITE_BUNDLE_JS)                           # same as above but only 
 $(LP_PREREQUISITE_BUNDLE_DTS)                          # same as above but only require bundled d.ts. declaration files
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Format
+#
+#    ########  #######  ########  ##     ##    ###    ########
+#    ##       ##     ## ##     ## ###   ###   ## ##      ##
+#    ##       ##     ## ##     ## #### ####  ##   ##     ##
+#    ######   ##     ## ########  ## ### ## ##     ##    ##
+#    ##       ##     ## ##   ##   ##     ## #########    ##
+#    ##       ##     ## ##    ##  ##     ## ##     ##    ##
+#    ##        #######  ##     ## ##     ## ##     ##    ##
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.format.include, file1.json file2.ts        ) # add the given files
@@ -87,17 +132,53 @@ $(call lp.bundle.get-command-with-hooks  , Format... ) # get the command with al
 $(call lp.bundle.get-default-command     , Format... ) # get the built-in command (with an optional "echo")
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Run
+#
+#   ##     ## ########  ##       #### ######## ########
+#   ##     ## ##     ## ##        ##  ##          ##
+#   ##     ## ##     ## ##        ##  ##          ##
+#   ##     ## ########  ##        ##  ######      ##
+#   ##     ## ##        ##        ##  ##          ##
+#   ##     ## ##        ##        ##  ##          ##
+#    #######  ##        ######## #### ##          ##
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.run, build/main.js ) param1 param2           # run a compiled (or bundled) command-line script
-$(call lp.run, src/main.ts   ) param1 param2           # run a source file (e.g. via ts-node or bun)
+$(call lp.uplift.disable                             ) # disable the uplift target ("lp.uplift" remains active)
+
+$(call lp.uplift.add-before-hook         , pwd && ls ) # append commands to run before uplifting
+$(call lp.uplift.overwrite-before-hooks  , pwd && ls ) # overwrite any previously defined before-hook commands
+$(call lp.uplift.add-after-hook          , pwd && ls ) # append commands to run after uplifting
+$(call lp.uplift.overwrite-after-hooks   , pwd && ls ) # overwrite any previously defined after-hook commands
+$(call lp.uplift.overwrite-command       , prettier  ) # overwrite the command itself
 
 #-----------------------------------------------------------------------------------------------------------------------
-# Clean
+#
+#     ######  ##       ########    ###    ##    ##
+#    ##    ## ##       ##         ## ##   ###   ##
+#    ##       ##       ##        ##   ##  ####  ##
+#    ##       ##       ######   ##     ## ## ## ##
+#    ##       ##       ##       ######### ##  ####
+#    ##    ## ##       ##       ##     ## ##   ###
+#     ######  ######## ######## ##     ## ##    ##
+#
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.clean.npm-packages                         ) # delete node_modules
 $(call lp.clean.tsc-output                           ) # delete transpiled JavaScript files
 $(call lp.clean.bundles                              ) # delete bundles
 $(call lp.clean.files, output.log dist               ) # delete the given files and directories
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#    ########  ##     ## ##    ##
+#    ##     ## ##     ## ###   ##
+#    ##     ## ##     ## ####  ##
+#    ########  ##     ## ## ## ##
+#    ##   ##   ##     ## ##  ####
+#    ##    ##  ##     ## ##   ###
+#    ##     ##  #######  ##    ##
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.run, build/main.js ) ...arguments            # run a compiled (or bundled) command-line script
+$(call lp.run, src/main.ts   ) ...arguments            # run a source file (e.g. via ts-node or bun)

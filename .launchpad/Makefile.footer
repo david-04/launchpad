@@ -17,9 +17,25 @@ ifeq "$(call lp.help.is-enabled)" "true"
     $(call lp.fn.publicize-phony-targets, help)
 endif
 
-$(foreach feature, tsc bundle format clean, \
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#   ########  ####    ###     ######   ##    ##  #######   ######  ######## ####  ######   ######
+#   ##     ##  ##    ## ##   ##    ##  ###   ## ##     ## ##    ##    ##     ##  ##    ## ##    ##
+#   ##     ##  ##   ##   ##  ##        ####  ## ##     ## ##          ##     ##  ##       ##
+#   ##     ##  ##  ##     ## ##   #### ## ## ## ##     ##  ######     ##     ##  ##        ######
+#   ##     ##  ##  ######### ##    ##  ##  #### ##     ##       ##    ##     ##  ##             ##
+#   ##     ##  ##  ##     ## ##    ##  ##   ### ##     ## ##    ##    ##     ##  ##    ## ##    ##
+#   ########  #### ##     ##  ######   ##    ##  #######   ######     ##    ####  ######   ######
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+ifneq "$(call lp.diagnostics.is-enabled)" ""
+$(call lp.help.add-target, <target>.help, ...... show diagnostic information (aliases: $(sort $(call lp.diagnostics.get-target-names))))
+endif
+
+$(foreach feature, tsc bundle format uplift clean, \
 	$(foreach target, $(call lp.$(feature).get-phony-targets), \
-        $(foreach shortcut, $(call lp.diagnostics.get-phony-targets), \
+        $(foreach shortcut, $(call lp.diagnostics.get-target-names), \
 		        $(eval $(call lp.fn.create-diagnostics-target,$(strip $(target)),$(strip $(shortcut)))) \
          ) \
 	 ) \
@@ -118,6 +134,34 @@ $(foreach name, $(call lp.format.get-phony-targets), lp.$(name)) : ;
     else
 		$(call lp.format.get-command-with-hooks, Formatting...)
     endif
+
+endif
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#   ##     ## ########  ##       #### ######## ########
+#   ##     ## ##     ## ##        ##  ##          ##
+#   ##     ## ##     ## ##        ##  ##          ##
+#   ##     ## ########  ##        ##  ######      ##
+#   ##     ## ##        ##        ##  ##          ##
+#   ##     ## ##        ##        ##  ##          ##
+#    #######  ##        ######## #### ##          ##
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+ifeq "$(call lp.uplift.is-enabled)" "true" # ........................................................ uplift is enabled
+
+$(call lp.fn.declare-phony-targets, uplift, lp.internal.uplift)
+
+lp.internal.uplift :
+	$(call lp.uplift.get-command-with-hooks, Uplifting...)
+
+else # .............................................................................................. uplift is disabled
+
+.PHONY: $(foreach name, $(call lp.uplift.get-phony-targets), lp.$(name))
+
+$(foreach name, $(call lp.uplift.get-phony-targets), lp.$(name)) : ;
+		$(call lp.uplift.get-command-with-hooks, Uplifting...)
 
 endif
 
