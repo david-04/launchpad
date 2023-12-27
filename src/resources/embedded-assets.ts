@@ -1041,7 +1041,7 @@ export const ASSETS = {
         "__LP_RUN_JS                             =node",
         "__LP_RUN_TS                             =$(call lp.fn.if-equal, $(LP_SETTINGS_MODULE_SYSTEM), esm, ts-node-esm, ts-node)",
         "",
-        "lp.run                                  =$(if $(filter %.ts,$(lastword $(strip $(1))),$(__LP_RUN_TS),$(__LP_RUN_TS)) $(1)",
+        "lp.run                                  =$(if $(filter %.ts,$(lastword $(strip $(1)))),$(__LP_RUN_TS),$(__LP_RUN_TS)) $(1)",
         "",
     ].join("\n"),
     ".launchpad/tsconfig.default.json": [

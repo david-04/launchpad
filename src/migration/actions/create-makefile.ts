@@ -33,13 +33,15 @@ export function createMakefile(context: MigrationContext) {
 function getDefaultTargetSection({ bundler, runtime, tscOutDir, bundlerOutDir, projectName }: NewConfig) {
     const header = getSpacedSeparator("Default target");
     const prerequisites = bundler.value === "disabled" ? "LP_PREREQUISITE_TSC" : "LP_PREREQUISITE_BUNDLE";
+    const comment =
+        bundler.value === "disabled" ? "" : " # or $(LP_PREREQUISITE_BUNDLE_JS) + $(LP_PREREQUISITE_BUNDLE_DTS)";
     if ("web" === runtime.value) {
-        return [...header, `autorun : $(${prerequisites});`];
+        return [...header, `autorun : $(${prerequisites});${comment}`];
     } else {
         runtime.value satisfies "node";
         const directory = "disabled" === bundler.value ? tscOutDir : bundlerOutDir;
         const script = `${directory}/${projectName}.js`;
-        return [...header, `autorun : $(${prerequisites})`, `\t$(call lp.run, ${script})`];
+        return [...header, `autorun : $(${prerequisites})${comment}`, `\t$(call lp.run, ${script})`];
     }
 }
 
@@ -47,16 +49,14 @@ function getDefaultTargetSection({ bundler, runtime, tscOutDir, bundlerOutDir, p
 // Bundle
 //----------------------------------------------------------------------------------------------------------------------
 
-function getBundleSection({ srcDir, projectName, bundlerOutDir, bundler }: NewConfig) {
+function getBundleSection({ srcDir, projectName, bundlerOutDir, bundler, artifact, dtsBundler }: NewConfig) {
     if ("disabled" === bundler.value) {
         return [];
     } else {
+        const options = "lib" === artifact && "disabled" !== dtsBundler.value ? "sourcemap dts" : "sourcemap";
         return [
             ...getSpacedSeparator("Bundling"),
-            "$(call lp.bundle.enable-minification)",
-            "# $(call lp.bundle.enable-dts-only-for-targets, release)",
-            "",
-            `$(call lp.bundle.add-bundle, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js)`,
+            `$(call lp.bundle.add, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js, ${options})`,
         ];
     }
 }
