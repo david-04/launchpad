@@ -19,8 +19,9 @@ endif
 
 $(foreach feature, tsc bundle format clean, \
 	$(foreach target, $(call lp.$(feature).get-phony-targets), \
-        $(foreach help, $(call lp.help.get-phony-targets), \
-		    $(eval $(call lp.fn.create-diagnostics-target, $(help), $(target)))) \
+        $(foreach shortcut, $(call lp.diagnostics.get-phony-targets), \
+		        $(eval $(call lp.fn.create-diagnostics-target,$(strip $(target)),$(strip $(shortcut)))) \
+         ) \
 	 ) \
  )
 
@@ -68,34 +69,23 @@ endif
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.bundle.is-enabled)" "true" # ....................................................... bundling is enabled
-
-ifneq "$(call lp.bundle.get-targets)" "" # ........................... bundling is enabled and bundles have been defined
-
-$(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
-
-$(call lp.bundle.get-targets) : $(call lp.bundle.get-prerequisites)
-	$(call lp.bundle.get-command-with-hooks, Bundling...)
-
-else # ............................................................ bundling is enabled but no bundles have been defined
-
-$(call lp.fn.declare-phony-targets, bundle, lp.bundle)
-
-lp.bundle :
-	$(error No bundles have been defined (missing call to lp.bundle.add-bundle))
-
-endif
-
-else # ............................................................................................ bundling is disabled
+ifeq "$(call lp.bundle.is-enabled)" "" # .......................................................... bundling is disabled
 
 .PHONY: lp.bundle
 
 lp.bundle : ;
-    ifeq "$(strip $(call lp.bundle.get-command-with-hooks))" ""
-		$(error Bundling is disabled/not configured)
-    else
-		$(call lp.bundle.get-command-with-hooks, Bundling...)
-    endif
+		$(error Bundling is disabled)
+
+else ifeq "$(call lp.bundle.get-targets)" "" # .............................................. no bundles have been added
+
+$(call lp.fn.declare-phony-targets, bundle, lp.bundle)
+
+lp.bundle :
+	$(error No bundles have been defined via lp.bundle.add
+
+else # ........................................................................................... bundles are available
+
+$(call lp.fn.declare-phony-targets, bundle, $(call lp.bundle.get-targets))
 
 endif
 
