@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { normalize, resolve } from "path";
-import { LAUNCHPAD_SETTINGS_CFG } from "../migration/data/known-files";
+import { LAUNCHPAD_CFG } from "../migration/data/known-files";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Representation of a file system path (file or directory)
@@ -86,5 +86,5 @@ export class Path {
 //----------------------------------------------------------------------------------------------------------------------
 
 export function getConfigFilePath(projectRoot: Path) {
-    return projectRoot.child(LAUNCHPAD_SETTINGS_CFG);
+    return projectRoot.child(LAUNCHPAD_CFG);
 }

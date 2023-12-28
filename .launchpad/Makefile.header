@@ -13,12 +13,12 @@
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_HOME_DIR                  :=$(strip $(patsubst %/Makefile.header,%,$(lastword $(MAKEFILE_LIST))))
-__LP_SETTINGS_CFG              :=$(strip $(__LP_HOME_DIR)/settings.cfg)
+__LP_LAUNCHPAD_CFG             :=$(strip $(__LP_HOME_DIR)/launchpad.cfg)
 __LP_MAKEFILE_HEADER           :=$(strip $(__LP_HOME_DIR)/Makefile.header)
 __LP_MAKEFILE_FOOTER           :=$(strip $(__LP_HOME_DIR)/Makefile.footer)
 __LP_TSCONFIG_DEFAULT_JSON     :=$(strip $(__LP_HOME_DIR)/tsconfig.default.json)
 __LP_MAKEFILES                 :=Makefile $(foreach ext, header footer, $(__LP_HOME_DIR)/Makefile.$(ext)) $(wildcard Makefile*)
-__LP_MAKEFILES_AND_SETTINGS    :=$(__LP_MAKEFILES) $(__LP_SETTINGS_CFG)
+__LP_MAKEFILES_AND_SETTINGS    :=$(__LP_MAKEFILES) $(__LP_LAUNCHPAD_CFG)
 __LP_TSCONFIG_JSON             :=tsconfig.json $(__LP_TSCONFIG_DEFAULT_JSON) $(wildcard tsconfig*.json)
 
 __LP_EMPTY_STRING               =#
@@ -80,7 +80,7 @@ lp.fn.config.assert.valid-enum  =$(if $(call lp.fn.config.extract-enums, $(1)),,
 lp.fn.config.assert.single-enum =$(if $(patsubst 1%,%,$(words $(strip $($(strip $(1)))))), $(call lp.fn.config.fail.invalid-enum, $(1)))
 lp.fn.config.assert.enum        =$(foreach fn, not-empty valid-enum single-enum, $(call lp.fn.config.assert.$(fn), $(1)))
 
-lp.fn.config.fail               =$(info Invalid configuration in $(__LP_SETTINGS_CFG)) \
+lp.fn.config.fail               =$(info Invalid configuration in $(__LP_LAUNCHPAD_CFG)) \
                                  $(info $(strip $(1))) \
                                  $(info ) \
                                  $(error $(__LP_BLANK))
@@ -131,7 +131,7 @@ endef
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-include $(__LP_SETTINGS_CFG)
+include $(__LP_LAUNCHPAD_CFG)
 
 LP_SETTINGS_ARTIFACT_ENUMS="app" or "lib"
 $(call lp.fn.config.validate-enum, LP_SETTINGS_ARTIFACT)
