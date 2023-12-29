@@ -27,7 +27,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     artifact: createNonPinnableEnumProperty({
         name: "artifact",
         configFile: {
-            currentKey: "LP_SETTINGS_ARTIFACT",
+            currentKey: "LP_CFG_ARTIFACT",
             newConfigObjectName: "artifact",
         },
         commandLine: {
@@ -57,7 +57,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     bundler: createPinnableEnumProperty({
         name: "bundler",
         configFile: {
-            currentKey: "LP_SETTINGS_BUNDLER",
+            currentKey: "LP_CFG_BUNDLER",
             newConfigObjectName: "bundler",
         },
         commandLine: {
@@ -86,7 +86,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     bundlerOutDir: createStringProperty({
         name: "bundler output directory",
         configFile: {
-            currentKey: "LP_SETTINGS_BUNDLER_OUT_DIR",
+            currentKey: "LP_CFG_BUNDLER_OUT_DIR",
             newConfigObjectName: "bundlerOutDir",
             comment: "only applicable if bundling is enabled",
         },
@@ -114,7 +114,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     dtsBundler: createPinnableEnumProperty({
         name: "d.ts bundler",
         configFile: {
-            currentKey: "LP_SETTINGS_DTS_BUNDLER",
+            currentKey: "LP_CFG_DTS_BUNDLER",
             newConfigObjectName: "dtsBundler",
         },
         commandLine: {
@@ -143,7 +143,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     formatter: createPinnableEnumProperty({
         name: "formatter",
         configFile: {
-            currentKey: "LP_SETTINGS_FORMATTER",
+            currentKey: "LP_CFG_FORMATTER",
             newConfigObjectName: "formatter",
         },
         commandLine: {
@@ -173,7 +173,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     installationMode: createNonPinnableEnumProperty({
         name: "launchpad installation mode",
         configFile: {
-            currentKey: "LP_SETTINGS_INSTALLATION_MODE",
+            currentKey: "LP_CFG_INSTALLATION_MODE",
             newConfigObjectName: "installationMode",
         },
         commandLine: {
@@ -207,7 +207,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     moduleSystem: createNonPinnableEnumProperty({
         name: "module system",
         configFile: {
-            currentKey: "LP_SETTINGS_MODULE_SYSTEM",
+            currentKey: "LP_CFG_MODULE_SYSTEM",
             newConfigObjectName: "moduleSystem",
         },
         commandLine: {
@@ -236,7 +236,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     packageManager: createPinnableEnumProperty({
         name: "package manager",
         configFile: {
-            currentKey: "LP_SETTINGS_PACKAGE_MANAGER",
+            currentKey: "LP_CFG_PACKAGE_MANAGER",
             newConfigObjectName: "packageManager",
         },
         commandLine: {
@@ -266,7 +266,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     projectName: createStringProperty({
         name: "project name",
         configFile: {
-            currentKey: "LP_SETTINGS_PROJECT_NAME",
+            currentKey: "LP_CFG_PROJECT_NAME",
             newConfigObjectName: "projectName",
             comment: "the main module's file name",
         },
@@ -294,7 +294,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     runtime: createPinnableEnumProperty({
         name: "runtime environment",
         configFile: {
-            currentKey: "LP_SETTINGS_RUNTIME",
+            currentKey: "LP_CFG_RUNTIME",
             newConfigObjectName: "runtime",
         },
         currentValues: [
@@ -319,7 +319,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     srcDir: createStringProperty({
         name: "source directory",
         configFile: {
-            currentKey: "LP_SETTINGS_SRC_DIR",
+            currentKey: "LP_CFG_SRC_DIR",
             newConfigObjectName: "srcDir",
         },
         commandLine: {
@@ -346,7 +346,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     tabSize: createIntegerProperty({
         name: "tab size",
         configFile: {
-            currentKey: "LP_SETTINGS_TAB_SIZE",
+            currentKey: "LP_CFG_TAB_SIZE",
             newConfigObjectName: "tabSize",
             comment: "only applicable if code formatting is enabled",
         },
@@ -373,7 +373,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     tscOutDir: createStringProperty({
         name: "TypeScript output directory",
         configFile: {
-            currentKey: "LP_SETTINGS_TSC_OUT_DIR",
+            currentKey: "LP_CFG_TSC_OUT_DIR",
             newConfigObjectName: "tscOutDir",
             comment: "directory for compiled JavaScript files",
         },
@@ -401,7 +401,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     upliftDependencies: createBooleanProperty({
         name: "upgrade all npm packages during uplifts",
         configFile: {
-            currentKey: "LP_SETTINGS_UPLIFT_DEPENDENCIES",
+            currentKey: "LP_CFG_UPLIFT_DEPENDENCIES",
             newConfigObjectName: "upliftDependencies",
             comment: "upgrade all npm packages during uplifts",
         },
@@ -427,7 +427,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     version: createVersionProperty({
         name: "version number",
         configFile: {
-            currentKey: "LP_SETTINGS_VERSION",
+            currentKey: "LP_CFG_VERSION",
             newConfigObjectName: "version",
         },
     }),
@@ -451,7 +451,7 @@ const CURRENT_CONFIG_PROPERTIES = {
             description: "Create settings for VSCode",
         },
         configFile: {
-            currentKey: "LP_SETTINGS_VSCODE_SETTINGS",
+            currentKey: "LP_CFG_VSCODE_SETTINGS",
             newConfigObjectName: "vsCodeSettings",
         },
         currentValues: [
@@ -477,7 +477,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     webAppDir: createStringProperty({
         name: "web app directory",
         configFile: {
-            currentKey: "LP_SETTINGS_WEB_APP_DIR",
+            currentKey: "LP_CFG_WEB_APP_DIR",
             newConfigObjectName: "webAppDir",
             comment: "only applicable for web applications",
         },

@@ -133,50 +133,50 @@ endef
 
 include $(__LP_LAUNCHPAD_CFG)
 
-LP_SETTINGS_ARTIFACT_ENUMS="app" or "lib"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_ARTIFACT)
+LP_CFG_ARTIFACT_ENUMS="app" or "lib"
+$(call lp.fn.config.validate-enum, LP_CFG_ARTIFACT)
 
-LP_SETTINGS_RUNTIME_ENUMS="node" or "web"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_RUNTIME)
+LP_CFG_RUNTIME_ENUMS="node" or "web"
+$(call lp.fn.config.validate-enum, LP_CFG_RUNTIME)
 
-LP_SETTINGS_MODULE_SYSTEM_ENUMS="cjs" or "esm"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_MODULE_SYSTEM)
+LP_CFG_MODULE_SYSTEM_ENUMS="cjs" or "esm"
+$(call lp.fn.config.validate-enum, LP_CFG_MODULE_SYSTEM)
 
-LP_SETTINGS_BUNDLER_ENUMS="disabled" or "esbuild"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_BUNDLER)
+LP_CFG_BUNDLER_ENUMS="disabled" or "esbuild"
+$(call lp.fn.config.validate-enum, LP_CFG_BUNDLER)
 
 __LP_DEFAULT_DTS_BUNDLER=dts-bundle-generator
-LP_SETTINGS_DTS_BUNDLER_ENUMS="disabled" or "$(__LP_DEFAULT_DTS_BUNDLER)"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_DTS_BUNDLER)
+LP_CFG_DTS_BUNDLER_ENUMS="disabled" or "$(__LP_DEFAULT_DTS_BUNDLER)"
+$(call lp.fn.config.validate-enum, LP_CFG_DTS_BUNDLER)
 
-LP_SETTINGS_FORMATTER_ENUMS="disabled", "biome" or "prettier"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_FORMATTER)
+LP_CFG_FORMATTER_ENUMS="disabled", "biome" or "prettier"
+$(call lp.fn.config.validate-enum, LP_CFG_FORMATTER)
 
-LP_SETTINGS_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_PACKAGE_MANAGER)
+LP_CFG_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
+$(call lp.fn.config.validate-enum, LP_CFG_PACKAGE_MANAGER)
 
-LP_SETTINGS_INSTALLATION_MODE_ENUMS="local", "global", "temp", "npx", "pnpm-dlx" or "yarn-dlx"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_INSTALLATION_MODE)
+LP_CFG_INSTALLATION_MODE_ENUMS="local", "global", "temp", "npx", "pnpm-dlx" or "yarn-dlx"
+$(call lp.fn.config.validate-enum, LP_CFG_INSTALLATION_MODE)
 
-$(call lp.fn.config.normalize.string, LP_SETTINGS_SRC_DIR)
-$(call lp.fn.config.assert.not-empty, LP_SETTINGS_SRC_DIR)
+$(call lp.fn.config.normalize.string, LP_CFG_SRC_DIR)
+$(call lp.fn.config.assert.not-empty, LP_CFG_SRC_DIR)
 
-LP_SETTINGS_UPLIFT_DEPENDENCIES_ENUMS="true" or "false"
-$(call lp.fn.config.validate-enum, LP_SETTINGS_UPLIFT_DEPENDENCIES)
-ifeq "$(LP_SETTINGS_UPLIFT_DEPENDENCIES)" "false"
-    LP_SETTINGS_UPLIFT_DEPENDENCIES=
+LP_CFG_UPLIFT_DEPENDENCIES_ENUMS="true" or "false"
+$(call lp.fn.config.validate-enum, LP_CFG_UPLIFT_DEPENDENCIES)
+ifeq "$(LP_CFG_UPLIFT_DEPENDENCIES)" "false"
+    LP_CFG_UPLIFT_DEPENDENCIES=
 endif
 
-$(call lp.fn.config.normalize.boolean, LP_SETTINGS_UPLIFT_DEPENDENCIES)
+$(call lp.fn.config.normalize.boolean, LP_CFG_UPLIFT_DEPENDENCIES)
 
-$(call lp.fn.config.normalize.string, LP_SETTINGS_TSC_OUT_DIR)
-ifeq "$(LP_SETTINGS_TSC_OUT_DIR)" ""
-    $(call lp.fn.config.fail, LP_SETTINGS_TSC_OUT_DIR must not be empty)
+$(call lp.fn.config.normalize.string, LP_CFG_TSC_OUT_DIR)
+ifeq "$(LP_CFG_TSC_OUT_DIR)" ""
+    $(call lp.fn.config.fail, LP_CFG_TSC_OUT_DIR must not be empty)
 endif
 
-ifeq "$(LP_SETTINGS_BUNDLER)" ""
-    ifneq "$(LP_SETTINGS_DTS_BUNDLER)" ""
-        $(call lp.fn.config.fail, LP_SETTINGS_DTS_BUNDLER must be "disabled" when LP_SETTINGS_BUNDLER is "disabled" as well)
+ifeq "$(LP_CFG_BUNDLER)" ""
+    ifneq "$(LP_CFG_DTS_BUNDLER)" ""
+        $(call lp.fn.config.fail, LP_CFG_DTS_BUNDLER must be "disabled" when LP_CFG_BUNDLER is "disabled" as well)
     endif
 endif
 
@@ -272,8 +272,8 @@ endef
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_TSC_ENABLED                        =true
-__LP_TSC_BUILDINFO                      =$(if $(LP_SETTINGS_TSC_OUT_DIR),$(LP_SETTINGS_TSC_OUT_DIR)/.tsbuildinfo,$(__LP_HOME_DIR)/.tsbuildinfo.tmp)
-__LP_TSC_DEFAULT_PREREQUISITES          =$(sort $(call lp.fn.wildcard, $(LP_SETTINGS_SRC_DIR), *) $(__LP_TSCONFIG_JSON) $(__LP_MAKEFILES_AND_SETTINGS))
+__LP_TSC_BUILDINFO                      =$(if $(LP_CFG_TSC_OUT_DIR),$(LP_CFG_TSC_OUT_DIR)/.tsbuildinfo,$(__LP_HOME_DIR)/.tsbuildinfo.tmp)
+__LP_TSC_DEFAULT_PREREQUISITES          =$(sort $(call lp.fn.wildcard, $(LP_CFG_SRC_DIR), *) $(__LP_TSCONFIG_JSON) $(__LP_MAKEFILES_AND_SETTINGS))
 __LP_TSC_EFFECTIVE_PREREQUISITES        =$(__LP_TSC_DEFAULT_PREREQUISITES)
 __LP_TSC_DEFAULT_TARGETS                =$(__LP_TSC_BUILDINFO)
 __LP_TSC_EFFECTIVE_TARGETS              =$(__LP_TSC_DEFAULT_TARGETS)
@@ -281,7 +281,7 @@ __LP_TSC_DEFAULT_BEFORE_HOOKS           =
 __LP_TSC_EFFECTIVE_BEFORE_HOOKS         =$(__LP_TSC_DEFAULT_BEFORE_HOOKS)
 __LP_TSC_DEFAULT_AFTER_HOOKS            =
 __LP_TSC_EFFECTIVE_AFTER_HOOKS          =$(__LP_TSC_DEFAULT_AFTER_HOOKS)
-__LP_TSC_DEFAULT_COMMAND                =$(strip $(if $(LP_SETTINGS_TSC_OUT_DIR), \
+__LP_TSC_DEFAULT_COMMAND                =$(strip $(if $(LP_CFG_TSC_OUT_DIR), \
                                              tsc -b, \
                                              tsc --noEmit true \
                                                  --tsBuildInfoFile "$(__LP_TSC_BUILDINFO)" \
@@ -332,7 +332,7 @@ LP_PREREQUISITE_TSC                     =$$(call lp.tsc.get-targets)
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_BUNDLE_ENABLED                     =$(if $(LP_SETTINGS_BUNDLER),true)
+__LP_BUNDLE_ENABLED                     =$(if $(LP_CFG_BUNDLER),true)
 __LP_BUNDLE_DEFAULT_PREREQUISITES       =$(call lp.tsc.get-targets) $(__LP_MAKEFILES_AND_SETTINGS)
 __LP_BUNDLE_EFFECTIVE_PREREQUISITES     =$(call lp.bundle.get-default-prerequisites)
 __LP_BUNDLE_DEFAULT_JS_TARGETS          =
@@ -359,13 +359,13 @@ lp.bundle.get-module-system             =$(strip $(call lp.fn.if-contains, $(2),
                                                  $(call lp.fn.if-contains, $(2), esm, $4, \
                                                  $(call lp.fn.if-contains, $(1), %.cjs, $3, \
                                                  $(call lp.fn.if-contains, $(1), %.mjs, $4, \
-                                                 $(call lp.fn.if-equal,$(LP_SETTINGS_MODULE_SYSTEM), esm, $4, \
+                                                 $(call lp.fn.if-equal,$(LP_CFG_MODULE_SYSTEM), esm, $4, \
                                                  $3 \
                                           ))))))
 # $1=options, $2=web, $3=cli
 lp.bundle.get-runtime                   =$(strip $(call lp.fn.if-contains, $(1), web, $2, \
                                                  $(call lp.fn.if-contains, $(1), cli, $3, \
-                                                 $(call lp.fn.if-equal,$(LP_SETTINGS_RUNTIME), web, $2, \
+                                                 $(call lp.fn.if-equal,$(LP_CFG_RUNTIME), web, $2, \
                                                  $(3) \
                                           ))))
 # $1=src, $2=target, $3=options
@@ -393,12 +393,12 @@ lp.bundle.get-js-command-esbuild        =esbuild "$(strip $(1))" \
                                                   ) \
 # $1=src, $2=target, $3=options
 lp.bundle.get-js-command-               =$(error lp.bundle.add can't be called when bundling is disabled)
-lp.bundle.get-js-command                =$(call lp.bundle.get-js-command-$(LP_SETTINGS_BUNDLER),$(1),$(2),$(3))
+lp.bundle.get-js-command                =$(call lp.bundle.get-js-command-$(LP_CFG_BUNDLER),$(1),$(2),$(3))
 
 # $1=src, $2=target, $3=options
 lp.bundle.get-dts-command-dts-bundle-generator=dts-bundle-generator "$(strip $(1))" -o "$(strip $(2))" --no-banner --silent
 lp.bundle.get-dts-command-              =$(error lp.bundle.add can't be called with the "dts" option when dts-bundling is disabled)
-lp.bundle.get-dts-command               =$(call lp.bundle.get-dts-command-$(LP_SETTINGS_DTS_BUNDLER),$(1),$(2),$(3))
+lp.bundle.get-dts-command               =$(call lp.bundle.get-dts-command-$(LP_CFG_DTS_BUNDLER),$(1),$(2),$(3))
 
 # $1=src, $2=target, $3=options, $4=after-hook
 lp.bundle.create-js-rule                =$(call lp.bundle.add-extra-js-targets, $(2)) \
@@ -414,11 +414,11 @@ lp.bundle.validate-options              =$(if $(filter-out $(__LP_BUNDLE_ALLOWED
                                           )
 
 # $1=src, $2=target, $3=options, $4=after-hook-js, $5=after-hook-dts
-lp.bundle.add                           =$(if $(LP_SETTINGS_BUNDLER),,$(error lp.bundle.add can't be called when bundling is disabled)) \
+lp.bundle.add                           =$(if $(LP_CFG_BUNDLER),,$(error lp.bundle.add can't be called when bundling is disabled)) \
                                          $(call lp.bundle.validate-options,$(strip $(3))) \
                                          $(call lp.bundle.create-js-rule,$(strip $(1)),$(strip $(2)),$(strip $(3)),$(strip $(4))) \
                                          $(if $(filter dts,$(strip $(3))), \
-                                              $(if $(LP_SETTINGS_DTS_BUNDLER),,$(error lp.bundle.add can't be called with the "dts" option when dts-bundling is disabled)) \
+                                              $(if $(LP_CFG_DTS_BUNDLER),,$(error lp.bundle.add can't be called with the "dts" option when dts-bundling is disabled)) \
                                               $(call lp.bundle.create-dts-rule,$(strip $(1)),$(call lp.bundle.js-extension-to-dts,$(strip $(2))),$(strip $(3)),$(strip $(5))) \
                                           )
 
@@ -469,14 +469,14 @@ LP_PREREQUISITE_BUNDLE_DTS              =$$(call lp.bundle.get-dts-targets)
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_FORMAT_ENABLED                     =$(if $(LP_SETTINGS_FORMATTER),true)
+__LP_FORMAT_ENABLED                     =$(if $(LP_CFG_FORMATTER),true)
 __LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
 __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
 __LP_FORMAT_DEFAULT_AFTER_HOOKS         =
 __LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
 __LP_FORMAT_DEFAULT_COMMAND_prettier    =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-files))
 __LP_FORMAT_DEFAULT_COMMAND_biome       =biome format --write --files-ignore-unknown=true $(patsubst %, '%', $(call lp.format.get-files))
-__LP_FORMAT_DEFAULT_COMMAND             =$(__LP_FORMAT_DEFAULT_COMMAND_$(LP_SETTINGS_FORMATTER))
+__LP_FORMAT_DEFAULT_COMMAND             =$(__LP_FORMAT_DEFAULT_COMMAND_$(LP_CFG_FORMATTER))
 __LP_FORMAT_EFFECTIVE_COMMAND           =$(call lp.format.get-default-command)
 __LP_FORMAT_DEFAULT_FILES               =
 __LP_FORMAT_EFFECTIVE_FILES             =$(__LP_FORMAT_DEFAULT_FILES)
@@ -484,7 +484,7 @@ __LP_FORMAT_EFFECTIVE_FILES             =$(__LP_FORMAT_DEFAULT_FILES)
 __LP_FORMAT_ROOT_LEVEL_DIRECTORIES      =$(filter-out .launchpad .vscode .yarn node_modules,$(call lp.fn.normalize.file-paths, $(wildcard */)))
 __LP_FORMAT_EXTENSIONS_prettier         =ts tsx js jsx json html htm css less sass
 __LP_FORMAT_EXTENSIONS_biome            =ts tsx js jsx json # html htm css less sass
-__LP_FORMAT_EXTENSIONS                  =$(__LP_FORMAT_EXTENSIONS_$(LP_SETTINGS_FORMATTER))
+__LP_FORMAT_EXTENSIONS                  =$(__LP_FORMAT_EXTENSIONS_$(LP_CFG_FORMATTER))
 
 
 lp.format.to-wildcard                   =$(if $(strip $(1)), $(1), $(patsubst %, *.%, $(__LP_FORMAT_EXTENSIONS)))
@@ -500,7 +500,7 @@ $(call lp.format.add-files-to,      __LP_FORMAT_DEFAULT_FILES, $(wildcard $(pats
 $(call lp.format.remove-files-from, __LP_FORMAT_DEFAULT_FILES, $(wildcard $(patsubst %,*.min.%,$(__LP_FORMAT_EXTENSIONS))))
 $(call lp.format.add-files-to,      __LP_FORMAT_DEFAULT_FILES, $(call lp.fn.wildcard, $(__LP_FORMAT_ROOT_LEVEL_DIRECTORIES), $(patsubst %,*.%,$(__LP_FORMAT_EXTENSIONS))))
 $(call lp.format.remove-files-from, __LP_FORMAT_DEFAULT_FILES, $(call lp.fn.wildcard, $(__LP_FORMAT_ROOT_LEVEL_DIRECTORIES), $(patsubst %,*.min.%,$(__LP_FORMAT_EXTENSIONS))))
-$(call lp.format.remove-files-from, __LP_FORMAT_DEFAULT_FILES, $(call lp.fn.wildcard, $(LP_SETTINGS_TSC_OUT_DIR) , *))
+$(call lp.format.remove-files-from, __LP_FORMAT_DEFAULT_FILES, $(call lp.fn.wildcard, $(LP_CFG_TSC_OUT_DIR) , *))
 
 lp.format.disable                       =$(call lp.fn.var.erase, __LP_FORMAT_ENABLED)
 lp.format.add-before-hook               =$(call lp.fn.var.append-with-separator, __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
@@ -517,7 +517,7 @@ lp.format.exclude                       =$(call lp.format.remove-files-from, __L
 
 lp.format.get-phony-targets             =format reformat
 lp.format.get-name                      =Format
-lp.format.get-description               =format sources with $(LP_SETTINGS_FORMATTER)
+lp.format.get-description               =format sources with $(LP_CFG_FORMATTER)
 lp.format.is-enabled                    =$(strip $(__LP_FORMAT_ENABLED))
 lp.format.get-default-prerequisites     =<n/a>
 lp.format.get-prerequisites             =
@@ -601,7 +601,7 @@ lp.clean.overwrite-command              =$(call lp.fn.assert.param-not-empty, lp
                                          $(call lp.fn.var.assign, __LP_CLEAN_EFFECTIVE_COMMAND, $(1))
 
 lp.clean.npm-packages                   =$(call lp.clean.files, node_modules)
-lp.clean.tsc-output                     =$(call lp.clean.files, $(if $(strip $(LP_SETTINGS_TSC_OUT_DIR)), $(LP_SETTINGS_TSC_OUT_DIR), $(__LP_TSC_BUILDINFO)))
+lp.clean.tsc-output                     =$(call lp.clean.files, $(if $(strip $(LP_CFG_TSC_OUT_DIR)), $(LP_CFG_TSC_OUT_DIR), $(__LP_TSC_BUILDINFO)))
 lp.clean.bundles                        =$(call lp.fn.var.assign, __LP_CLEAN_DELETE_BUNDLES, true)
 lp.clean.files                          =$(call lp.fn.var.append, __LP_CLEAN_FILES, $(1))
 
@@ -642,6 +642,6 @@ lp.clean.get-files                      =$(strip $(sort \
 #-----------------------------------------------------------------------------------------------------------------------
 
 __LP_RUN_JS                             =node
-__LP_RUN_TS                             =$(call lp.fn.if-equal, $(LP_SETTINGS_MODULE_SYSTEM), esm, ts-node-esm, ts-node)
+__LP_RUN_TS                             =$(call lp.fn.if-equal, $(LP_CFG_MODULE_SYSTEM), esm, ts-node-esm, ts-node)
 
 lp.run                                  =$(if $(filter %.ts,$(lastword $(strip $(1)))),$(__LP_RUN_TS),$(__LP_RUN_TS)) $(1)
