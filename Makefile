@@ -68,7 +68,7 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.js, minify)
+$(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.js, minify shebang)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Format

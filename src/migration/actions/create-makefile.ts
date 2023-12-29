@@ -49,11 +49,19 @@ function getDefaultTargetSection({ bundler, runtime, tscOutDir, bundlerOutDir, p
 // Bundle
 //----------------------------------------------------------------------------------------------------------------------
 
-function getBundleSection({ srcDir, projectName, bundlerOutDir, bundler, artifact, dtsBundler }: NewConfig) {
+function getBundleSection({ srcDir, projectName, bundlerOutDir, bundler, artifact, dtsBundler, runtime }: NewConfig) {
     if ("disabled" === bundler.value) {
         return [];
     } else {
-        const options = "lib" === artifact && "disabled" !== dtsBundler.value ? "sourcemap dts" : "sourcemap";
+        const options = [
+            "sourcemap",
+            "lib" === artifact && "disabled" !== dtsBundler.value ? ["dts"] : [],
+            "app" === artifact && "web" !== runtime.value ? ["shebang"] : [],
+        ]
+            .flatMap(option => option)
+            .map(option => option.trim())
+            .filter(option => option)
+            .join(" ");
         return [
             ...getSpacedSeparator("Bundling"),
             `$(call lp.bundle.add, ${srcDir}/${projectName}.ts, ${bundlerOutDir}/${projectName}.js, ${options})`,

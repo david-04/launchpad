@@ -341,7 +341,7 @@ __LP_BUNDLE_DEFAULT_DTS_TARGETS         =
 __LP_BUNDLE_EFFECTIVE_DTS_TARGETS       =$(__LP_BUNDLE_DEFAULT_DTS_TARGETS)
 __LP_BUNDLE_COMMANDS                    =
 
-__LP_BUNDLE_ALLOWED_OPTIONS             =minify web cli sourcemap inline-sources esm cjs dts
+__LP_BUNDLE_ALLOWED_OPTIONS             =minify web cli sourcemap inline-sources esm cjs dts shebang
 
 # $1=target, $2=command, $3=after-hook
 define lp.bundle.create-rule
@@ -391,6 +391,11 @@ lp.bundle.get-js-command-esbuild        =esbuild "$(strip $(1))" \
                                                         --platform=browser --target=es6 --jsx=transform, \
                                                         --platform=node --target=es2022 \
                                                   ) \
+                                                 $(call lp.fn.if-contains, \
+                                                        $(3), \
+                                                        shebang hashbang, \
+                                                        "--banner:js=#!/usr/bin/env node" \
+                                                  )
 # $1=src, $2=target, $3=options
 lp.bundle.get-js-command-               =$(error lp.bundle.add can't be called when bundling is disabled)
 lp.bundle.get-js-command                =$(call lp.bundle.get-js-command-$(LP_CFG_BUNDLER),$(1),$(2),$(3))
