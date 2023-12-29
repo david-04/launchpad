@@ -199,7 +199,7 @@ __LP_HELP_TARGETS          =$(call lp.help.add-builtin-target, bundle, bundle ..
                             $(call lp.help.add-builtin-target, tsc,    compile ............$(__LP_EXTRA_DOTS)) \
                             $(call lp.help.add-builtin-target, format, format .............$(__LP_EXTRA_DOTS)) \
                             $(call lp.help.add-builtin-target, help,   help ...............$(__LP_EXTRA_DOTS)) \
-                            $(call lp.help.add-builtin-target, tsc,    tsc ................$(__LP_EXTRA_DOTS))
+                            $(call lp.help.add-builtin-target, tsc,    tsc ................$(__LP_EXTRA_DOTS)) \
                             $(call lp.help.add-builtin-target, uplift, uplift .............$(__LP_EXTRA_DOTS))
 
 lp.help.disable            =$(call lp.fn.var.erase, __LP_HELP_ENABLED)
