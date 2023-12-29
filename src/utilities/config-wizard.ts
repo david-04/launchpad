@@ -9,8 +9,6 @@ import {
     DEFAULT_ARTIFACT,
     DEFAULT_BUILD_DIR,
     DEFAULT_BUNDLER,
-    DEFAULT_CREATE_DEBUG_MODULE,
-    DEFAULT_CREATE_MAKEFILE,
     DEFAULT_CREATE_PROJECT_TEMPLATE,
     DEFAULT_DEPENDENCIES_CLI,
     DEFAULT_DEPENDENCIES_WEB,
@@ -80,13 +78,8 @@ export async function getNewConfig(
     const installDevDependencies = await getInstallDevDependencies(presets);
     const upliftDependencies = await getUpliftDependencies(presets);
     const createProjectTemplate = await getCreateProjectTemplate(presets);
-    const createDebugModule = getCreateFile(
-        presets,
-        createProjectTemplate,
-        "createDebugModule",
-        DEFAULT_CREATE_DEBUG_MODULE
-    );
-    const createMakefile = getCreateFile(presets, createProjectTemplate, "createMakefile", DEFAULT_CREATE_MAKEFILE);
+    const createDebugModule = true === commandLineConfig.createDebugModule ? true : false;
+    const createMakefile = getCreateMakefile(presets, createProjectTemplate);
     const vsCodeSettings = await getVsCodeSettings(presets);
     return {
         artifact,
@@ -616,26 +609,18 @@ async function getVsCodeSettings(presets: Presets) {
                     value: item[0],
                 } as const satisfies Choice;
             }),
-            message: "Install packages",
+            message: "Manage VSCode settings",
         });
         return new Set(selection) as Set<CURRENT>;
     }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Create a debug module / Makefile / VSCode settings
+// Create a Makefile
 //----------------------------------------------------------------------------------------------------------------------
 
-function getCreateFile(
-    presets: Presets,
-    createProjectTemplate: boolean,
-    key: keyof CommandLineConfig,
-    defaultValue: boolean
-) {
-    if (!createProjectTemplate) {
-        return false;
-    } else {
-        const preselected = presets.commandLineConfig[key];
-        return "boolean" === typeof preselected ? preselected : defaultValue;
-    }
+function getCreateMakefile(presets: Presets, createProjectTemplate: boolean) {
+    return "boolean" === typeof presets.commandLineConfig.createMakefile
+        ? presets.commandLineConfig.createMakefile
+        : createProjectTemplate;
 }
