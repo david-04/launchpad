@@ -87,7 +87,7 @@ export async function getNewConfig(
         DEFAULT_CREATE_DEBUG_MODULE
     );
     const createMakefile = getCreateFile(presets, createProjectTemplate, "createMakefile", DEFAULT_CREATE_MAKEFILE);
-    const createVsCodeSettings = await getCreateVsCodeSettings(presets, formatter);
+    const vsCodeSettings = await getVsCodeSettings(presets);
     return {
         artifact,
         bundler,
@@ -95,7 +95,6 @@ export async function getNewConfig(
         createDebugModule,
         createMakefile,
         createProjectTemplate,
-        createVsCodeSettings,
         dependencies,
         dtsBundler,
         formatter,
@@ -110,6 +109,7 @@ export async function getNewConfig(
         tscOutDir,
         upliftDependencies,
         version,
+        vsCodeSettings,
         webAppDir,
     };
 }
@@ -564,7 +564,7 @@ async function getUpliftDependencies(presets: Presets) {
         return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
     } else {
         return promptYesNo({
-            message: "Uplift dependencies",
+            message: "Uplift all dependencies (not just launchpad)",
             yesHint: "Upgrade all npm packages during uplifts",
             noHint: "Only upgrade launchpad itself during uplifts",
             default: DEFAULT_UPLIFT_DEPENDENCIES,
@@ -597,20 +597,28 @@ async function getCreateProjectTemplate(presets: Presets) {
 // Create VSCode settings
 //----------------------------------------------------------------------------------------------------------------------
 
-async function getCreateVsCodeSettings(presets: Presets, formatter: NewConfig["formatter"]) {
-    const FIELD = "createVsCodeSettings";
+async function getVsCodeSettings(presets: Presets) {
+    const FIELD = "vsCodeSettings";
     const preselectedOption = presets.commandLineConfig[FIELD];
-    const defaultValue = "disabled" !== formatter.value;
+    const allCurrentValues = ConfigProperties.vsCodeSettings.options.map(item => item[0]);
+    type CURRENT = (typeof allCurrentValues)[0];
+    const defaultValue: Set<CURRENT> = new Set(allCurrentValues);
     if (undefined !== preselectedOption) {
-        return DEFAULT_ENUM === preselectedOption ? defaultValue : preselectedOption;
+        return (DEFAULT_ENUM === preselectedOption ? defaultValue : preselectedOption) as Set<CURRENT>;
     } else {
-        const formatterName = "disabled" === formatter.value ? "VSCode's default formatter" : formatter.value;
-        return promptYesNo({
-            message: "Create VSCode settings",
-            yesHint: `Enable auto-formatting with ${formatterName}`,
-            noHint: "Don't maintain formatter settings",
-            default: defaultValue,
+        const selection = await promptMultiSelect({
+            type: "multiselect",
+            choices: ConfigProperties.vsCodeSettings.options.map(item => {
+                return {
+                    title: item[0],
+                    description: item[1],
+                    selected: presets.oldConfig?.vsCodeSettings?.has(item[0]) ?? true,
+                    value: item[0],
+                } as const satisfies Choice;
+            }),
+            message: "Install packages",
         });
+        return new Set(selection) as Set<CURRENT>;
     }
 }
 

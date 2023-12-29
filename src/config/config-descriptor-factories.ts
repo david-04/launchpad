@@ -11,6 +11,7 @@ import {
     type SerializationDetails,
 } from "./config-data-types";
 import {
+    createEnumSetParser,
     createIntegerParser,
     createNonPinnableEnumParser,
     createPinnableEnumParser,
@@ -20,7 +21,15 @@ import {
 import type { Version } from "./version-number";
 
 //----------------------------------------------------------------------------------------------------------------------
-// Data types
+//
+//   ########     ###    ########    ###       ######## ##    ## ########  ########  ######
+//   ##     ##   ## ##      ##      ## ##         ##     ##  ##  ##     ## ##       ##    ##
+//   ##     ##  ##   ##     ##     ##   ##        ##      ####   ##     ## ##       ##
+//   ##     ## ##     ##    ##    ##     ##       ##       ##    ########  ######    ######
+//   ##     ## #########    ##    #########       ##       ##    ##        ##             ##
+//   ##     ## ##     ##    ##    ##     ##       ##       ##    ##        ##       ##    ##
+//   ########  ##     ##    ##    ##     ##       ##       ##    ##        ########  ######
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type AssembledDescriptor<OLD, NEW, KEY extends string> = {
@@ -52,7 +61,15 @@ type CommandLineDescriptorWithPlaceholder = CommandLineDescriptor & { readonly p
 type CommandLineDescriptorWithOptionalPlaceholder = CommandLineDescriptor & { readonly placeholder?: string };
 
 //----------------------------------------------------------------------------------------------------------------------
-// Non-pinnable enums
+//
+//   ######## ##    ## ##     ## ##     ##
+//   ##       ###   ## ##     ## ###   ###
+//   ##       ####  ## ##     ## #### ####
+//   ######   ## ## ## ##     ## ## ### ##
+//   ##       ##  #### ##     ## ##     ##
+//   ##       ##   ### ##     ## ##     ##
+//   ######## ##    ##  #######  ##     ##
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type NonPinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
@@ -94,7 +111,15 @@ export function createNonPinnableEnumProperty<KEY extends string, CURRENT extend
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Pinnable enums
+//
+//   ########  #### ##    ## ##    ##    ###    ########  ##       ########
+//   ##     ##  ##  ###   ## ###   ##   ## ##   ##     ## ##       ##
+//   ##     ##  ##  ####  ## ####  ##  ##   ##  ##     ## ##       ##
+//   ########   ##  ## ## ## ## ## ## ##     ## ########  ##       ######
+//   ##         ##  ##  #### ##  #### ######### ##     ## ##       ##
+//   ##         ##  ##   ### ##   ### ##     ## ##     ## ##       ##
+//   ##        #### ##    ## ##    ## ##     ## ########  ######## ########
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type PinnableEnumPropertyDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
@@ -140,7 +165,69 @@ export function createPinnableEnumProperty<KEY extends string, CURRENT extends s
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// String properties
+//
+//   ######## ##    ## ##     ## ##     ##         ######  ######## ########
+//   ##       ###   ## ##     ## ###   ###        ##    ## ##          ##
+//   ##       ####  ## ##     ## #### ####        ##       ##          ##
+//   ######   ## ## ## ##     ## ## ### ##         ######  ######      ##
+//   ##       ##  #### ##     ## ##     ##              ## ##          ##
+//   ##       ##   ### ##     ## ##     ##        ##    ## ##          ##
+//   ######## ##    ##  #######  ##     ##         ######  ########    ##
+//
+//----------------------------------------------------------------------------------------------------------------------
+
+type EnumSetDescriptor<KEY extends string, CURRENT extends string, OBSOLETE extends string> = {
+    readonly name: string;
+    readonly configFile?: ConfigFileDescriptor<KEY>;
+    readonly commandLine?: CommandLineDescriptorWithOptionalPlaceholder;
+    readonly currentValues: ReadonlyArray<readonly [CURRENT, string?]>;
+    readonly obsoleteValues: ReadonlyArray<OBSOLETE>;
+};
+
+export function createEnumSetProperty<KEY extends string, CURRENT extends string, OBSOLETE extends string>(
+    property: EnumSetDescriptor<KEY, CURRENT, OBSOLETE>
+) {
+    type ALL = CURRENT | OBSOLETE;
+    const currentValues = property.currentValues.map(value => value[0]);
+    const allValues = [...currentValues, ...property.obsoleteValues];
+    const currentValuesWithDefault = [DEFAULT_ENUM, ...currentValues];
+    const commandLineInfo = createCommandLineInfo(
+        property.commandLine,
+        property.commandLine?.placeholder ?? `[${currentValuesWithDefault.join(",")}]`
+    );
+    const matchesConfigFileKey = createConfigFileKeyMatcher(property.configFile);
+    const parseOldValue = createOldValueParser<Set<ALL>>(matchesConfigFileKey, createEnumSetParser(allValues));
+    const parseNewValue = createEnumSetParser(currentValues);
+    const parseFromCommandLine = createCommandLineParser(property.commandLine, parseNewValue);
+    const values = currentValues.join(", ");
+    const serialize = createSerializer<Set<CURRENT>, KEY>(
+        property.configFile,
+        (value: Set<CURRENT>) => [...value].join(","),
+        values
+    );
+    const assertOldValuePresent = createAssertPresentHandler<KEY, Set<ALL>>(property.name, property.configFile);
+    const descriptor = {
+        commandLineInfo,
+        matchesConfigFileKey,
+        parseOldValue,
+        parseNewValue,
+        parseFromCommandLine,
+        serialize,
+        assertOldValuePresent,
+    } as const satisfies AssembledDescriptor<Set<ALL>, Set<CURRENT>, KEY>;
+    return { ...descriptor, options: property.currentValues };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//    ######  ######## ########  #### ##    ##  ######
+//   ##    ##    ##    ##     ##  ##  ###   ## ##    ##
+//   ##          ##    ##     ##  ##  ####  ## ##
+//    ######     ##    ########   ##  ## ## ## ##   ####
+//         ##    ##    ##   ##    ##  ##  #### ##    ##
+//   ##    ##    ##    ##    ##   ##  ##   ### ##    ##
+//    ######     ##    ##     ## #### ##    ##  ######
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type StringPropertyDescriptor<KEY extends string> = {
@@ -172,7 +259,15 @@ export function createStringProperty<KEY extends string>(property: StringPropert
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// String-array properties
+//
+//    ######  ######## ########  #### ##    ##  ######         ###    ########  ########     ###    ##    ##
+//   ##    ##    ##    ##     ##  ##  ###   ## ##    ##       ## ##   ##     ## ##     ##   ## ##    ##  ##
+//   ##          ##    ##     ##  ##  ####  ## ##            ##   ##  ##     ## ##     ##  ##   ##    ####
+//    ######     ##    ########   ##  ## ## ## ##   ####    ##     ## ########  ########  ##     ##    ##
+//         ##    ##    ##   ##    ##  ##  #### ##    ##     ######### ##   ##   ##   ##   #########    ##
+//   ##    ##    ##    ##    ##   ##  ##   ### ##    ##     ##     ## ##    ##  ##    ##  ##     ##    ##
+//    ######     ##    ##     ## #### ##    ##  ######      ##     ## ##     ## ##     ## ##     ##    ##
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type StringArrayPropertyDescriptor<KEY extends string> = {
@@ -210,7 +305,15 @@ export function createStringArrayProperty<KEY extends string>(property: StringAr
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Boolean
+//
+//   ########   #######   #######  ##       ########    ###    ##    ##
+//   ##     ## ##     ## ##     ## ##       ##         ## ##   ###   ##
+//   ##     ## ##     ## ##     ## ##       ##        ##   ##  ####  ##
+//   ########  ##     ## ##     ## ##       ######   ##     ## ## ## ##
+//   ##     ## ##     ## ##     ## ##       ##       ######### ##  ####
+//   ##     ## ##     ## ##     ## ##       ##       ##     ## ##   ###
+//   ########   #######   #######  ######## ######## ##     ## ##    ##
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type BooleanPropertyDescriptor<KEY extends string> = {
@@ -241,7 +344,15 @@ export function createBooleanProperty<KEY extends string>(property: BooleanPrope
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Number
+//
+//   ##    ## ##     ## ##     ## ########  ######## ########
+//   ###   ## ##     ## ###   ### ##     ## ##       ##     ##
+//   ####  ## ##     ## #### #### ##     ## ##       ##     ##
+//   ## ## ## ##     ## ## ### ## ########  ######   ########
+//   ##  #### ##     ## ##     ## ##     ## ##       ##   ##
+//   ##   ### ##     ## ##     ## ##     ## ##       ##    ##
+//   ##    ##  #######  ##     ## ########  ######## ##     ##
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type IntegerPropertyDescriptor<KEY extends string> = {
@@ -272,7 +383,15 @@ export function createIntegerProperty<KEY extends string>(property: IntegerPrope
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Version number
+//
+//   ##     ## ######## ########   ######  ####  #######  ##    ##
+//   ##     ## ##       ##     ## ##    ##  ##  ##     ## ###   ##
+//   ##     ## ##       ##     ## ##        ##  ##     ## ####  ##
+//   ##     ## ######   ########   ######   ##  ##     ## ## ## ##
+//    ##   ##  ##       ##   ##         ##  ##  ##     ## ##  ####
+//     ## ##   ##       ##    ##  ##    ##  ##  ##     ## ##   ###
+//      ###    ######## ##     ##  ######  ####  #######  ##    ##
+//
 //----------------------------------------------------------------------------------------------------------------------
 
 type VersionPropertyDescriptor<KEY extends string> = {
@@ -298,6 +417,18 @@ export function createVersionProperty<KEY extends string>(property: VersionPrope
         assertOldValuePresent,
     } as const satisfies AssembledDescriptor<Version, Version, KEY>;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+//   ##     ## ######## ##       ########  ######## ########   ######
+//   ##     ## ##       ##       ##     ## ##       ##     ## ##    ##
+//   ##     ## ##       ##       ##     ## ##       ##     ## ##
+//   ######### ######   ##       ########  ######   ########   ######
+//   ##     ## ##       ##       ##        ##       ##   ##         ##
+//   ##     ## ##       ##       ##        ##       ##    ##  ##    ##
+//   ##     ## ######## ######## ##        ######## ##     ##  ######
+//
+//----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create a command-line info object

@@ -131,7 +131,6 @@ DEFAULT_OPTIONS  = --auto-selected-dependencies= \
                    --create-debug-module=true \
                    --create-project-template=true \
                    --create-makefile=true \
-                   --create-vscode-settings=true \
                    --formatter=prettier \
                    --install-dev-dependencies=false \
                    --installation-mode=global \
@@ -143,6 +142,7 @@ DEFAULT_OPTIONS  = --auto-selected-dependencies= \
                    --tab-size=4 \
                    --tsc-out-dir=default \
                    --uplift-dependencies=true \
+                   --vscode-settings=default \
                    --web-app-dir=default
 CLI              = --runtime=cli
 WEB              = --runtime=web

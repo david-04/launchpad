@@ -28,6 +28,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
         upliftDependencies: ConfigProperties.upliftDependencies.parseOldValue(properties, addError),
         version: ConfigProperties.version.parseOldValue(properties, addError),
+        vsCodeSettings: ConfigProperties.vsCodeSettings.parseOldValue(properties, addError),
         webAppDir: ConfigProperties.webAppDir.parseOldValue(properties, addError),
     } as const satisfies { [K in keyof typeof ConfigProperties.currentAndObsolete]: unknown };
 }
@@ -54,6 +55,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             tscOutDir: ConfigProperties.tscOutDir.assertOldValuePresent(config.tscOutDir),
             upliftDependencies: ConfigProperties.upliftDependencies.assertOldValuePresent(config.upliftDependencies),
             version: ConfigProperties.version.assertOldValuePresent(config.version),
+            vsCodeSettings: ConfigProperties.vsCodeSettings.assertOldValuePresent(config.vsCodeSettings),
             webAppDir: ConfigProperties.webAppDir.assertOldValuePresent(config.webAppDir),
         } as const satisfies typeof config;
     } catch (error: unknown) {
@@ -85,7 +87,6 @@ export type NewConfig = {
     createDebugModule: NewConfigType<"createDebugModule">;
     createMakefile: NewConfigType<"createMakefile">;
     createProjectTemplate: NewConfigType<"createProjectTemplate">;
-    createVsCodeSettings: NewConfigType<"createVsCodeSettings">;
     dependencies: NewConfigType<"dependencies">;
     dtsBundler: NewConfigType<"dtsBundler">;
     formatter: NewConfigType<"formatter">;
@@ -100,6 +101,7 @@ export type NewConfig = {
     tscOutDir: NewConfigType<"tscOutDir">;
     upliftDependencies: NewConfigType<"upliftDependencies">;
     version: NewConfigType<"version">;
+    vsCodeSettings: NewConfigType<"vsCodeSettings">;
     webAppDir: NewConfigType<"webAppDir">;
 };
 
@@ -123,7 +125,6 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         createDebugModule: ConfigProperties.createDebugModule.parseFromCommandLine(properties),
         createMakefile: ConfigProperties.createMakefile.parseFromCommandLine(properties),
         createProjectTemplate: ConfigProperties.createProjectTemplate.parseFromCommandLine(properties),
-        createVsCodeSettings: ConfigProperties.createVsCodeSettings.parseFromCommandLine(properties),
         dependencies: ConfigProperties.dependencies.parseFromCommandLine(properties),
         dtsBundler: ConfigProperties.dtsBundler.parseFromCommandLine(properties),
         formatter: ConfigProperties.formatter.parseFromCommandLine(properties),
@@ -139,6 +140,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         tabSize: ConfigProperties.tabSize.parseFromCommandLine(properties),
         tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
         upliftDependencies: ConfigProperties.upliftDependencies.parseFromCommandLine(properties),
+        vsCodeSettings: ConfigProperties.vsCodeSettings.parseFromCommandLine(properties),
         webAppDir: ConfigProperties.webAppDir.parseFromCommandLine(properties),
     } as const satisfies Omit<{ [K in keyof NewConfigCli]: NewConfigCli[K] | undefined | "default" }, "version">;
 }

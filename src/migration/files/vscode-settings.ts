@@ -33,9 +33,11 @@ export type VSCodeSettingsLanguage = VSCodeSettingsObject & {
     readonly "editor.defaultFormatter"?: string;
 };
 
-export type VSCodeSettings = VSCodeSettingsObject & Readonly<Record<`[${VsCodeLanguageId}]`, VSCodeSettingsLanguage>>;
+export type VSCodeSettings = VSCodeSettingsObject &
+    Readonly<Record<`[${VsCodeLanguageId}]`, VSCodeSettingsLanguage>> & {
+        "editor.formatOnSave"?: boolean;
+    };
 
-const FORMAT_ON_SAVE = "editor.formatOnSave";
 const DEFAULT_FORMATTER = "editor.defaultFormatter";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,12 +65,12 @@ export class VSCodeSettingsOperations {
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Set or remove the formatter
+    // Get, set or remove the formatter
     //------------------------------------------------------------------------------------------------------------------
 
     public setFormatter(languageId: VsCodeLanguageId, formatter: string) {
         const key = VSCodeSettingsOperations.languageIdToJsonKey(languageId);
-        this.json = { ...this.json, [key]: { ...this.json[key], DEFAULT_FORMATTER: formatter } };
+        this.json = { ...this.json, [key]: { ...this.json[key], [DEFAULT_FORMATTER]: formatter } };
     }
 
     public removeFormatter(languageId: VsCodeLanguageId) {
@@ -77,18 +79,6 @@ export class VSCodeSettingsOperations {
             const languageSettings = { ...this.json[key] };
             delete languageSettings[DEFAULT_FORMATTER];
             this.json = { ...this.json, [key]: languageSettings };
-        }
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Enable format-on-save
-    //------------------------------------------------------------------------------------------------------------------
-
-    public enableFormatOnSaveIfNotSet(languageId: VsCodeLanguageId) {
-        const key = VSCodeSettingsOperations.languageIdToJsonKey(languageId);
-        const json = this.json;
-        if (!(key in json) || !(FORMAT_ON_SAVE in json[key])) {
-            this.json = { ...json, [key]: { ...json[key], [FORMAT_ON_SAVE]: true } };
         }
     }
 

@@ -19,7 +19,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         createDebugModule: false,
         createMakefile: false,
         createProjectTemplate: false,
-        createVsCodeSettings: false,
+        vsCodeSettings: new Set(),
         dependencies: [],
         dtsBundler: oldConfig.dtsBundler,
         formatter: oldConfig.formatter,

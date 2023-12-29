@@ -1,4 +1,5 @@
 import { NewConfig, OldConfig } from "config/config-objects";
+import { MigrationContext } from "migration/data/migration-context";
 import { Biome } from "./biome";
 import { Formatter } from "./formatter";
 import { NoFormatter } from "./no-formatter";
@@ -22,8 +23,10 @@ export function getAllFormatters() {
     return getFormatters(() => true);
 }
 
-export function getFormatter(formatter: keyof typeof FORMATTERS) {
-    return FORMATTERS[formatter];
+export function getFormatter(formatterOrContext: keyof typeof FORMATTERS | MigrationContext) {
+    return FORMATTERS[
+        "string" === typeof formatterOrContext ? formatterOrContext : formatterOrContext.newConfig.formatter.value
+    ];
 }
 
 export function getAllFormattersExcept(formatter: keyof typeof FORMATTERS) {

@@ -1,14 +1,14 @@
-import { defaultMightChange } from "../utilities/constants";
+import { COMMAND_LINE_OPTIONS } from "./command-line-options";
 import {
     createBooleanProperty,
+    createEnumSetProperty,
     createIntegerProperty,
     createNonPinnableEnumProperty,
     createPinnableEnumProperty,
-    createStringArrayProperty,
     createStringProperty,
     createVersionProperty,
 } from "./config-descriptor-factories";
-import { createDirectoryParser, parseProjectName, parseStringArray } from "./config-parsers";
+import { createDirectoryParser, parseProjectName } from "./config-parsers";
 
 const CURRENT_CONFIG_PROPERTIES = {
     //
@@ -434,6 +434,36 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     //------------------------------------------------------------------------------------------------------------------
     //
+    //   ##     ##  ######   ######   #######  ########  ########        ######  ########  ######
+    //   ##     ## ##    ## ##    ## ##     ## ##     ## ##             ##    ## ##       ##    ##
+    //   ##     ## ##       ##       ##     ## ##     ## ##             ##       ##       ##
+    //   ##     ##  ######  ##       ##     ## ##     ## ######         ##       ######   ##   ####
+    //    ##   ##        ## ##       ##     ## ##     ## ##             ##       ##       ##    ##
+    //     ## ##   ##    ## ##    ## ##     ## ##     ## ##             ##    ## ##       ##    ##
+    //      ###     ######   ######   #######  ########  ########        ######  ##        ######
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    vsCodeSettings: createEnumSetProperty({
+        name: "Manage selected VSCode settings",
+        commandLine: {
+            option: "--vscode-settings",
+            description: "Create settings for VSCode",
+        },
+        configFile: {
+            currentKey: "LP_SETTINGS_VSCODE_SETTINGS",
+            newConfigObjectName: "vsCodeSettings",
+        },
+        currentValues: [
+            ["formatter", "use the project's formatter (if it has any)"],
+            ["format-on-save", "enabled auto-format"],
+            ["future-settings", "manage settings that might be added to launchpad in the future"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
     //   ##      ## ######## ########            ###    ########  ########         ########  #### ########
     //   ##  ##  ## ##       ##     ##          ## ##   ##     ## ##     ##        ##     ##  ##  ##     ##
     //   ##  ##  ## ##       ##     ##         ##   ##  ##     ## ##     ##        ##     ##  ##  ##     ##
@@ -461,149 +491,29 @@ const CURRENT_CONFIG_PROPERTIES = {
     }),
 } as const;
 
-//----------------------------------------------------------------------------------------------------------------------
-//
-//     ######  ##       ####          #######  ########  ######## ####  #######  ##    ##  ######
-//    ##    ## ##        ##          ##     ## ##     ##    ##     ##  ##     ## ###   ## ##    ##
-//    ##       ##        ##          ##     ## ##     ##    ##     ##  ##     ## ####  ## ##
-//    ##       ##        ##          ##     ## ########     ##     ##  ##     ## ## ## ##  ######
-//    ##       ##        ##          ##     ## ##           ##     ##  ##     ## ##  ####       ##
-//    ##    ## ##        ##          ##     ## ##           ##     ##  ##     ## ##   ### ##    ##
-//     ######  ######## ####          #######  ##           ##    ####  #######  ##    ##  ######
-//
-//----------------------------------------------------------------------------------------------------------------------
-
-const INIT_ONLY_CONFIG_PROPERTIES = {
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    // Runtime
-    //------------------------------------------------------------------------------------------------------------------
-
-    runtimeCli: createNonPinnableEnumProperty({
-        name: "runtime environment",
-        commandLine: {
-            option: "--runtime",
-            description: "Runtime environment",
-            placeholder: "[cli | node | web]",
-        },
-        currentValues: [
-            ["cli", defaultMightChange("node")],
-            ["node", "command line"],
-            ["web", "web browser"],
-        ] as const,
-        obsoleteValues: [] as const,
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Dependencies to install
-    //------------------------------------------------------------------------------------------------------------------
-
-    installDevDependencies: createBooleanProperty({
-        name: "install development tools toggle",
-        commandLine: {
-            option: "--install-dev-dependencies",
-            placeholder: "[true | false]",
-            description: "Install development tools (compiler, bundler, formatter, ...) locally",
-        },
-    }),
-
-    dependencies: createStringArrayProperty({
-        name: "auto-selected NPM packages",
-        commandLine: {
-            option: "--auto-selected-dependencies",
-            placeholder: "<dep1>, <dep2>, ...",
-            description: "NPM packages to install without without prompting",
-        },
-        parseOldValue: parseStringArray,
-        parseNewValue: parseStringArray,
-    }),
-
-    preselectedDependencies: createStringArrayProperty({
-        name: "pre-selected NPM packages",
-        commandLine: {
-            option: "--preselected-dependencies",
-            placeholder: "<dep1>, <dep2>, ...",
-            description: "Pre-selected NPM packages offered for installation",
-        },
-        parseOldValue: parseStringArray,
-        parseNewValue: parseStringArray,
-    }),
-
-    optionalDependencies: createStringArrayProperty({
-        name: "optional NPM packages",
-        commandLine: {
-            option: "--optional-dependencies",
-            placeholder: "<dep1>, <dep2>, ...",
-            description: "Optional (non-pre-selected) NPM packages offered for installation",
-        },
-        parseOldValue: parseStringArray,
-        parseNewValue: parseStringArray,
-    }),
-
-    //------------------------------------------------------------------------------------------------------------------
-    // Project template
-    //------------------------------------------------------------------------------------------------------------------
-
-    createProjectTemplate: createBooleanProperty({
-        name: "project template toggle",
-        commandLine: {
-            option: "--create-project-template",
-            placeholder: "[true | false]",
-            description: "Create a basic project template (main module, Makefile, ...)",
-        },
-    }),
-
-    createDebugModule: createBooleanProperty({
-        name: "debug module toggle",
-        commandLine: {
-            option: "--create-debug-module",
-            placeholder: "[true | false]",
-            description: "Create a debug.ts file",
-        },
-    }),
-
-    createMakefile: createBooleanProperty({
-        name: "Makefile toggle",
-        commandLine: {
-            option: "--create-makefile",
-            placeholder: "[true | false]",
-            description: "Create a template Makefile",
-        },
-    }),
-
-    createVsCodeSettings: createBooleanProperty({
-        name: "VSCode settings toggle",
-        commandLine: {
-            option: "--create-vscode-settings",
-            placeholder: "[true | false]",
-            description: "Create settings for VSCode",
-        },
-    }),
-} as const;
-
 const OBSOLETE_CONFIG_PROPERTIES = {} as const;
 
 //----------------------------------------------------------------------------------------------------------------------
 //
-//       ###     ######   ######  ######## ##     ## ########  ##       ##    ##
-//      ## ##   ##    ## ##    ## ##       ###   ### ##     ## ##        ##  ##
-//     ##   ##  ##       ##       ##       #### #### ##     ## ##         ####
-//    ##     ##  ######   ######  ######   ## ### ## ########  ##          ##
-//    #########       ##       ## ##       ##     ## ##     ## ##          ##
-//    ##     ## ##    ## ##    ## ##       ##     ## ##     ## ##          ##
-//    ##     ##  ######   ######  ######## ##     ## ########  ########    ##
+//   ##     ## ######## ##       ########  ######## ########   ######
+//   ##     ## ##       ##       ##     ## ##       ##     ## ##    ##
+//   ##     ## ##       ##       ##     ## ##       ##     ## ##
+//   ######### ######   ##       ########  ######   ########   ######
+//   ##     ## ##       ##       ##        ##       ##   ##         ##
+//   ##     ## ##       ##       ##        ##       ##    ##  ##    ##
+//   ##     ## ######## ######## ##        ######## ##     ##  ######
 //
 //----------------------------------------------------------------------------------------------------------------------
 
 const ALL_CONFIG_PROPERTIES = {
     ...CURRENT_CONFIG_PROPERTIES,
     ...OBSOLETE_CONFIG_PROPERTIES,
-    ...INIT_ONLY_CONFIG_PROPERTIES,
+    ...COMMAND_LINE_OPTIONS,
 } as const;
 const CURRENT_AND_OBSOLETE_CONFIG_PROPERTIES = { ...CURRENT_CONFIG_PROPERTIES, ...OBSOLETE_CONFIG_PROPERTIES } as const;
 const CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES = {
     ...CURRENT_CONFIG_PROPERTIES,
-    ...INIT_ONLY_CONFIG_PROPERTIES,
+    ...COMMAND_LINE_OPTIONS,
 } as const;
 
 const toArray = <T extends object>(properties: T) => Object.keys(properties).map(key => properties[key as keyof T]);
@@ -614,16 +524,16 @@ export const ConfigProperties = {
     current: CURRENT_CONFIG_PROPERTIES,
     currentAndInitOnly: CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES,
     currentAndObsolete: CURRENT_AND_OBSOLETE_CONFIG_PROPERTIES,
-    initOnly: INIT_ONLY_CONFIG_PROPERTIES,
+    initOnly: COMMAND_LINE_OPTIONS,
     obsolete: OBSOLETE_CONFIG_PROPERTIES,
     arrays: {
         all: toArray(ALL_CONFIG_PROPERTIES),
         current: toArray(CURRENT_CONFIG_PROPERTIES),
         currentAndInitOnly: toArray(CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES),
         currentAndObsolete: toArray(CURRENT_AND_OBSOLETE_CONFIG_PROPERTIES),
-        initOnly: toArray(INIT_ONLY_CONFIG_PROPERTIES),
+        initOnly: toArray(COMMAND_LINE_OPTIONS),
         obsolete: toArray(OBSOLETE_CONFIG_PROPERTIES),
     },
 } as const;
 
-export type InitOnlyConfigProperties = keyof typeof INIT_ONLY_CONFIG_PROPERTIES;
+export type InitOnlyConfigProperties = keyof typeof COMMAND_LINE_OPTIONS;

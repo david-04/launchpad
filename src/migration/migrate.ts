@@ -25,6 +25,8 @@ import { updateGitignoreTscOutput } from "./actions/update-gitignore-tsc-output"
 import { updatePackageJsonDependencies } from "./actions/update-package-json-dependencies";
 import { updatePackageJsonMetadata } from "./actions/update-package-json-metadata";
 import { updatePackageJsonPackageManager } from "./actions/update-package-json-package-manager";
+import { updateVsCodeSettingsFormatOnSave } from "./actions/update-vscode-settings-format-on-save";
+import { updateVsCodeSettingsFormatter } from "./actions/update-vscode-settings-formatter";
 import { MigrationContext, type MigrationContextOptions } from "./data/migration-context";
 import { applyFileSystemChanges } from "./executor/apply-file-system-changes";
 
@@ -80,6 +82,10 @@ function prepareMigrationSteps(context: MigrationContext) {
     updatePackageJsonDependencies(context);
     updatePackageJsonMetadata(context);
     updatePackageJsonPackageManager(context);
+
+    // .vscode/settings.json
+    updateVsCodeSettingsFormatOnSave(context);
+    updateVsCodeSettingsFormatter(context);
 
     // tsconfig.json
     createTsconfigJson(context);
