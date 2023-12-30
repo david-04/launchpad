@@ -85,7 +85,16 @@ $(call lp.format.exclude, src/resources/embedded-tsconfig.ts)
 # Release
 #-----------------------------------------------------------------------------------------------------------------------
 
-# not implemented yet
+release : clean.build bundle
+	echo Copying README... && cp -f ./README.md ./dist/README.md
+
+clean.build :
+    ifneq "$(wildcard build dist/launchpad.*js*)" ""
+	echo Deleting pre-existing builds/bundles... && rm -rf $(wildcard build dist/launchpad.*js*)
+    endif
+
+unrelease :
+	echo Reverting the dist directory... && rm -rf dist/* && git checkout -- dist
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Clean
