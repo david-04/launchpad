@@ -31,6 +31,9 @@
         "editor.defaultFormatter": "biomejs.biome"
     },
     "search.exclude": {
-        "/test": true
+        "/test": true,
+        "/build": true,
+        "/dist/*.*js*": true,
+        "/src/resources/embedded*.ts": true
     }
 }
