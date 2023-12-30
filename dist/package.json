@@ -1,6 +1,23 @@
 {
+    "author": "David Hofmann",
+    "bin": "./launchpad.js",
+    "bugs": {
+        "url": "https://github.com/david-04/launchpad/issues"
+    },
+    "description": "A TypeScript starter app that keeps generated projects and their toolchains up to date",
+    "homepage": "https://github.com/david-04/launchpad#readme",
+    "keywords": [
+        "typescript",
+        "project starter",
+        "starter app"
+    ],
+    "license": "MIT",
     "name": "@david-04/launchpad",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/david-04/launchpad.git",
+        "directory": "dist"
+    },
     "type": "commonjs",
-    "version": "0.0.0",
-    "bin": "./launchpad.js"
+    "version": "0.0.0"
 }
