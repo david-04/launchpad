@@ -70,7 +70,7 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.js, shebang)
+$(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.cjs, shebang)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Format
@@ -85,13 +85,11 @@ $(call lp.format.exclude, src/resources/embedded-tsconfig.ts)
 # Release
 #-----------------------------------------------------------------------------------------------------------------------
 
-release : clean.build bundle
+release : clean.build-and-dist bundle
 	echo Copying README... && cp -f ./README.md ./dist/README.md
 
-clean.build :
-    ifneq "$(wildcard build dist/launchpad.*js*)" ""
-	echo Deleting pre-existing builds/bundles... && rm -rf $(wildcard build dist/launchpad.*js*)
-    endif
+clean.build-and-dist :
+	echo Deleting pre-existing builds/bundles... && rm -rf build dist/launchpad.*js* dist/*.map dist/*.d.ts
 
 unrelease :
 	echo Reverting the dist directory... && rm -rf dist/* && git checkout -- dist
@@ -128,7 +126,7 @@ test.$(strip $(1)) : $(LP_PREREQUISITE_BUNDLE)
 	&& echo "------------------------------------------------------------------------------------------------------------------------" \
 	&& echo "" \
 	&& $(call CREATE_AND_GO_TO_TEST_DIRECTORY, $(1)) \
-	&& node "../$(TEST_PATH_TO_DIST_DIRECTORY)/launchpad.js" $(2)
+	&& node "../$(TEST_PATH_TO_DIST_DIRECTORY)/launchpad.cjs" $(2)
 endef
 
 DEFAULT_OPTIONS  = --auto-selected-dependencies= \

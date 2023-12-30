@@ -1,6 +1,6 @@
 {
     "author": "David Hofmann",
-    "bin": "./launchpad.js",
+    "bin": "./launchpad.cjs",
     "bugs": {
         "url": "https://github.com/david-04/launchpad/issues"
     },
