@@ -13,6 +13,8 @@ autorun : tsc;
 $(call lp.help.add-phony-target, embed, .............. embed resources)
 $(call lp.help.add-phony-target, tsconfig, ........... assemble the tsconfig.json templates)
 $(call lp.help.add-phony-target, version, ............ update version number and copyright years)
+$(call lp.help.add-phony-target, release, ............ assemble the release)
+$(call lp.help.add-phony-target, unrelease, .......... git-revert the dist directory)
 $(call lp.help.add-phony-target, test.init, .......... run debug init)
 $(call lp.help.add-phony-target, test.help, .......... run debug help)
 $(call lp.help.add-phony-target, test.postinsatll, ... run debug postinstall)
@@ -68,7 +70,7 @@ $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
 # Bundle
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.js, minify shebang)
+$(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.js, shebang)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Format
@@ -81,12 +83,6 @@ $(call lp.format.exclude, src/resources/embedded-tsconfig.ts)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Release
-#-----------------------------------------------------------------------------------------------------------------------
-
-# not implemented yet
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Uplift
 #-----------------------------------------------------------------------------------------------------------------------
 
 # not implemented yet

@@ -1124,6 +1124,15 @@ export const ASSETS = {
         "    ]",
         "}",
     ].join("\n"),
+    ".launchpad/uplift": [
+        "#!/usr/bin/env bash",
+        "",
+        "# shellcheck disable=SC2046",
+        "npm install \\",
+        "    $(npm list -p | grep 'node_modules[/\\\\]' | sed 's|\\r||g;s|\\\\|/|g;s|.*node_modules/||;s|^|\"|;s|$|@latest\"|' | grep -v \"@types/node\") \\",
+        "    @types/node@$(node --version | sed 's|^v||;s|\\..*||')",
+        "",
+    ].join("\n"),
     "resources/templates/index.css": [
         "html {",
         "    font-family: sans-serif;",
