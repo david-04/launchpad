@@ -12,21 +12,21 @@ A TypeScript starter app that keeps generated projects and their toolchains up t
 
 ## Features
 
-Launchpad is used to set up new TypeScript projects. This involves the following steps:
+Launchpad is a command-line tool for creating TypeScript projects from built-in templates. Initializing a new project involves the following steps:
 
 - Create common configuration files (like `tsconfig.json` and `package.json`)
-- Set up the package manager (`npm`, `pnpm`, or `yarn`)
-- Set up a code formatter ([Prettier](https://prettier.io) or [Biome](https://biomejs.dev))
-- Set up a bundler ([esbuild](https://esbuild.github.io)) and a `d.ts` declaration bundler ([DTS Bundle Generator](https://www.npmjs.com/package/dts-bundle-generator))
-- Integrate with [GNU Make](https://www.gnu.org/software/make/) through a framework of pre-configured rules and dependencies
-- Create a basic set of template source files with a matching Makefile
-- Configure the project according to the requirements (application or library, command line or web, CommonJS or ECMAScript modules)
+- Set up a package manager ([npm](https://www.npmjs.com/package/npm), [pnpm](https://pnpm.io), or [yarn](https://yarnpkg.com))
+- Set up a code formatter ([Biome](https://biomejs.dev) or [Prettier](https://prettier.io))
+- Set up a bundler ([esbuild](https://esbuild.github.io)) and a declaration bundler ([DTS Bundle Generator](https://www.npmjs.com/package/dts-bundle-generator))
+- Deploy a framework of pre-configured rules and dependencies for [GNU Make](https://www.gnu.org/software/make/)
+- Create template source files with a matching Makefile
+- Customize the project facets (app/lib, cli/web, cjs/esm)
 
-After a project has been created, launchpad takes care of its ongoing maintenance. Projects can be reconfigured and, for example, be switched to another formatter or package manager. When a newer version of launchpad is released, it can also uplift existing projects:
+After a project has been created, launchpad takes care of its ongoing maintenance. Its reconfiguration feature can change a project's facets and, for example, switch it to a different code formatter or package manager. When a newer version of launchpad is released, it can automatically uplift existing projects. This involves the following steps:
 
 - Deploy the latest version of launchpad's default `tsconfig.json` and its built-in [GNU Make](https://www.gnu.org/software/make/) rules and dependencies
-- Maintain configuration files (like code formatter settings) to preserve compatibility with the respective tools' latest versions
-- Switch development tools to launchpad's latest defaults (unless the current selection is pinned)
+- Update configuration files (like code formatter settings) to preserve compatibility with the respective tools' latest versions
+- Automatically switch development tools to launchpad's latest defaults (unless the current selection is pinned)
 
 Launchpad aims to be an easy option for setting up new TypeScript projects and keeping them up-to-date as the tooling ecosystem evolves.
 
@@ -47,11 +47,11 @@ Launchpad can be added as a dependency of the project itself, installed globally
   - pnpm: `pnpm dlx @david-04/launchpad@latest`
   - yarn: `yarn dlx @david-04/launchpad@latest`
 
-When installed as a local project dependency, launchpad upgrades itself to the latest version during uplifts. Globally installed versions need to be upgraded manually.
+Launchpad upgrades itself to the latest version during [uplifts](#uplifting-projects) when installed as a local project dependency. Globally installed versions need to be upgraded manually.
 
 ## Creating a new project
 
-Add/install `@david-04/launchpad` as a project dependency (unless using a globally installed version or running without installation) and run:
+To get started, add/install `@david-04/launchpad` as a project dependency (or use a global or temporary installation) and run:
 
 ```shell
 launchpad init
@@ -161,11 +161,11 @@ All options can also be set to `default` (instead of a specific value). This cau
 
 For some enumerated values (like the formatter or package manager), `default` can also be selected as an option in the configuration wizard. It causes launchpad's recommended default to be used, but (unlike picking a specific option) doesn't pin it. This allows launchpad to switch to a different option when performing uplifts in the future.
 
-Launchpad's goal is to keep projects and their toolchains up to date. When creating a new project today, [Prettier](https://prettier.io) and [ts-node](https://typestrong.org/ts-node/) might be sensible defaults. But as new tools emerge in the future, it might be beneficial to switch to other options like [Biome](https://biomejs.dev) or [Bun](https://bun.sh). Granting Launchpad the autonomy to switch between options simplifies the ongoing maintenance. Instead of manually having to reconfigure each project interactively, it's enough to simply run launchpad's uplift operation.
+Launchpad's goal is to keep projects and their toolchains up to date. When creating a new project today, [Prettier](https://prettier.io) and [ts-node](https://typestrong.org/ts-node/) might be sensible defaults. But as new tools emerge, it might be beneficial to switch to other options like [Biome](https://biomejs.dev) or [Bun](https://bun.sh) in the future. Granting Launchpad the autonomy to switch between options simplifies the ongoing maintenance. Instead of manually having to reconfigure each project interactively, it's enough to simply run launchpad's [uplift](#uplifting-projects) operation.
 
 ## The .launchpad directory
 
-Launchpad creates a `.launchpad` directory within the project's root directory. It's used to store the project configuration as well as scripts and files that are included/referenced from the main project. The `.launchpad` directory makes the project self-contained and should be added to git. Make and other development tools can run without launchpad itself being installed (locally or globally).
+Launchpad creates and maintains a `.launchpad` directory within the project. It's used to store the current configuration as well as scripts and files that are included/referenced from the project itself. The `.launchpad` directory makes the project self-contained. It allows all build and development tools to run without requiring launchpad itself to be installed. The `.lauchpad` directory contains important files like the Makefile framework and the template `tsconfig.json` from which the project extends. Therefore, the directory should be added to git.
 
 ## Using the Makefile
 
@@ -241,19 +241,19 @@ Command with hooks:
 tsc -b && touch "build/.tsbuildinfo"
 ```
 
-In addition to using Make, launchpad also enables [incremental builds](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#faster-subsequent-builds-with-the---incremental-flag) in TypeScript. This speeds up the compilation process whenever a recompile is required.
+In addition to using Make, launchpad also enables [incremental builds](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#faster-subsequent-builds-with-the---incremental-flag) in TypeScript. This speeds up the compilation process whenever a (partial) recompile is required.
 
-Projects can also be compiled manually by running `tsc -b`. It's not necessary to use the Makefile. But it is recommended to use the Makefile for projects that require bundling. It hides all the complexity and automatically generates the required commands. It uses launchpad's project configuration and needs almost no extra setup. Moreover, launchpad might support other bundlers in the future. Makefiles are expected to continue working with any bundler that launchpad might support in the future.
+Projects can also be compiled manually by running `tsc -b` (without using make). However, the Makefile simplifies the bundling step by hiding all the complexity and automatically generating the required bundler commands. The configuration of bundles in the Makefile is agnostic to the specific bundler being used. This allows switching between different bundlers without requiring any code changes.
 
 ## Uplifting projects
 
 Uplifting a project brings its configuration and toolchain up-to-date. An uplift might include the following steps:
 
-- Upgrade launchpad itself to the latest version (if it's installed as a dependency within the project itself)
-- Switch development tools (package manager, bundler, formatter, ...) to launchpad's current defaults (except for development tools that have been pinned)
+- Upgrade launchpad itself to the latest version (if it's installed as a project dependency)
+- Switch development tools (package manager, bundler, formatter, ...) to launchpad's latest defaults (except for development tools that have been pinned)
 - Upgrade all dependencies to the latest version (if enabled in the project's configuration)
 - Update configuration files (like `package.json`, `tsconfig.json`, and formatter settings)
-- Repopulate the `.launchpad` directory with the latest version of scripts and Makefiles
+- Re-populate the `.launchpad` directory with the latest version of scripts and Makefiles
 
 An uplift can be initiated through the Makefile:
 
@@ -261,16 +261,16 @@ An uplift can be initiated through the Makefile:
 my-sample-project > make uplift
 ```
 
-This executes the uplift script in the `.launchpad` directory. This script can also be invoked manually (without using make):
+This executes the uplift script in the `.launchpad` directory. The script can also be invoked manually (without using make):
 
 ```
 my-sample-project > ./.launchpad/uplift
 ```
 
-Uplifts are only applied when there is a valid project configuration. Errors in `.launchpad/launchpad.cfg` cause the uplift operation to fail. A broken configuration that can't be fixed manually can be reset by reconfiguring the project.
+Uplifts are only applied when there is a valid configuration file. Errors in `.launchpad/launchpad.cfg` cause the uplift operation to fail. A broken configuration that can't be fixed manually can be reset by reconfiguring the project.
 
 ## Reconfiguring projects
 
 A project can be reconfigured by running `launchpad init` in a directory that has already been initialized. Technically, it's almost the same as initializing a new project. But launchpad also reads the current project configuration and uses the settings as presets for the configuration wizard.
 
-The init operation tolerates errors in the configuration file. It can be used to correct broken project settings. However, the primary use case is to change a project's configuration. This might involve switching to a different formatter or package manager or changing source and output directories.
+The init operation tolerates errors in the configuration file. It can be used to correct broken project settings. However, the primary use case is to change a project's configuration. This might involve switching to a different code formatter or changing source and output directories.
