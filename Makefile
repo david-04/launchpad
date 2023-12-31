@@ -11,10 +11,11 @@ autorun : tsc;
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.help.add-phony-target, embed, .............. embed resources)
-$(call lp.help.add-phony-target, tsconfig, ........... assemble the tsconfig.json templates)
-$(call lp.help.add-phony-target, version, ............ update version number and copyright years)
+$(call lp.help.add-phony-target, publish, ............ publish the npm package)
 $(call lp.help.add-phony-target, release, ............ assemble the release)
+$(call lp.help.add-phony-target, tsconfig, ........... assemble the tsconfig.json templates)
 $(call lp.help.add-phony-target, unrelease, .......... git-revert the dist directory)
+$(call lp.help.add-phony-target, version, ............ update version number and copyright years)
 $(call lp.help.add-phony-target, test.init, .......... run debug init)
 $(call lp.help.add-phony-target, test.help, .......... run debug help)
 $(call lp.help.add-phony-target, test.postinsatll, ... run debug postinstall)
@@ -93,6 +94,13 @@ clean.build-and-dist :
 
 unrelease :
 	echo Reverting the dist directory... && rm -rf dist/* && git checkout -- dist
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Publish
+#-----------------------------------------------------------------------------------------------------------------------
+
+publish:
+	cd dist && npm publish --access public
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Clean
