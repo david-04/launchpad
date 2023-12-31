@@ -45,7 +45,7 @@ Launchpad can be added as a dependency of the project itself, installed globally
 - Run without installation
   - npm: `npm exec --yes -- @david-04/launchpad@latest`
   - pnpm: `pnpm dlx @david-04/launchpad@latest`
-  - yarn: `yarn dlx @david-04/launchpad@latest`
+  - yarn (modern only): `yarn dlx @david-04/launchpad@latest`
 
 Launchpad upgrades itself to the latest version during [uplifts](#uplifting-projects) when installed as a local project dependency. Globally installed versions need to be upgraded manually.
 
