@@ -74,10 +74,7 @@ $(call lp.bundle.add, src/launchpad-cli.ts, dist/launchpad.cjs, shebang)
 # Format
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.format.exclude, resources/tsconfig/01-default)
-$(call lp.format.exclude, resources/tsconfig/02-facets)
-$(call lp.format.exclude, src/resources/embedded-assets.ts)
-$(call lp.format.exclude, src/resources/embedded-tsconfig.ts)
+$(call lp.format.exclude, resources test tmp dist)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Release

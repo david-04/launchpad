@@ -30,6 +30,7 @@ $(call lp.help.add-extra-dots   ,                      ...      ) # add more spa
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.diagnostics.disable                                   ) # disable diagnostics targets ("lp.*" remains active)
+
 $(call lp.diagnostics.set-target-names, help info config        ) # set aliases for diagnostics targets
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -74,6 +75,8 @@ $(LP_PREREQUISITE_TSC)                                 # use as a prerequisite f
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
+$(call lp.bundle.disable                             ) # disable the "bundle" target ("lp.bundle" remains active)
+
 $(call lp.bundle.add,                                  # add a file to be bundled
        src/app.ts,                                     # [1] source file
        dist/app.js,                                    # [2] bundled output file
@@ -88,8 +91,6 @@ $(call lp.bundle.add,                                  # add a file to be bundle
        echo "js after-hook",                           # [3] command to run after bundling the js file
 	   echo "dts after-hook"                           # [4] command to run after bundling the d.ts file
  )
-
-$(call lp.bundle.disable                             ) # disable the "bundle" target ("lp.bundle" remains active)
 
 $(call lp.bundle.add-extra-prerequisites , ...files  ) # add extra prerequisite files that should cause a re-bundle
 $(call lp.bundle.overwrite-prerequisites , ...files  ) # use only the given files as prerequisites for bundling
@@ -114,14 +115,27 @@ $(LP_PREREQUISITE_BUNDLE_DTS)                          # same as above but only 
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.format.include, file1.json file2.ts        ) # add the given files
-$(call lp.format.include, src scripts resources      ) # add all files (of supported formats) in the given directories
-$(call lp.format.include, resources, *.json *.js     ) # add specific files in the given directories
-$(call lp.format.include, file.json src, *.ts *.tsx  ) # specific files and directory wildcards can be combined
-$(call lp.format.exclude, file.json src, *.ts *.tsx  ) # exclude the given files and directories from formatting
-$(call lp.format.include-only, file.json src, *.ts   ) # discard any default and previously added files
-
 $(call lp.format.disable                             ) # disable the "format" target ("lp.format" remains active)
+
+$(call lp.format.include      , *.cjs resources/*    ) # format files/directores matching the $(wildcard) pattern
+$(call lp.format.exclude      , resources/tmp        ) # don't format files/directores matching the $(wildcard) pattern
+$(call lp.format.include-only , *.json src           ) # format only these files/directories (but not the built-in ones)
+
+                                                       # Note: All patterns are expanded via $(wildcard ...). They can
+                                                       # resolve to files or directories. They do not expand recursively.
+                                                       # It not possible to exclude sub-directories of included parent
+                                                       # directories, e.g.:
+                                                       #
+                                                       # $(call lp.format.include, src     )
+                                                       # $(call lp.format.exclude, src/tmp ) # DOES NOT WORK!
+                                                       #
+                                                       # Instead, include the child path and all of its siblings and
+                                                       # then exclude the specific child:
+                                                       #
+                                                       # $(call lp.format.include, src/*   ) # expands to src/tmp src/...
+                                                       # $(call lp.format.exclude, src/tmp ) # works now
+                                                       #
+                                                       # The effective paths can be checked via "make format.help"
 
 $(call lp.format.add-before-hook         , pwd && ls ) # append commands to run before formatting
 $(call lp.format.overwrite-before-hooks  , pwd && ls ) # overwrite any previously defined before-hook commands

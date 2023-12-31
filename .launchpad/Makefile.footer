@@ -117,23 +117,25 @@ endif
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-ifeq "$(call lp.format.is-enabled)" "true" # ..................................................... formatting is enabled
-
-$(call lp.fn.declare-phony-targets, format, lp.internal.format)
-
-lp.internal.format :
-	$(call lp.format.get-command-with-hooks, Formatting...)
-
-else # .......................................................................................... formatting is disabled
+ifeq "$(call lp.format.is-enabled)" "" # ........................................................ formatting is disabled
 
 .PHONY: $(foreach name, $(call lp.format.get-phony-targets), lp.$(name))
 
 $(foreach name, $(call lp.format.get-phony-targets), lp.$(name)) : ;
-    ifeq "$(strip $(call lp.format.get-command-with-hooks))" ""
-		$(error Formatting is disabled)
-    else
-		$(call lp.format.get-command-with-hooks, Formatting...)
-    endif
+	$(if $(call lp.format.get-command-with-hooks), \
+	     $(call lp.format.get-command-with-hooks, Formatting...), \
+	     $(error No paths to format have been configured)\
+	 )
+
+else # ........................................................................................... formatting is enabled
+
+$(call lp.fn.declare-phony-targets, format, lp.internal.format)
+
+lp.internal.format :
+	$(if $(call lp.format.get-command-with-hooks), \
+	     $(call lp.format.get-command-with-hooks, Formatting...), \
+	     $(error No paths to format have been configured)\
+	 )
 
 endif
 
