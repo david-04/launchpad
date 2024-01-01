@@ -5,4 +5,4 @@ import { Version } from "../config/version-number";
 //----------------------------------------------------------------------------------------------------------------------
 
 export const VERSION_NUMBER = new Version(1, 0, 0);
-export const COPYRIGHT_YEARS = "2024";
+export const COPYRIGHT_YEARS = "2023-2024";

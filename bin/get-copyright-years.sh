@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-COPYRIGHT_FROM=$(grep -E "^## \[[0-9.]+\]" ../CHANGELOG.md | tail -1 | sed 's|.*[(]||;s|-.*||')
+COPYRIGHT_FROM="2023" # $(grep -E "^## \[[0-9.]+\]" ../CHANGELOG.md | tail -1 | sed 's|.*[(]||;s|-.*||')
 COPYRIGHT_UNITL=$(grep -E "^## \[[0-9.]+\]" ../CHANGELOG.md | head -1 | sed "s|.*[(]||;s|-.*||")
 
 if [ "$COPYRIGHT_FROM" == "$COPYRIGHT_UNITL" ]; then
