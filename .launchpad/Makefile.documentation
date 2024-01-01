@@ -195,5 +195,7 @@ $(call lp.clean.files, output.log dist               ) # delete the given files 
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.run, build/main.js ) ...arguments            # run a compiled (or bundled) command-line script
-$(call lp.run, src/main.ts   ) ...arguments            # run a source file (e.g. via ts-node or bun)
+$(call lp.run    , dir/js-or-ts-file ) ...arguments  # run a TypeScript source file or a compiled JavaScript file
+
+$(call lp.run.js , out/my-app.js     ) ...arguments  # run a JavaScript file
+$(call lp.run.ts , src/my-app.ts     ) ...arguments  # run a TypeScript file (via ts-node)

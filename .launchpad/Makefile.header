@@ -445,6 +445,7 @@ lp.bundle.get-phony-targets             =bundle
 lp.bundle.get-name                      =Bundle
 lp.bundle.get-description               =create bundles
 lp.bundle.is-enabled                    =$(strip $(__LP_BUNDLE_ENABLED))
+lp.bundle.is-dts-enabled                =$(if $(__LP_BUNDLE_EFFECTIVE_DTS_TARGETS),true)
 lp.bundle.get-default-prerequisites     =$(sort $(strip $(__LP_BUNDLE_DEFAULT_PREREQUISITES)))
 lp.bundle.get-prerequisites             =$(sort $(strip $(__LP_BUNDLE_EFFECTIVE_PREREQUISITES)))
 lp.bundle.get-default-js-targets        =$(sort $(strip $(__LP_BUNDLE_DEFAULT_JS_TARGETS)))
@@ -639,7 +640,12 @@ lp.clean.get-files                      =$(strip $(sort \
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_RUN_JS                             =node
-__LP_RUN_TS                             =$(call lp.fn.if-equal, $(LP_CFG_MODULE_SYSTEM), esm, ts-node-esm, ts-node)
-
-lp.run                                  =$(if $(filter %.ts,$(lastword $(strip $(1)))),$(__LP_RUN_TS),$(__LP_RUN_TS)) $(1)
+lp.run.js                               =node $(1)
+lp.run.ts                               =$(call lp.fn.if-equal, $(LP_CFG_MODULE_SYSTEM), esm, \
+                                                                ts-node-esm, \
+                                                                ts-node \
+                                          ) $(1)
+lp.run                                  =$(if $(filter %.ts,$(lastword $(strip $(1)))),\
+                                              $(call lp.run.js,$(1)),\
+                                              $(call lp.run.jts,$(1)) \
+                                          )
