@@ -10,6 +10,15 @@
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
+$(if $(call lp.bundle.is-enabled     ), $(call lp.help.add-builtin-target, bundle ............., bundle))
+$(if $(call lp.clean.is-enabled      ), $(call lp.help.add-builtin-target, clean .............., clean ))
+$(if $(call lp.tsc.is-enabled        ), $(call lp.help.add-builtin-target, compile ............, tsc   ))
+$(if $(call lp.format.is-enabled     ), $(call lp.help.add-builtin-target, format ............., format))
+$(if $(call lp.help.is-enabled       ), $(call lp.help.add-builtin-target, help ..............., help  ))
+$(if $(call lp.tsc.is-enabled        ), $(call lp.help.add-builtin-target, tsc ................, tsc   ))
+$(if $(call lp.uplift.is-enabled     ), $(call lp.help.add-builtin-target, uplift ............., uplift))
+$(if $(call lp.diagnostics.is-enabled), $(call lp.help.add-target        , <target>.help ......, show diagnostic information (aliases: $(sort $(call lp.diagnostics.get-target-names)))))
+
 $(foreach name, $(call lp.help.get-phony-targets), lp.$(name)) : ;
 	$(call lp.help.print-targets)
 
@@ -28,10 +37,6 @@ endif
 #   ########  #### ##     ##  ######   ##    ##  #######   ######     ##    ####  ######   ######
 #
 #-----------------------------------------------------------------------------------------------------------------------
-
-ifneq "$(call lp.diagnostics.is-enabled)" ""
-$(call lp.help.add-target, <target>.help, ...... show diagnostic information (aliases: $(sort $(call lp.diagnostics.get-target-names))))
-endif
 
 $(foreach feature, tsc bundle format uplift clean, \
 	$(foreach target, $(call lp.$(feature).get-phony-targets), \
