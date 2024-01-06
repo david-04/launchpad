@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.0](https://github.com/david-04/typefinity/releases/tag/v0.0.0) (2024-01-01)
+## [1.0.0](https://github.com/david-04/typefinity/releases/tag/v0.0.0) (2024-01-07)
 
 - Set up project templates (app/lib, cli/web, cjs/esm)
 - Configure and install development tools
