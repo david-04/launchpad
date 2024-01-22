@@ -107,5 +107,5 @@ function getConfigProperties() {
 //----------------------------------------------------------------------------------------------------------------------
 
 function showVersion() {
-    console.log(VERSION_NUMBER);
+    console.log(VERSION_NUMBER.render());
 }
