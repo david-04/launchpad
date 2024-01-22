@@ -8,6 +8,5 @@
         "module": "CommonJS", //                            Specify what module code is generated.
         "moduleResolution": "node", //                      Specify how TypeScript looks up a file from a given module specifier.
         "baseUrl": "__SRC_DIR__", //                        Specify the base directory to resolve non-relative module names.
-        "verbatimModuleSyntax": false, //                   Do not transform or elide any imports or exports not marked as type-only, ensuring they are written in the output file's format based on the 'module' setting.
     }
 }
