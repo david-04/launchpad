@@ -6371,7 +6371,7 @@ var DEFAULT_SRC_DIR = "src";
 var DEFAULT_TAB_SIZE = 4;
 
 // src/resources/version-information.ts
-var VERSION_NUMBER = new Version(1, 0, 0);
+var VERSION_NUMBER = new Version(1, 0, 1);
 
 // src/migration/data/file.ts
 var File = class _File {
@@ -8102,8 +8102,8 @@ var ASSETS = {
     "                                                                ts-node \\",
     "                                          ) $(1)",
     "lp.run                                  =$(if $(filter %.ts,$(lastword $(strip $(1)))),\\",
-    "                                              $(call lp.run.js,$(1)),\\",
-    "                                              $(call lp.run.jts,$(1)) \\",
+    "                                              $(call lp.run.ts,$(1)),\\",
+    "                                              $(call lp.run.js,$(1)) \\",
     "                                          )",
     ""
   ].join("\n"),
@@ -8524,7 +8524,7 @@ var TSCONFIG_JSON_TEMPLATES = {
       tsBuildInfoFile: "__OUT_DIR__/.tsbuildinfo",
       useDefineForClassFields: true,
       useUnknownInCatchVariables: true,
-      verbatimModuleSyntax: true
+      verbatimModuleSyntax: false
     },
     include: ["__SRC_DIR__/**/*.ts"],
     "ts-node": {
@@ -8662,7 +8662,7 @@ var TSCONFIG_JSON_TEMPLATES = {
       tsBuildInfoFile: "__OUT_DIR__/.tsbuildinfo",
       useDefineForClassFields: true,
       useUnknownInCatchVariables: true,
-      verbatimModuleSyntax: true
+      verbatimModuleSyntax: false
     },
     include: ["__SRC_DIR__/**/*.ts"],
     "ts-node": {
@@ -8802,7 +8802,7 @@ var TSCONFIG_JSON_TEMPLATES = {
       tsBuildInfoFile: "__OUT_DIR__/.tsbuildinfo",
       useDefineForClassFields: true,
       useUnknownInCatchVariables: true,
-      verbatimModuleSyntax: true
+      verbatimModuleSyntax: false
     },
     include: ["__SRC_DIR__/**/*.ts"],
     "ts-node": {
@@ -8942,7 +8942,7 @@ var TSCONFIG_JSON_TEMPLATES = {
       tsBuildInfoFile: "__OUT_DIR__/.tsbuildinfo",
       useDefineForClassFields: true,
       useUnknownInCatchVariables: true,
-      verbatimModuleSyntax: true
+      verbatimModuleSyntax: false
     },
     include: ["__SRC_DIR__/**/*.ts"],
     "ts-node": {
@@ -10528,7 +10528,7 @@ function getConfigProperties() {
   return properties.map((property) => `${property.parameter.padEnd(maxPropertyLength)}   ${property.description}`);
 }
 function showVersion() {
-  console.log(VERSION_NUMBER);
+  console.log(VERSION_NUMBER.render());
 }
 
 // src/launchpad-cli.ts
