@@ -4,7 +4,11 @@ export class Version {
     // Initialization
     //------------------------------------------------------------------------------------------------------------------
 
-    public constructor(public readonly major: number, public readonly minor: number, public readonly patch: number) {}
+    public constructor(
+        public readonly major: number,
+        public readonly minor: number,
+        public readonly patch: number
+    ) {}
 
     //------------------------------------------------------------------------------------------------------------------
     // Compare the current version with another one

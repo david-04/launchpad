@@ -9,7 +9,6 @@
     "linter": {
         "enabled": false
     },
-
     "formatter": {
         "enabled": true,
         "formatWithErrors": true,
@@ -33,7 +32,6 @@
             "semicolons": "always",
             "arrowParentheses": "asNeeded",
             "enabled": true,
-
             "bracketSameLine": false,
             "bracketSpacing": true
         }

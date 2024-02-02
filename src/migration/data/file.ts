@@ -16,7 +16,11 @@ export class File {
     // Initialization
     //------------------------------------------------------------------------------------------------------------------
 
-    public constructor(projectRoot: Path, public readonly relativePath: string, private readonly tabSize: number) {
+    public constructor(
+        projectRoot: Path,
+        public readonly relativePath: string,
+        private readonly tabSize: number
+    ) {
         this.absolutePath = projectRoot.child(relativePath);
         if (this.absolutePath.existsAndIsDirectory()) {
             fail(`${this.absolutePath.path} is a directory (expected it to be a file)`);
