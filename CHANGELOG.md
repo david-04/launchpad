@@ -1,13 +1,12 @@
 # Change Log
 
-## [1.0.1](https://github.com/david-04/typefinity/releases/tag/v1.0.1) (2024-02-03)
+## [1.0.1](https://github.com/david-04/launchpad/releases/tag/v1.0.1) (2024-02-03)
 
 - Fixed a `tsconfig.json` issue that prohibited top-level exports in ESM modules (`verbatimModuleSyntax` is now always set to `false`)
 - Fixed a Makefile issue with `lp.run` that caused JavaScript files to not run at all and TypeScript files to run uncompiled through `node` (instead of `node-ts`)
 - Tweaked the `--version` command line option to print the version number as a plain string
 
-
-## [1.0.0](https://github.com/david-04/typefinity/releases/tag/v1.0.0) (2024-01-07)
+## [1.0.0](https://github.com/david-04/launchpad/releases/tag/v1.0.0) (2024-01-07)
 
 - Set up project templates (app/lib, cli/web, cjs/esm)
 - Configure and install development tools
