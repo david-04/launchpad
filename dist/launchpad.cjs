@@ -6371,7 +6371,7 @@ var DEFAULT_SRC_DIR = "src";
 var DEFAULT_TAB_SIZE = 4;
 
 // src/resources/version-information.ts
-var VERSION_NUMBER = new Version(1, 0, 1);
+var VERSION_NUMBER = new Version(1, 0, 2);
 
 // src/migration/data/file.ts
 var File = class _File {
@@ -8991,7 +8991,7 @@ function recreateUpliftShellScript(context, commands) {
     'echo "Uplifting the project..."',
     'echo ""',
     "",
-    `if ! ${commands.map((command) => command.replaceAll(UPLIFT_PARAMETERS, '"$@"')).join(" && ")}; then`,
+    `if ! ${commands.map((command) => command.replaceAll(UPLIFT_PARAMETERS, 'uplift "$@"')).join(" && ")}; then`,
     '    echo "" >&2',
     '    echo "\u26D4 ERROR: The uplift has failed" >&2',
     "    exit 1",
@@ -9039,7 +9039,7 @@ function serializeCommand(command) {
 function toBatchCommandWithErrorHandler(command) {
   return !command ? [] : [
     "",
-    command.replaceAll(UPLIFT_PARAMETERS, "%*"),
+    command.replaceAll(UPLIFT_PARAMETERS, "uplift %*"),
     'if not "%ERRORLEVEL%" == "0" (',
     "    echo.",
     "    echo ERROR: The uplift has failed",

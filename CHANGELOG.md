@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.2](https://github.com/david-04/launchpad/releases/tag/v1.0.2) (2024-02-09)
+
+- Fixed an issue that caused uplifts to fail (when using `.launchpad/uplift.sh` or `.bat`)
+
 ## [1.0.1](https://github.com/david-04/launchpad/releases/tag/v1.0.1) (2024-02-03)
 
 - Fixed a `tsconfig.json` issue that prohibited top-level exports in ESM modules (`verbatimModuleSyntax` is now always set to `false`)
