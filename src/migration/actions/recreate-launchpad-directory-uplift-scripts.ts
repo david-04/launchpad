@@ -37,7 +37,7 @@ function recreateUpliftShellScript(context: MigrationContext, commands: Readonly
         'echo "Uplifting the project..."',
         'echo ""',
         "",
-        `if ! ${commands.map(command => command.replaceAll(UPLIFT_PARAMETERS, '"$@"')).join(" && ")}; then`,
+        `if ! ${commands.map(command => command.replaceAll(UPLIFT_PARAMETERS, 'uplift "$@"')).join(" && ")}; then`,
         '    echo "" >&2',
         '    echo "⛔ ERROR: The uplift has failed" >&2',
         "    exit 1",
@@ -116,7 +116,7 @@ function toBatchCommandWithErrorHandler(command: string) {
         ? []
         : [
               "",
-              command.replaceAll(UPLIFT_PARAMETERS, "%*"),
+              command.replaceAll(UPLIFT_PARAMETERS, "uplift %*"),
               'if not "%ERRORLEVEL%" == "0" (',
               "    echo.",
               "    echo ERROR: The uplift has failed",
