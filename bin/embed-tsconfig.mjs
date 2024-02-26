@@ -68,7 +68,7 @@ function normalizeTsconfig(fileName, json) {
         .sort()
         .forEach(key => (compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key])));
     const tsNode = 0 <= fileName.indexOf("-esm") ? { "ts-node": { esm: true } } : {};
-    return { compilerOptions: compilerOptionsOut, include: ["__SRC_DIR__/**/*.ts"], ...tsNode };
+    return { compilerOptions: compilerOptionsOut, include: ["__SRC_DIR__/**/*.ts", "__SRC_DIR__/**/*.tsx"], ...tsNode };
 }
 
 //----------------------------------------------------------------------------------------------------------------------

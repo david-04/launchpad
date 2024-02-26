@@ -7,7 +7,7 @@
 
         "target": "ES6", //                                 Set the JavaScript language version for emitted JavaScript and include compatible library declarations.
         "jsx": "react", //                                  Specify what JSX code is generated.
-        // "jsxFactory": "", //                             only need to override when using preact | Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'.
+        "jsxFactory": "React.createElement", //             only need to override when using preact | Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'.
         // "jsxFragmentFactory": "", //                     same as jsxFactory | Specify the JSX Fragment reference used for fragments when targeting React JSX emit e.g. 'React.Fragment' or 'Fragment'.
         // "jsxImportSource": "", //                        could be set to "preact" | Specify module specifier used to import the JSX factory functions when using 'jsx: react-jsx*'.
         // "reactNamespace": "", //                         seems obsolete, docs state "use jsxFactory instead" | Specify the object invoked for 'createElement'. This only applies when targeting 'react' JSX emit.

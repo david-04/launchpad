@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.0.3](https://github.com/david-04/launchpad/releases/tag/v1.0.3) (2024-02-26)
+
+- Improved React compatibility by automatically including/compiling `tsx` files
+- Improved Preact compatibility by setting `tsxFactory` to `h`
+
 ## [1.0.2](https://github.com/david-04/launchpad/releases/tag/v1.0.2) (2024-02-09)
 
 - Fixed an issue that caused uplifts to fail (when using `.launchpad/uplift.sh` or `.bat`)

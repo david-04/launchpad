@@ -116,5 +116,5 @@
         // "skipDefaultLibCheck": false, //                     Deprecated - use "skipLibCheck" instead | Skip type checking .d.ts files that are included with TypeScript.
         "skipLibCheck": true //                                 Only check the d.ts files that are actually used/imported | Skip type checking all .d.ts files.
     },
-    "include": ["../../../src/**/*.ts"]
+    "include": ["../../../src/**/*.ts", "../../../src/**/*.tsx"]
 }
