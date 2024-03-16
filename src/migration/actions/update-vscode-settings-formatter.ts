@@ -1,6 +1,6 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { VSCODE_LANGUAGE_IDS } from "migration/files/vscode-settings";
-import { getFormatter } from "migration/formatters/formatter-registry";
+import { MigrationContext } from "../data/migration-context";
+import { VSCODE_LANGUAGE_IDS } from "../files/vscode-settings";
+import { getFormatter } from "../formatters/formatter-registry";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Update the VSCode settings

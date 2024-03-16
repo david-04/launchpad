@@ -1,5 +1,5 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { deepMerge } from "utilities/object-utilities";
+import { deepMerge } from "../../utilities/object-utilities";
+import { MigrationContext } from "../data/migration-context";
 import { Formatter } from "./formatter";
 
 //----------------------------------------------------------------------------------------------------------------------

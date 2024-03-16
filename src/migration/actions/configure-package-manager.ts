@@ -1,5 +1,5 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { getAllPackageManagersExcept, getPackageManager } from "migration/package-managers/package-manager-registry";
+import { MigrationContext } from "../data/migration-context";
+import { getAllPackageManagersExcept, getPackageManager } from "../package-managers/package-manager-registry";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Configure the package manager

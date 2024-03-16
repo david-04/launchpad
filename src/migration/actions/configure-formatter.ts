@@ -1,5 +1,5 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { getAllFormattersExcept, getFormatter } from "migration/formatters/formatter-registry";
+import { MigrationContext } from "../data/migration-context";
+import { getAllFormattersExcept, getFormatter } from "../formatters/formatter-registry";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Configure the formatter

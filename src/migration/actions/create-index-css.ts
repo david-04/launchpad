@@ -1,6 +1,6 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { ASSETS } from "resources/embedded-assets";
-import { adjustTabSize } from "utilities/string-utilities";
+import { ASSETS } from "../../resources/embedded-assets";
+import { adjustTabSize } from "../../utilities/string-utilities";
+import { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create the project template's CSS file

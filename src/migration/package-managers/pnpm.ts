@@ -1,5 +1,5 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { LAUNCHPAD_PACKAGE_NAME } from "utilities/constants";
+import { LAUNCHPAD_PACKAGE_NAME } from "../../utilities/constants";
+import { MigrationContext } from "../data/migration-context";
 import { PackageManager } from "./package-manager";
 
 //----------------------------------------------------------------------------------------------------------------------

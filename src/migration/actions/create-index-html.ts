@@ -1,7 +1,7 @@
-import { MigrationContext } from "migration/data/migration-context";
 import { relative } from "path";
-import { ASSETS } from "resources/embedded-assets";
-import { adjustTabSize } from "utilities/string-utilities";
+import { ASSETS } from "../../resources/embedded-assets";
+import { adjustTabSize } from "../../utilities/string-utilities";
+import { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create the web app

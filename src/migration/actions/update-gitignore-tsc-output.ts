@@ -1,5 +1,5 @@
-import { TSBUILDINFO } from "migration/data/known-files";
-import { MigrationContext } from "migration/data/migration-context";
+import { TSBUILDINFO } from "../data/known-files";
+import { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // TypeScript output

@@ -1,4 +1,4 @@
-import { MigrationContext } from "migration/data/migration-context";
+import { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Set format-on-save if it's not set already

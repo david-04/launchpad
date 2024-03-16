@@ -1,4 +1,4 @@
-import { MigrationContext } from "migration/data/migration-context";
+import { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Prepare the main module's source file

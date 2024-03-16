@@ -1,5 +1,5 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { getAllPackageManagers, getPackageManager } from "migration/package-managers/package-manager-registry";
+import { MigrationContext } from "../data/migration-context";
+import { getAllPackageManagers, getPackageManager } from "../package-managers/package-manager-registry";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Add/remove package manager .gitignore patterns

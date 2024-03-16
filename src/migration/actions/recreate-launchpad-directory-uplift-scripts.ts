@@ -1,6 +1,6 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { getPackageManager } from "migration/package-managers/package-manager-registry";
-import { LAUNCHPAD_PACKAGE_NAME } from "utilities/constants";
+import { LAUNCHPAD_PACKAGE_NAME } from "../../utilities/constants";
+import { MigrationContext } from "../data/migration-context";
+import { getPackageManager } from "../package-managers/package-manager-registry";
 
 const UPLIFT_PARAMETERS = "__UPLIFT_PARAMETERS__";
 

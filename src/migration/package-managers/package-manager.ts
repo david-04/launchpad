@@ -1,9 +1,9 @@
+import { MigrationContext } from "../data/migration-context";
+import { PackageJson } from "../files/package-json";
+
 //----------------------------------------------------------------------------------------------------------------------
 // General metadata
 //----------------------------------------------------------------------------------------------------------------------
-
-import { MigrationContext } from "migration/data/migration-context";
-import { PackageJson } from "migration/files/package-json";
 
 export type PackageManagerDescriptor = {
     readonly gitignorePatterns: Readonly<Record<"current" | "deprecated", ReadonlyArray<string>>>;

@@ -1,5 +1,5 @@
-import { MigrationContext } from "migration/data/migration-context";
-import { VsCodeLanguageId } from "migration/files/vscode-settings";
+import { MigrationContext } from "../data/migration-context";
+import { VsCodeLanguageId } from "../files/vscode-settings";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Base class for all formatters

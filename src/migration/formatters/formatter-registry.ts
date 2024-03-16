@@ -1,5 +1,5 @@
-import { NewConfig, OldConfig } from "config/config-objects";
-import { MigrationContext } from "migration/data/migration-context";
+import { NewConfig, OldConfig } from "../../config/config-objects";
+import { MigrationContext } from "../data/migration-context";
 import { Biome } from "./biome";
 import { Formatter } from "./formatter";
 import { NoFormatter } from "./no-formatter";

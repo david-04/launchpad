@@ -1,8 +1,8 @@
 import { mkdirSync, renameSync, rmSync, writeFileSync } from "fs";
-import { File } from "migration/data/file";
 import { LP_NEW_FILE_EXTENSION, LP_OLD_FILE_EXTENSION } from "../../utilities/constants";
 import { Path } from "../../utilities/path";
 import { Directory } from "../data/directory";
+import { File } from "../data/file";
 import { type FileOrDirectory } from "../data/file-or-directory-cache";
 
 //----------------------------------------------------------------------------------------------------------------------

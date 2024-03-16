@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.4](https://github.com/david-04/launchpad/releases/tag/v1.0.4) (2024-03-17)
+
+- Removed `baseUrl` from the CommonJS template version of `tsconfig.json`
+
 ## [1.0.3](https://github.com/david-04/launchpad/releases/tag/v1.0.3) (2024-02-26)
 
 - Improved React compatibility by automatically including/compiling `tsx` files

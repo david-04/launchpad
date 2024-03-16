@@ -6371,7 +6371,7 @@ var DEFAULT_SRC_DIR = "src";
 var DEFAULT_TAB_SIZE = 4;
 
 // src/resources/version-information.ts
-var VERSION_NUMBER = new Version(1, 0, 3);
+var VERSION_NUMBER = new Version(1, 0, 4);
 
 // src/migration/data/file.ts
 var File = class _File {
@@ -8331,7 +8331,6 @@ var TSCONFIG_JSON_TEMPLATES = {
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
       "alwaysStrict": true,
-      "baseUrl": "__SRC_DIR__",
       "composite": false,
       "declaration": false,
       "declarationMap": false,
@@ -8443,6 +8442,8 @@ var TSCONFIG_JSON_TEMPLATES = {
       "preserveSymlinks": false,
       "removeComments": true,
       "resolveJsonModule": true,
+      "resolvePackageJsonExports": true,
+      "resolvePackageJsonImports": true,
       "skipLibCheck": true,
       "sourceMap": true,
       "strict": true,
@@ -8475,7 +8476,6 @@ var TSCONFIG_JSON_TEMPLATES = {
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
       "alwaysStrict": true,
-      "baseUrl": "__SRC_DIR__",
       "composite": false,
       "declaration": true,
       "declarationMap": true,
@@ -8587,6 +8587,8 @@ var TSCONFIG_JSON_TEMPLATES = {
       "preserveSymlinks": false,
       "removeComments": true,
       "resolveJsonModule": true,
+      "resolvePackageJsonExports": true,
+      "resolvePackageJsonImports": true,
       "skipLibCheck": true,
       "sourceMap": true,
       "strict": true,
@@ -8619,7 +8621,6 @@ var TSCONFIG_JSON_TEMPLATES = {
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
       "alwaysStrict": true,
-      "baseUrl": "__SRC_DIR__",
       "composite": false,
       "declaration": false,
       "declarationMap": false,
@@ -8735,6 +8736,8 @@ var TSCONFIG_JSON_TEMPLATES = {
       "preserveSymlinks": false,
       "removeComments": true,
       "resolveJsonModule": true,
+      "resolvePackageJsonExports": true,
+      "resolvePackageJsonImports": true,
       "skipLibCheck": true,
       "sourceMap": true,
       "strict": true,
@@ -8767,7 +8770,6 @@ var TSCONFIG_JSON_TEMPLATES = {
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
       "alwaysStrict": true,
-      "baseUrl": "__SRC_DIR__",
       "composite": false,
       "declaration": true,
       "declarationMap": true,
@@ -8883,6 +8885,8 @@ var TSCONFIG_JSON_TEMPLATES = {
       "preserveSymlinks": false,
       "removeComments": true,
       "resolveJsonModule": true,
+      "resolvePackageJsonExports": true,
+      "resolvePackageJsonImports": true,
       "skipLibCheck": true,
       "sourceMap": true,
       "strict": true,

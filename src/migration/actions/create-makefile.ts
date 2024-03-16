@@ -1,4 +1,4 @@
-import { NewConfig } from "config/config-objects";
+import { NewConfig } from "../../config/config-objects";
 import type { MigrationContext } from "../data/migration-context";
 
 const SEPARATOR_LINE = `#${new Array(119).fill("-").join("")}`;
