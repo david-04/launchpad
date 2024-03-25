@@ -6181,7 +6181,7 @@ function validateConfig(config, addError) {
     return {
       artifact: ConfigProperties.artifact.assertOldValuePresent(config.artifact),
       bundler: ConfigProperties.bundler.assertOldValuePresent(config.bundler),
-      bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.tscOutDir),
+      bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.bundlerOutDir),
       dtsBundler: ConfigProperties.dtsBundler.assertOldValuePresent(config.dtsBundler),
       formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
       installationMode: ConfigProperties.installationMode.assertOldValuePresent(config.installationMode),
@@ -6371,7 +6371,7 @@ var DEFAULT_SRC_DIR = "src";
 var DEFAULT_TAB_SIZE = 4;
 
 // src/resources/version-information.ts
-var VERSION_NUMBER = new Version(1, 0, 4);
+var VERSION_NUMBER = new Version(1, 0, 5);
 
 // src/migration/data/file.ts
 var File = class _File {
@@ -6566,7 +6566,6 @@ function calculateNewConfig(options, oldConfig) {
     createDebugModule: false,
     createMakefile: false,
     createProjectTemplate: false,
-    vsCodeSettings: /* @__PURE__ */ new Set(),
     dependencies: [],
     dtsBundler: oldConfig.dtsBundler,
     formatter: oldConfig.formatter,
@@ -6581,6 +6580,7 @@ function calculateNewConfig(options, oldConfig) {
     tscOutDir: oldConfig.tscOutDir,
     upliftDependencies: oldConfig.upliftDependencies,
     version: VERSION_NUMBER,
+    vsCodeSettings: oldConfig.vsCodeSettings,
     webAppDir: oldConfig.webAppDir
   };
 }
@@ -7026,7 +7026,7 @@ function createDebugModule(context) {
   const mainModule = context.files.get(context.mainModulePath);
   if (context.newConfig.createDebugModule && !debugModule.exists) {
     if (mainModule.exists || context.newConfig.createProjectTemplate) {
-      const importFileExtension = "esm" === context.newConfig.moduleSystem ? ".js" : "";
+      const importFileExtension = "esm" === context.newConfig.moduleSystem ? ".js" : ".js";
       const importPath = `./${context.newConfig.projectName}${importFileExtension}`;
       debugModule.contents = `import ${JSON.stringify(importPath)};`;
     } else {
@@ -8420,9 +8420,9 @@ var TSCONFIG_JSON_TEMPLATES = {
       "inlineSourceMap": false,
       "inlineSources": false,
       "isolatedModules": true,
-      "module": "node16",
+      "module": "nodenext",
       "moduleDetection": "force",
-      "moduleResolution": "node16",
+      "moduleResolution": "nodenext",
       "newLine": "lf",
       "noEmit": false,
       "noEmitHelpers": false,
@@ -8565,9 +8565,9 @@ var TSCONFIG_JSON_TEMPLATES = {
       "inlineSourceMap": false,
       "inlineSources": false,
       "isolatedModules": true,
-      "module": "node16",
+      "module": "nodenext",
       "moduleDetection": "force",
-      "moduleResolution": "node16",
+      "moduleResolution": "nodenext",
       "newLine": "lf",
       "noEmit": false,
       "noEmitHelpers": false,
@@ -8917,20 +8917,29 @@ function recreateLaunchpadDirectoryTsConfig(context) {
   const normalizedRuntime = "node" === runtime.value ? "cli" : runtime.value;
   const file = `tsconfig.${normalizedRuntime}-${artifact}-${moduleSystem}.json`;
   const tsconfig = TSCONFIG_JSON_TEMPLATES[file];
-  const compilerOptionsOverride = getPreactCompilerOptionsOverride(context);
+  const compilerOptionsOverridePreact = getCompilerOptionsOverridePreact(context);
+  const compilerOptionsOverrideLib = getCompilerOptionsOverrideLib(context, tsconfig.compilerOptions.target);
   const tsconfigWithOverrides = {
     ...tsconfig,
     compilerOptions: {
       ...tsconfig.compilerOptions,
-      ...compilerOptionsOverride
+      ...compilerOptionsOverridePreact,
+      ...compilerOptionsOverrideLib
     }
   };
   const stringified = JSON.stringify(tsconfigWithOverrides, void 0, context.newConfig.tabSize).replaceAll("__SRC_DIR__", normalizeDirectory(context.newConfig.srcDir)).replaceAll("__OUT_DIR__", normalizeDirectory(context.newConfig.tscOutDir));
   context.files.get(LAUNCHPAD_TSCONFIG_DEFAULT_JSON).contents = `${stringified}
 `;
 }
-function getPreactCompilerOptionsOverride(context) {
+function getCompilerOptionsOverridePreact(context) {
   return context.fileOperations.packageJson.containsDependency("preact") ? { jsxFactory: "h" } : {};
+}
+function getCompilerOptionsOverrideLib(context, target) {
+  if (context.newConfig.runtime.value === "web") {
+    return {};
+  } else {
+    return context.fileOperations.packageJson.containsDependency("@types/node") ? { lib: [target] } : {};
+  }
 }
 function normalizeDirectory(directory) {
   return JSON.stringify(`../${directory}`).replace(/^"/, "").replace(/"$/, "");
@@ -9029,8 +9038,8 @@ function updateGitignoreBundlerOutput(context) {
   if (oldBundlerOutDir && oldBundlerOutDir !== newBundlerOutDir) {
     allGlobs.forEach((glob) => context.fileOperations.gitignore.remove(`/${oldBundlerOutDir}/${glob}`));
   }
-  if (!oldBundlerOutDir || oldBundlerOutDir !== newBundlerOutDir) {
-    currentGlobs.forEach((glob) => context.fileOperations.gitignore.add(`/${oldBundlerOutDir}/${glob}`));
+  if (newBundlerOutDir && (!oldBundlerOutDir || oldBundlerOutDir !== newBundlerOutDir)) {
+    currentGlobs.forEach((glob) => context.fileOperations.gitignore.add(`/${newBundlerOutDir}/${glob}`));
   }
 }
 
@@ -9092,12 +9101,28 @@ function updatePackageJsonMetadata(context) {
   setIfMissing(packageJson, "version", "0.0.0");
   setIfMissing(packageJson, "private", true);
   setIfMissing(packageJson, "license", "UNLICENSED");
-  setIfMissing(packageJson, "module", { esm: "module", cjs: "commonjs" }[context.newConfig.moduleSystem]);
+  setIfMissing(packageJson, "type", { esm: "module", cjs: "commonjs" }[context.newConfig.moduleSystem]);
+  removeModuleProperty(context, packageJson);
 }
 function setIfMissing(packageJson, key, value) {
   const json = packageJson.json;
   if (!(key in json)) {
     packageJson.json = { ...json, [key]: value };
+  }
+}
+function removeModuleProperty(context, packageJson) {
+  if (!("module" in packageJson.json)) {
+    return;
+  }
+  if ("module" !== packageJson.json["module"] && "commonjs" !== packageJson.json["module"]) {
+    return;
+  }
+  const maxVersion = new Version(1, 0, 4);
+  const currentVersion = context.oldConfig?.version ?? new Version(1, 0, 5);
+  if (currentVersion.compareTo(maxVersion) <= 0) {
+    const json = { ...packageJson.json };
+    delete json["module"];
+    packageJson.json = json;
   }
 }
 
@@ -9270,7 +9295,7 @@ var GitignoreOperations = class _GitignoreOperations {
     }
   }
   remove(pattern) {
-    this.lines = this.lines.filter((line) => this.matches(line, "active", pattern));
+    this.lines = this.lines.filter((line) => !this.matches(line, "active", pattern));
   }
 };
 
@@ -9780,7 +9805,7 @@ function onFileSystemChangesSucceeded(context) {
   const summaryOfChanges = [...context.directories.toSummaryOfChanges(), ...context.files.toSummaryOfChanges()];
   if (summaryOfChanges.length) {
     console.log("");
-    summaryOfChanges.flatMap((line) => breakAndLog("- ", line));
+    summaryOfChanges.forEach((line) => console.log(`- ${line}`));
   }
   executeExternalCommands(context);
   if (context.manualActionRequired) {
