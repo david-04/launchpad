@@ -1,5 +1,18 @@
 # Change Log
 
+## [1.0.5](https://github.com/david-04/launchpad/releases/tag/v1.0.5) (2024-03-26)
+
+- Updated default compiler settings in `tsconfig.default.json`
+  - Enable top-level `await` for `cli` projects by setting `module` and `moduleResolution` to `NodeNext`
+  - Set `lib` to the target ECMAScript version for `cli` projects that have Node typings installed (to prevent the auto-inclusion of `DOM`)
+- Fixed uplift issues that made inadvertently changed the project settings
+  - `.gitignore` was overwritten (with custom entries removed)
+  - The bundler output directory was set to the tsc output directory
+  - The bundler output directory was added to `.gitignore` even if it was not set (because bundling is disabled)
+  - The ongoing management of VSCode settings (like code formatting) was cancelled
+  - Please run `launchpad init` to review and correct the accidentally modified settings
+- Fixed the module type setting in `package.json` (renaming the property from `module` to `type`)
+
 ## [1.0.4](https://github.com/david-04/launchpad/releases/tag/v1.0.4) (2024-03-17)
 
 - Removed `baseUrl` from the CommonJS template version of `tsconfig.json`
