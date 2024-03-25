@@ -42,7 +42,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
         return {
             artifact: ConfigProperties.artifact.assertOldValuePresent(config.artifact),
             bundler: ConfigProperties.bundler.assertOldValuePresent(config.bundler),
-            bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.tscOutDir),
+            bundlerOutDir: ConfigProperties.bundlerOutDir.assertOldValuePresent(config.bundlerOutDir),
             dtsBundler: ConfigProperties.dtsBundler.assertOldValuePresent(config.dtsBundler),
             formatter: ConfigProperties.formatter.assertOldValuePresent(config.formatter),
             installationMode: ConfigProperties.installationMode.assertOldValuePresent(config.installationMode),
