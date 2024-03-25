@@ -11,12 +11,14 @@ export function recreateLaunchpadDirectoryTsConfig(context: MigrationContext) {
     const normalizedRuntime = "node" === runtime.value ? "cli" : runtime.value;
     const file = `tsconfig.${normalizedRuntime}-${artifact}-${moduleSystem}.json` as const;
     const tsconfig = TSCONFIG_JSON_TEMPLATES[file];
-    const compilerOptionsOverride = getPreactCompilerOptionsOverride(context);
+    const compilerOptionsOverridePreact = getCompilerOptionsOverridePreact(context);
+    const compilerOptionsOverrideLib = getCompilerOptionsOverrideLib(context, tsconfig.compilerOptions.target);
     const tsconfigWithOverrides = {
         ...tsconfig,
         compilerOptions: {
             ...tsconfig.compilerOptions,
-            ...compilerOptionsOverride,
+            ...compilerOptionsOverridePreact,
+            ...compilerOptionsOverrideLib,
         },
     };
     const stringified = JSON.stringify(tsconfigWithOverrides, undefined, context.newConfig.tabSize)
@@ -25,8 +27,14 @@ export function recreateLaunchpadDirectoryTsConfig(context: MigrationContext) {
     context.files.get(LAUNCHPAD_TSCONFIG_DEFAULT_JSON).contents = `${stringified}\n`;
 }
 
-function getPreactCompilerOptionsOverride(context: MigrationContext) {
+function getCompilerOptionsOverridePreact(context: MigrationContext) {
     return context.fileOperations.packageJson.containsDependency("preact") ? { jsxFactory: "h" } : {};
+}
+
+function getCompilerOptionsOverrideLib(context: MigrationContext, target: string) {
+    const isCli = context.newConfig.runtime.value === "node";
+    const hasNodeTypings = context.fileOperations.packageJson.containsDependency("@types/node");
+    return isCli && hasNodeTypings ? { lib: [target] } : {};
 }
 
 function normalizeDirectory(directory: string) {
