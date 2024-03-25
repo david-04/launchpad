@@ -89,7 +89,7 @@ clean.build-and-dist :
 	echo Deleting pre-existing builds/bundles... && rm -rf build dist/launchpad.*js* dist/*.map dist/*.d.ts
 
 unrelease :
-	echo Reverting the dist directory... && rm -rf dist/* && git checkout -- dist
+	echo Reverting the dist directory... && rm -rf dist/* && git checkout -- dist src/resources/version-information.ts
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Publish
