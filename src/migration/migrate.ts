@@ -166,7 +166,7 @@ function onFileSystemChangesSucceeded(context: MigrationContext) {
     const summaryOfChanges = [...context.directories.toSummaryOfChanges(), ...context.files.toSummaryOfChanges()];
     if (summaryOfChanges.length) {
         console.log("");
-        summaryOfChanges.flatMap(line => breakAndLog("- ", line));
+        summaryOfChanges.forEach(line => console.log(`- ${line}`));
     }
     executeExternalCommands(context);
     if (context.manualActionRequired) {
