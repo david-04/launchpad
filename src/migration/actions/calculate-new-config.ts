@@ -19,7 +19,6 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         createDebugModule: false,
         createMakefile: false,
         createProjectTemplate: false,
-        vsCodeSettings: new Set(),
         dependencies: [],
         dtsBundler: oldConfig.dtsBundler,
         formatter: oldConfig.formatter,
@@ -34,6 +33,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         tscOutDir: oldConfig.tscOutDir,
         upliftDependencies: oldConfig.upliftDependencies,
         version: VERSION_NUMBER,
+        vsCodeSettings: oldConfig.vsCodeSettings,
         webAppDir: oldConfig.webAppDir,
     };
 }
