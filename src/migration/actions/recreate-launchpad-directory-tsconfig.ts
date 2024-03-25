@@ -32,9 +32,11 @@ function getCompilerOptionsOverridePreact(context: MigrationContext) {
 }
 
 function getCompilerOptionsOverrideLib(context: MigrationContext, target: string) {
-    const isCli = context.newConfig.runtime.value === "node";
-    const hasNodeTypings = context.fileOperations.packageJson.containsDependency("@types/node");
-    return isCli && hasNodeTypings ? { lib: [target] } : {};
+    if (context.newConfig.runtime.value === "web") {
+        return {};
+    } else {
+        return context.fileOperations.packageJson.containsDependency("@types/node") ? { lib: [target] } : {};
+    }
 }
 
 function normalizeDirectory(directory: string) {
