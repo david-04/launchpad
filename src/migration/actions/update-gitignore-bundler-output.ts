@@ -13,7 +13,7 @@ export function updateGitignoreBundlerOutput(context: MigrationContext) {
     if (oldBundlerOutDir && oldBundlerOutDir !== newBundlerOutDir) {
         allGlobs.forEach(glob => context.fileOperations.gitignore.remove(`/${oldBundlerOutDir}/${glob}`));
     }
-    if (!oldBundlerOutDir || oldBundlerOutDir !== newBundlerOutDir) {
-        currentGlobs.forEach(glob => context.fileOperations.gitignore.add(`/${oldBundlerOutDir}/${glob}`));
+    if (newBundlerOutDir && (!oldBundlerOutDir || oldBundlerOutDir !== newBundlerOutDir)) {
+        currentGlobs.forEach(glob => context.fileOperations.gitignore.add(`/${newBundlerOutDir}/${glob}`));
     }
 }
