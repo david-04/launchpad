@@ -1,3 +1,4 @@
+import { Version } from "../../config/version-number";
 import type { MigrationContext } from "../data/migration-context";
 import type { PackageJson, PackageJsonOperations } from "../files/package-json";
 
@@ -11,7 +12,8 @@ export function updatePackageJsonMetadata(context: MigrationContext) {
     setIfMissing(packageJson, "version", "0.0.0");
     setIfMissing(packageJson, "private", true);
     setIfMissing(packageJson, "license", "UNLICENSED");
-    setIfMissing(packageJson, "module", ({ esm: "module", cjs: "commonjs" } as const)[context.newConfig.moduleSystem]);
+    setIfMissing(packageJson, "type", ({ esm: "module", cjs: "commonjs" } as const)[context.newConfig.moduleSystem]);
+    removeModuleProperty(context, packageJson);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -26,5 +28,25 @@ function setIfMissing<T extends keyof PackageJson>(
     const json = packageJson.json;
     if (!(key in json)) {
         packageJson.json = { ...json, [key]: value };
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Up to version 1.0.4, the module property was accidentally named "module" (instead of "type")
+//----------------------------------------------------------------------------------------------------------------------
+
+function removeModuleProperty(context: MigrationContext, packageJson: PackageJsonOperations) {
+    if (!("module" in packageJson.json)) {
+        return;
+    }
+    if ("module" !== packageJson.json["module"] && "commonjs" !== packageJson.json["module"]) {
+        return;
+    }
+    const maxVersion = new Version(1, 0, 4);
+    const currentVersion = context.oldConfig?.version ?? new Version(1, 0, 5);
+    if (currentVersion.compareTo(maxVersion) <= 0) {
+        const json = { ...packageJson.json };
+        delete json["module"];
+        packageJson.json = json;
     }
 }
