@@ -1,7 +1,7 @@
 {
     "extends": [
         "../02-facets/tsconfig.base.json",
-        "../02-facets/tsconfig.runtime-node.json",
+        "../02-facets/tsconfig.runtime-cli.json",
         "../02-facets/tsconfig.artifact-application.json",
         "../02-facets/tsconfig.module-commonjs.json"
     ]
