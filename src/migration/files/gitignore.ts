@@ -92,6 +92,6 @@ export class GitignoreOperations {
     }
 
     public remove(pattern: string) {
-        this.lines = this.lines.filter(line => this.matches(line, "active", pattern));
+        this.lines = this.lines.filter(line => !this.matches(line, "active", pattern));
     }
 }
