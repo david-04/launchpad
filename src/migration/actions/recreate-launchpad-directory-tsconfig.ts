@@ -34,18 +34,13 @@ function getCompilerOptionsOverridePreact(context: MigrationContext) {
 }
 
 function getCompilerOptionsOverrideLib(context: MigrationContext, target: string) {
-    return isCliProjectWithoutNodeTypings(context) ? { lib: [target] } : {};
+    return context.newConfig.runtime.value === "web" ? {} : { lib: [target] };
 }
 
 function getIncludeAppendNodeMinDts(context: MigrationContext) {
-    return isCliProjectWithoutNodeTypings(context) ? [`../${LAUNCHPAD_NODE_MIN_DTS}`] : [];
-}
-
-function isCliProjectWithoutNodeTypings(context: MigrationContext) {
-    return (
-        context.newConfig.runtime.value !== "web" &&
-        !context.fileOperations.packageJson.containsDependency("@types/node")
-    );
+    const isCli = context.newConfig.runtime.value !== "web";
+    const hasNodeTypes = context.fileOperations.packageJson.containsDependency("@types/node");
+    return isCli && !hasNodeTypes ? [`../${LAUNCHPAD_NODE_MIN_DTS}`] : [];
 }
 
 function normalizeDirectory(directory: string) {
