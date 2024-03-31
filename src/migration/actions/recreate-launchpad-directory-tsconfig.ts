@@ -1,5 +1,5 @@
 import { TSCONFIG_JSON_TEMPLATES } from "../../resources/embedded-tsconfig";
-import { LAUNCHPAD_TSCONFIG_DEFAULT_JSON } from "../data/known-files";
+import { LAUNCHPAD_NODE_MIN_DTS, LAUNCHPAD_TSCONFIG_DEFAULT_JSON } from "../data/known-files";
 import type { MigrationContext } from "../data/migration-context";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -13,6 +13,7 @@ export function recreateLaunchpadDirectoryTsConfig(context: MigrationContext) {
     const tsconfig = TSCONFIG_JSON_TEMPLATES[file];
     const compilerOptionsOverridePreact = getCompilerOptionsOverridePreact(context);
     const compilerOptionsOverrideLib = getCompilerOptionsOverrideLib(context, tsconfig.compilerOptions.target);
+    const includeAppendNodeMinDts = getIncludeAppendNodeMinDts(context);
     const tsconfigWithOverrides = {
         ...tsconfig,
         compilerOptions: {
@@ -20,6 +21,7 @@ export function recreateLaunchpadDirectoryTsConfig(context: MigrationContext) {
             ...compilerOptionsOverridePreact,
             ...compilerOptionsOverrideLib,
         },
+        include: [...tsconfig.include, ...includeAppendNodeMinDts],
     };
     const stringified = JSON.stringify(tsconfigWithOverrides, undefined, context.newConfig.tabSize)
         .replaceAll("__SRC_DIR__", normalizeDirectory(context.newConfig.srcDir))
@@ -32,11 +34,18 @@ function getCompilerOptionsOverridePreact(context: MigrationContext) {
 }
 
 function getCompilerOptionsOverrideLib(context: MigrationContext, target: string) {
-    if (context.newConfig.runtime.value === "web") {
-        return {};
-    } else {
-        return context.fileOperations.packageJson.containsDependency("@types/node") ? { lib: [target] } : {};
-    }
+    return isCliProjectWithoutNodeTypings(context) ? { lib: [target] } : {};
+}
+
+function getIncludeAppendNodeMinDts(context: MigrationContext) {
+    return isCliProjectWithoutNodeTypings(context) ? [`../${LAUNCHPAD_NODE_MIN_DTS}`] : [];
+}
+
+function isCliProjectWithoutNodeTypings(context: MigrationContext) {
+    return (
+        context.newConfig.runtime.value !== "web" &&
+        !context.fileOperations.packageJson.containsDependency("@types/node")
+    );
 }
 
 function normalizeDirectory(directory: string) {

@@ -3,6 +3,7 @@ export const LAUNCHPAD = ".launchpad";
 export const LAUNCHPAD_MAKEFILE_DOCUMENTATION = `${LAUNCHPAD}/Makefile.documentation`;
 export const LAUNCHPAD_MAKEFILE_FOOTER = `${LAUNCHPAD}/Makefile.footer`;
 export const LAUNCHPAD_MAKEFILE_HEADER = `${LAUNCHPAD}/Makefile.header`;
+export const LAUNCHPAD_NODE_MIN_DTS = `${LAUNCHPAD}/node.min.d.ts`;
 export const LAUNCHPAD_CFG = `${LAUNCHPAD}/launchpad.cfg`;
 export const LAUNCHPAD_TSCONFIG_DEFAULT_JSON = `${LAUNCHPAD}/tsconfig.default.json`;
 export const MAKEFILE = "Makefile";

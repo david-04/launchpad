@@ -16,6 +16,7 @@ import { createOutputDirectories } from "./actions/create-output-directories";
 import { createTsconfigJson } from "./actions/create-tsconfig-json";
 import { installOrUpgradeNpmPackages } from "./actions/install-or-upgrade-npm-packages";
 import { recreateLaunchpadDirectoryMakefiles } from "./actions/recreate-launchpad-directory-makefiles";
+import { recreateLaunchpadDirectoryNodeMinDts } from "./actions/recreate-launchpad-directory-node-min-dts";
 import { recreateLaunchpadDirectorySettings } from "./actions/recreate-launchpad-directory-settings";
 import { recreateLaunchpadDirectoryTsConfig } from "./actions/recreate-launchpad-directory-tsconfig";
 import { recreateLaunchpadDirectoryUpliftScripts } from "./actions/recreate-launchpad-directory-uplift-scripts";
@@ -67,8 +68,14 @@ export function migrate(options: MigrateOptions) {
 
 function prepareMigrationSteps(context: MigrationContext) {
     //
+    // package.json
+    updatePackageJsonDependencies(context);
+    updatePackageJsonMetadata(context);
+    updatePackageJsonPackageManager(context);
+
     // .launchpad/*
     recreateLaunchpadDirectoryMakefiles(context);
+    recreateLaunchpadDirectoryNodeMinDts(context);
     recreateLaunchpadDirectorySettings(context);
     recreateLaunchpadDirectoryTsConfig(context);
     recreateLaunchpadDirectoryUpliftScripts(context);
@@ -77,11 +84,6 @@ function prepareMigrationSteps(context: MigrationContext) {
     updateGitignoreBundlerOutput(context);
     updateGitignorePackageManager(context);
     updateGitignoreTscOutput(context);
-
-    // package.json
-    updatePackageJsonDependencies(context);
-    updatePackageJsonMetadata(context);
-    updatePackageJsonPackageManager(context);
 
     // .vscode/settings.json
     updateVsCodeSettingsFormatOnSave(context);
