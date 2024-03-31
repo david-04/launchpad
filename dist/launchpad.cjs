@@ -6371,7 +6371,7 @@ var DEFAULT_SRC_DIR = "src";
 var DEFAULT_TAB_SIZE = 4;
 
 // src/resources/version-information.ts
-var VERSION_NUMBER = new Version(1, 0, 5);
+var VERSION_NUMBER = new Version(1, 0, 6);
 
 // src/migration/data/file.ts
 var File = class _File {
@@ -6475,6 +6475,7 @@ var LAUNCHPAD = ".launchpad";
 var LAUNCHPAD_MAKEFILE_DOCUMENTATION = `${LAUNCHPAD}/Makefile.documentation`;
 var LAUNCHPAD_MAKEFILE_FOOTER = `${LAUNCHPAD}/Makefile.footer`;
 var LAUNCHPAD_MAKEFILE_HEADER = `${LAUNCHPAD}/Makefile.header`;
+var LAUNCHPAD_NODE_MIN_DTS = `${LAUNCHPAD}/node.min.d.ts`;
 var LAUNCHPAD_CFG = `${LAUNCHPAD}/launchpad.cfg`;
 var LAUNCHPAD_TSCONFIG_DEFAULT_JSON = `${LAUNCHPAD}/tsconfig.default.json`;
 var PACKAGE_JSON = "package.json";
@@ -8107,6 +8108,68 @@ var ASSETS = {
     "                                          )",
     ""
   ].join("\n"),
+  ".launchpad/node.min.d.ts": [
+    "//----------------------------------------------------------------------------------------------------------------------",
+    "// console",
+    "//----------------------------------------------------------------------------------------------------------------------",
+    "",
+    "declare interface Console {",
+    "    assert: (condition?: boolean | undefined, ...data: any[]) => void;",
+    "    clear: () => void;",
+    "    count: (label?: string) => void;",
+    "    countReset: (label?: string) => void;",
+    "    group: (...label: any[]) => void;",
+    "    groupCollapsed: (...label: any[]) => void;",
+    "    groupEnd: () => void;",
+    "    debug: (...data: any[]) => void;",
+    "    error: (...data: any[]) => void;",
+    "    info: (...data: any[]) => void;",
+    "    trace: (...data: any[]) => void;",
+    "    warn: (...data: any[]) => void;",
+    "    log: (...data: any[]) => void;",
+    "    table: (tabularData?: any, properties?: string[] | undefined) => void;",
+    "    time: (label?: string) => void;",
+    "    timeEnd: (label?: string) => void;",
+    "    timeLog: (label?: string, ...data: any[]) => void;",
+    "    timeStamp: (label?: string) => void;",
+    "}",
+    "",
+    "declare var console: Console;",
+    "",
+    "//----------------------------------------------------------------------------------------------------------------------",
+    "// process",
+    "//----------------------------------------------------------------------------------------------------------------------",
+    "",
+    "declare var process: {",
+    "    argv: string[];",
+    "    env: { [index: string]: string | undefined };",
+    "    exit: (code?: number) => never;",
+    "};",
+    "",
+    "//----------------------------------------------------------------------------------------------------------------------",
+    "// timeout",
+    "//----------------------------------------------------------------------------------------------------------------------",
+    "",
+    "declare namespace NodeJS {",
+    "    namespace launchpad {",
+    "        interface Timeout {",
+    "            ref(): this;",
+    "            unref(): this;",
+    "            hasRef(): boolean;",
+    "            refresh(): this;",
+    "            [Symbol.toPrimitive](): number;",
+    "            [Symbol.dispose](): void;",
+    "        }",
+    "    }",
+    "}",
+    "",
+    "declare function setTimeout(callback: (args: void) => void, ms?: number): NodeJS.launchpad.Timeout;",
+    "declare function clearTimeout(timeoutId: NodeJS.launchpad.Timeout | string | number | undefined): void;",
+    "",
+    "declare function setInterval(callback: (args: void) => void, ms?: number): NodeJS.launchpad.Timeout;",
+    "declare function clearInterval(intervalId: NodeJS.launchpad.Timeout | string | number | undefined): void;",
+    ""
+  ].join("\n"),
   ".launchpad/uplift": [
     "#!/usr/bin/env bash",
     "",
@@ -8292,6 +8355,11 @@ function installOrUpgradeNpmPackages(context) {
 function recreateLaunchpadDirectoryMakefiles(context) {
   const files = [LAUNCHPAD_MAKEFILE_DOCUMENTATION, LAUNCHPAD_MAKEFILE_HEADER, LAUNCHPAD_MAKEFILE_FOOTER];
   files.forEach((makefile) => context.files.get(makefile).contents = ASSETS[makefile]);
+}
+
+// src/migration/actions/recreate-launchpad-directory-node-min-dts.ts
+function recreateLaunchpadDirectoryNodeMinDts(context) {
+  context.files.get(LAUNCHPAD_NODE_MIN_DTS).contents = ASSETS[LAUNCHPAD_NODE_MIN_DTS];
 }
 
 // src/config/config-serializer.ts
@@ -8919,13 +8987,15 @@ function recreateLaunchpadDirectoryTsConfig(context) {
   const tsconfig = TSCONFIG_JSON_TEMPLATES[file];
   const compilerOptionsOverridePreact = getCompilerOptionsOverridePreact(context);
   const compilerOptionsOverrideLib = getCompilerOptionsOverrideLib(context, tsconfig.compilerOptions.target);
+  const includeAppendNodeMinDts = getIncludeAppendNodeMinDts(context);
   const tsconfigWithOverrides = {
     ...tsconfig,
     compilerOptions: {
       ...tsconfig.compilerOptions,
       ...compilerOptionsOverridePreact,
       ...compilerOptionsOverrideLib
-    }
+    },
+    include: [...tsconfig.include, ...includeAppendNodeMinDts]
   };
   const stringified = JSON.stringify(tsconfigWithOverrides, void 0, context.newConfig.tabSize).replaceAll("__SRC_DIR__", normalizeDirectory(context.newConfig.srcDir)).replaceAll("__OUT_DIR__", normalizeDirectory(context.newConfig.tscOutDir));
   context.files.get(LAUNCHPAD_TSCONFIG_DEFAULT_JSON).contents = `${stringified}
@@ -8935,11 +9005,12 @@ function getCompilerOptionsOverridePreact(context) {
   return context.fileOperations.packageJson.containsDependency("preact") ? { jsxFactory: "h" } : {};
 }
 function getCompilerOptionsOverrideLib(context, target) {
-  if (context.newConfig.runtime.value === "web") {
-    return {};
-  } else {
-    return context.fileOperations.packageJson.containsDependency("@types/node") ? { lib: [target] } : {};
-  }
+  return context.newConfig.runtime.value === "web" ? {} : { lib: [target] };
+}
+function getIncludeAppendNodeMinDts(context) {
+  const isCli = context.newConfig.runtime.value !== "web";
+  const hasNodeTypes = context.fileOperations.packageJson.containsDependency("@types/node");
+  return isCli && !hasNodeTypes ? [`../${LAUNCHPAD_NODE_MIN_DTS}`] : [];
 }
 function normalizeDirectory(directory) {
   return JSON.stringify(`../${directory}`).replace(/^"/, "").replace(/"$/, "");
@@ -9740,16 +9811,17 @@ function migrate(options) {
   }
 }
 function prepareMigrationSteps(context) {
+  updatePackageJsonDependencies(context);
+  updatePackageJsonMetadata(context);
+  updatePackageJsonPackageManager(context);
   recreateLaunchpadDirectoryMakefiles(context);
+  recreateLaunchpadDirectoryNodeMinDts(context);
   recreateLaunchpadDirectorySettings(context);
   recreateLaunchpadDirectoryTsConfig(context);
   recreateLaunchpadDirectoryUpliftScripts(context);
   updateGitignoreBundlerOutput(context);
   updateGitignorePackageManager(context);
   updateGitignoreTscOutput(context);
-  updatePackageJsonDependencies(context);
-  updatePackageJsonMetadata(context);
-  updatePackageJsonPackageManager(context);
   updateVsCodeSettingsFormatOnSave(context);
   updateVsCodeSettingsFormatter(context);
   createTsconfigJson(context);

@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.0.6](https://github.com/david-04/launchpad/releases/tag/v1.0.6) (2024-03-31)
+
+- Auto-include a minimal `d.ts` file for `cli` projects that don't have Node typings installed (includes `console`, timer functions and `argv`, `env` and `exit` from `process`)
+- Exclude the `DOM` library from `cli` projects' `tsconfig.json`
+
 ## [1.0.5](https://github.com/david-04/launchpad/releases/tag/v1.0.5) (2024-03-26)
 
 - Updated default compiler settings in `tsconfig.default.json`
