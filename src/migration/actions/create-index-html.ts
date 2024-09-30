@@ -25,7 +25,7 @@ export function createIndexHtml(context: MigrationContext) {
 
 function getScriptTag(context: MigrationContext) {
     const path = getRelativeJsMainModulePath(context);
-    return "esm" === context.newConfig.moduleSystem
+    return "esm" === context.newConfig.moduleSystem && "disabled" === context.newConfig.bundler.value
         ? `<script src="${path}" charset="utf-8" type="module"></script>`
         : `<script src="${path}" charset="utf-8"></script>`;
 }
