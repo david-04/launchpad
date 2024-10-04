@@ -33,7 +33,7 @@
     "search.exclude": {
         "/test": true,
         "/build": true,
-        "/dist/*.*js*": true,
+        "/dist": true,
         "/src/resources/embedded*.ts": true
     }
 }

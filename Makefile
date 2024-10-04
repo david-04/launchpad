@@ -83,13 +83,15 @@ $(call lp.format.include, $(filter-out src/resources/embedded-%.ts, $(wildcard s
 #-----------------------------------------------------------------------------------------------------------------------
 
 release : clean.build-and-dist bundle
-	echo Copying README... && cp -f ./README.md ./dist/README.md
+	   echo Assembling package... \
+   && cp -f README.md dist/README.md \
+   && cp -f resources/package/package.json dist/package.json
 
 clean.build-and-dist :
-	echo Deleting pre-existing builds/bundles... && rm -rf build dist/launchpad.*js* dist/*.map dist/*.d.ts
+	echo Deleting pre-existing builds/bundles... && rm -rf build dist
 
 unrelease :
-	echo Reverting the dist directory... && rm -rf dist/* && git checkout -- dist src/resources/version-information.ts
+	echo Reverting the version number... && git checkout -- src/resources/version-information.ts resources/package/package.json
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Publish

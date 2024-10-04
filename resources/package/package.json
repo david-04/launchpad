@@ -15,8 +15,7 @@
     "name": "@david-04/launchpad",
     "repository": {
         "type": "git",
-        "url": "https://github.com/david-04/launchpad.git",
-        "directory": "dist"
+        "url": "https://github.com/david-04/launchpad.git"
     },
     "type": "commonjs",
     "version": "1.0.6"
