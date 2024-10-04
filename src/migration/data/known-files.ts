@@ -1,5 +1,7 @@
+export const BIOME_JSON = "biome.json";
 export const GITIGNORE = ".gitignore";
 export const LAUNCHPAD = ".launchpad";
+export const LAUNCHPAD_BIOME_DEFAULT_JSON = `${LAUNCHPAD}/biome.default.json`;
 export const LAUNCHPAD_MAKEFILE_DOCUMENTATION = `${LAUNCHPAD}/Makefile.documentation`;
 export const LAUNCHPAD_MAKEFILE_FOOTER = `${LAUNCHPAD}/Makefile.footer`;
 export const LAUNCHPAD_MAKEFILE_HEADER = `${LAUNCHPAD}/Makefile.header`;

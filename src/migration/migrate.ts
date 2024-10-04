@@ -15,6 +15,7 @@ import { createMakefile } from "./actions/create-makefile";
 import { createOutputDirectories } from "./actions/create-output-directories";
 import { createTsconfigJson } from "./actions/create-tsconfig-json";
 import { installOrUpgradeNpmPackages } from "./actions/install-or-upgrade-npm-packages";
+import { recreateLaunchpadDirectoryBiome } from "./actions/recreate-launchpad-directory-biome";
 import { recreateLaunchpadDirectoryMakefiles } from "./actions/recreate-launchpad-directory-makefiles";
 import { recreateLaunchpadDirectoryNodeMinDts } from "./actions/recreate-launchpad-directory-node-min-dts";
 import { recreateLaunchpadDirectorySettings } from "./actions/recreate-launchpad-directory-settings";
@@ -79,6 +80,7 @@ function prepareMigrationSteps(context: MigrationContext) {
     recreateLaunchpadDirectorySettings(context);
     recreateLaunchpadDirectoryTsConfig(context);
     recreateLaunchpadDirectoryUpliftScripts(context);
+    recreateLaunchpadDirectoryBiome(context);
 
     // .gitignore
     updateGitignoreBundlerOutput(context);

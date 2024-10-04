@@ -26,3 +26,6 @@ export class Version {
         return `${this.major}.${this.minor}.${this.patch}`;
     }
 }
+
+export const VERSION_0_0_0 = new Version(0, 0, 0);
+export const VERSION_1_0_7 = new Version(1, 0, 7); // NOSONAR
