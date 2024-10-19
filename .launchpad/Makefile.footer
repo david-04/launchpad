@@ -95,7 +95,7 @@ ifeq "$(call lp.bundle.is-enabled)" "" # .......................................
 .PHONY: lp.bundle
 
 lp.bundle : ;
-		$(error Bundling is disabled)
+	$(error Bundling is disabled)
 
 else ifeq "$(call lp.bundle.get-targets)" "" # .............................................. no bundles have been added
 
