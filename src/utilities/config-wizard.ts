@@ -9,6 +9,7 @@ import {
     DEFAULT_ARTIFACT,
     DEFAULT_BUILD_DIR,
     DEFAULT_BUNDLER,
+    DEFAULT_CREATE_DEBUG_MODULE,
     DEFAULT_CREATE_PROJECT_TEMPLATE,
     DEFAULT_DEPENDENCIES_CLI,
     DEFAULT_DEPENDENCIES_WEB,
@@ -22,6 +23,7 @@ import {
     DEFAULT_RUNTIME,
     DEFAULT_SRC_DIR,
     DEFAULT_TAB_SIZE,
+    DEFAULT_TEST_RUNNER,
     DEFAULT_UPLIFT_DEPENDENCIES,
 } from "../config/default-config-values";
 import { VERSION_NUMBER } from "../resources/version-information";
@@ -49,6 +51,8 @@ type Presets = {
     commandLineConfig: CommandLineConfig;
 };
 
+type VALUE_OR_DEFAULT_OR_UNDEFINED<T> = T | typeof DEFAULT_ENUM | undefined;
+
 //----------------------------------------------------------------------------------------------------------------------
 // Acquire the new configuration
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,6 +67,7 @@ export async function getNewConfig(
     const projectName = await getProjectName(presets, projectRoot);
     const artifact = await getArtifact(presets);
     const runtime = await getRuntime(presets);
+    const testRunner = await getTestRunner(presets);
     const moduleSystem = await getModuleSystem(presets);
     const installationMode = await getInstallationMode(presets);
     const bundler = await getBundler(presets, artifact);
@@ -78,7 +83,10 @@ export async function getNewConfig(
     const installDevDependencies = await getInstallDevDependencies(presets);
     const upliftDependencies = await getUpliftDependencies(presets);
     const createProjectTemplate = await getCreateProjectTemplate(presets);
-    const createDebugModule = true === commandLineConfig.createDebugModule ? true : false;
+    const createDebugModule =
+        "boolean" === typeof commandLineConfig.createDebugModule
+            ? commandLineConfig.createDebugModule
+            : DEFAULT_CREATE_DEBUG_MODULE;
     const createMakefile = getCreateMakefile(presets, createProjectTemplate);
     const vsCodeSettings = await getVsCodeSettings(presets);
     return {
@@ -99,6 +107,7 @@ export async function getNewConfig(
         runtime,
         srcDir,
         tabSize,
+        testRunner,
         tscOutDir,
         upliftDependencies,
         version,
@@ -114,7 +123,7 @@ export async function getNewConfig(
 async function getOldConfig(parsedConfig: ParsedConfig | undefined) {
     if (parsedConfig) {
         const { partial, errors } = parsedConfig;
-        if (errors && errors.length) {
+        if (errors?.length) {
             console.log(`Invalid configuration in ${parsedConfig.configFile}:`);
             errors.forEach(error => console.log(1 < errors.length ? `- ${error}` : error));
             console.log("");
@@ -145,7 +154,7 @@ async function getProjectName(presets: Presets, projectRoot: Path) {
     }
     return prompt<string>({
         type: "text",
-        initial: presets.oldConfig?.projectName?.trim() || defaultName,
+        initial: presets.oldConfig?.projectName?.trim() || defaultName, // NOSONAR
         message: "Project name",
         format: input => input.trim(),
         validate: toValidator(ConfigProperties.projectName.parseNewValue),
@@ -211,6 +220,30 @@ function runtimeCliToConfig(value: Exclude<CommandLineConfig["runtimeCli"], unde
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Select the tet runner
+//----------------------------------------------------------------------------------------------------------------------
+
+async function getTestRunner(presets: Presets) {
+    const FIELD = "testRunner";
+    type T = NewConfig[typeof FIELD];
+    const defaultValue: T = DEFAULT_TEST_RUNNER;
+    const preselectedValue: T = DEFAULT_TEST_RUNNER;
+    const presetValue: VALUE_OR_DEFAULT_OR_UNDEFINED<T> = presets.commandLineConfig[FIELD];
+    const oldValue = presets.oldConfig?.[FIELD];
+    if (presetValue) {
+        return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
+    } else {
+        const options: ChoiceOptions<T> = [
+            createDefaultOption(defaultValue.value),
+            ...ConfigProperties[FIELD].options.map(array => [...array, pinned(array[0])] as const),
+        ];
+        const choices = toChoice(options);
+        const initial = findPinnableMatchingChoice(options, oldValue, preselectedValue);
+        return prompt<T>({ type: "select", message: "Test runner", choices, initial });
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 // Select the module system
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -259,7 +292,7 @@ async function getBundler(presets: Presets, artifact: NewConfig["artifact"]) {
     type T = NewConfig[typeof FIELD];
     const defaultValue: T = DEFAULT_BUNDLER;
     const preselectedValue: T = "lib" === artifact ? DEFAULT_BUNDLER : pinned("disabled");
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const presetValue: VALUE_OR_DEFAULT_OR_UNDEFINED<T> = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
@@ -308,7 +341,7 @@ async function getFormatter(presets: Presets) {
     const FIELD = "formatter";
     type T = NewConfig[typeof FIELD];
     const defaultValue: T = DEFAULT_FORMATTER;
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const presetValue: VALUE_OR_DEFAULT_OR_UNDEFINED<T> = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
@@ -331,7 +364,7 @@ async function getTabSize(presets: Presets) {
     const FIELD = "tabSize";
     type T = NewConfig[typeof FIELD];
     const defaultValue: T = DEFAULT_TAB_SIZE;
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const presetValue: VALUE_OR_DEFAULT_OR_UNDEFINED<T> = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : presetValue;
@@ -360,7 +393,7 @@ async function getPackageManager(presets: Presets) {
     const FIELD = "packageManager";
     type T = NewConfig[typeof FIELD];
     const defaultValue: T = DEFAULT_PACKAGE_MANAGER;
-    const presetValue: T | typeof DEFAULT_ENUM | undefined = presets.commandLineConfig[FIELD];
+    const presetValue: VALUE_OR_DEFAULT_OR_UNDEFINED<T> = presets.commandLineConfig[FIELD];
     const oldValue = presets.oldConfig?.[FIELD];
     if (presetValue) {
         return DEFAULT_ENUM === presetValue ? defaultValue : forcePinned(presetValue);
@@ -413,7 +446,7 @@ async function getWebAppDir(presets: Presets, config: Pick<NewConfig, "runtime" 
         const previousValue = presets.oldConfig?.[FIELD];
         return prompt<string>({
             type: "text",
-            initial: previousValue?.trim() || defaultDirectory,
+            initial: previousValue?.trim() || defaultDirectory, // NOSONAR
             message: "Web app root directory",
             format: input => input.trim(),
             validate: toValidator(ConfigProperties[FIELD].parseNewValue),
@@ -470,7 +503,7 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
         const previousValue = presets.oldConfig?.[FIELD];
         return prompt<string>({
             type: "text",
-            initial: previousValue?.trim() || defaultDirectory,
+            initial: previousValue?.trim() || defaultDirectory, // NOSONAR
             message: "Bundler output directory",
             format: input => input.trim(),
             validate: toValidator(createDirectoryParser("Bundler output directory", "mandatory")),
@@ -484,7 +517,7 @@ async function getBundlerOutDir(presets: Presets, config: Pick<NewConfig, "runti
 
 async function getDependencies(presets: Presets, config: Pick<NewConfig, "runtime">) {
     const options = getDependencyOptions(presets, config);
-    if (0 == options.interactive.length) {
+    if (0 === options.interactive.length) {
         return options.autoSelected;
     } else {
         const selection = await promptMultiSelect({
@@ -492,7 +525,7 @@ async function getDependencies(presets: Presets, config: Pick<NewConfig, "runtim
             choices: options.interactive,
             message: "Install packages",
         });
-        return [...options.autoSelected, ...selection].sort();
+        return [...options.autoSelected, ...selection].sort((a, b) => a.localeCompare(b));
     }
 }
 
@@ -597,7 +630,7 @@ async function getVsCodeSettings(presets: Presets) {
     type CURRENT = (typeof allCurrentValues)[0];
     const defaultValue: Set<CURRENT> = new Set(allCurrentValues);
     if (undefined !== preselectedOption) {
-        return (DEFAULT_ENUM === preselectedOption ? defaultValue : preselectedOption) as Set<CURRENT>;
+        return DEFAULT_ENUM === preselectedOption ? defaultValue : preselectedOption;
     } else {
         const selection = await promptMultiSelect({
             type: "multiselect",

@@ -1,5 +1,5 @@
 import { NewConfig } from "../../config/config-objects";
-import { ASSETS } from "../../resources/embedded-assets";
+import { ASSETS } from "../../resources/embedded-assets.generated";
 import { LAUNCHPAD_BIOME_DEFAULT_JSON } from "../data/known-files";
 import type { MigrationContext } from "../data/migration-context";
 

@@ -1,4 +1,4 @@
-import { Version } from "../../config/version-number";
+import { VERSION_1_0_4, VERSION_1_0_5 } from "../../config/version-number";
 import type { MigrationContext } from "../data/migration-context";
 import type { PackageJson, PackageJsonOperations } from "../files/package-json";
 
@@ -42,9 +42,8 @@ function removeModuleProperty(context: MigrationContext, packageJson: PackageJso
     if ("module" !== packageJson.json["module"] && "commonjs" !== packageJson.json["module"]) {
         return;
     }
-    const maxVersion = new Version(1, 0, 4);
-    const currentVersion = context.oldConfig?.version ?? new Version(1, 0, 5);
-    if (currentVersion.compareTo(maxVersion) <= 0) {
+    const currentVersion = context.oldConfig?.version ?? VERSION_1_0_5;
+    if (currentVersion.compareTo(VERSION_1_0_4) <= 0) {
         const json = { ...packageJson.json };
         delete json["module"];
         packageJson.json = json;

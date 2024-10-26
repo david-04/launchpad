@@ -43,12 +43,13 @@ export class GitignoreOperations {
     //------------------------------------------------------------------------------------------------------------------
 
     private destructure(line: string) {
-        if (GitignoreOperations.CACHE.has(line)) {
-            return GitignoreOperations.CACHE.get(line)!;
+        const cachedLine = GitignoreOperations.CACHE.get(line);
+        if (cachedLine) {
+            return cachedLine;
         }
         const trimmed = line.trim();
         const isCommentedOut = trimmed.startsWith("#");
-        const isNegated = !!trimmed.match(/^#?\s*!/);
+        const isNegated = !!/^#?\s*!/.exec(trimmed);
         const glob = trimmed.replace(/^#?\s*!/, "");
         const pattern = `${isNegated ? "!" : ""}${glob}`;
         const normalized = `${isCommentedOut ? "# " : ""}${pattern}`;

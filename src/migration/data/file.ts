@@ -57,7 +57,7 @@ export class File {
         try {
             return undefined === this.newContents ? undefined : JSON.parse(this.newContents.replace(/(\n\s)+$/, ""));
         } catch (error) {
-            fail(`Failed to parse ${this.absolutePath.path}: ${error}`);
+            return fail(`Failed to parse ${this.absolutePath.path}: ${error}`);
         }
     }
 

@@ -1,4 +1,4 @@
-import { ASSETS } from "../../resources/embedded-assets";
+import { ASSETS } from "../../resources/embedded-assets.generated";
 import {
     LAUNCHPAD_MAKEFILE_DOCUMENTATION,
     LAUNCHPAD_MAKEFILE_FOOTER,

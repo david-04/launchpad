@@ -1,8 +1,4 @@
-include .launchpad/Makefile.header
-
-#-----------------------------------------------------------------------------------------------------------------------
-# .launchpad/Makefile.documentation
-#-----------------------------------------------------------------------------------------------------------------------
+include .launchpad/Makefile.header # .launchpad/Makefile.documentation
 
 autorun : tsc;
 
@@ -25,11 +21,11 @@ $(call lp.help.add-phony-target, version, ............ update version number and
 TSCONFIG_SRC_DIRECTORIES = resources/tsconfig/02-facets resources/tsconfig/03-compilations
 TSCONFIG_SRC_JSON        = $(wildcard $(foreach dir, $(TSCONFIG_SRC_DIRECTORIES), $(dir)/tsconfig*.json))
 TSCONFIG_SRC             = $(TSCONFIG_SRC_JSON)
-TSCONFIG_TARGETS         = src/resources/embedded-tsconfig.ts .launchpad/tsconfig.default.json
+EMBEDDED_TSCONFIG        = src/resources/embedded-tsconfig.generated.ts
 
-tsconfig : $(TSCONFIG_TARGETS);
+tsconfig : $(EMBEDDED_TSCONFIG);
 
-$(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tsconfig.mjs
+$(EMBEDDED_TSCONFIG) &: $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tsconfig.mjs
 	./bin/embed-tsconfig.sh
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -37,32 +33,114 @@ $(TSCONFIG_TARGETS) : $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tscon
 #-----------------------------------------------------------------------------------------------------------------------
 
 EMBEDDED_ASSETS_SOURCE = $(filter-out .launchpad/launchpad.cfg .launchpad/tsconfig.default.json, $(call lp.fn.wildcard, .launchpad resources/templates, *) biome.json)
-EMBEDDED_ASSETS_TARGET = src/resources/embedded-assets.ts
+EMBEDDED_ASSETS_TARGET = src/resources/embedded-assets.generated.ts
 
 embed : $(EMBEDDED_ASSETS_TARGET)
 
-$(EMBEDDED_ASSETS_TARGET) : $(EMBEDDED_ASSETS_SOURCE) bin/embed-assets.sh  bin/embed-assets.mjs $(TSCONFIG_TARGETS)
+$(EMBEDDED_ASSETS_TARGET) &: $(EMBEDDED_ASSETS_SOURCE) bin/embed-assets.sh  bin/embed-assets.mjs $(EMBEDDED_TSCONFIG)
 	./bin/embed-assets.sh $@ $(sort $(patsubst bin/%, ,$(EMBEDDED_ASSETS_SOURCE)))
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Update version information
 #-----------------------------------------------------------------------------------------------------------------------
 
-UPDATE_VERSION_INFO_SRC		= CHANGELOG.md bin/update-version-information.sh bin/get-copyright-years.sh bin/get-version-number.sh
-UPDATE_VERSION_INFO_TARGETS	= LICENSE package.json dist/package.json src/resources/version-information.ts
+UPDATE_VERSION_INFO_SRC=CHANGELOG.md bin/update-version-information.sh bin/get-copyright-years.sh bin/get-version-number.sh
+UPDATE_VERSION_INFO_TARGETS=LICENSE package.json dist/package.json src/resources/version-information.ts
 
 version : $(UPDATE_VERSION_INFO_TARGETS);
 
-$(UPDATE_VERSION_INFO_TARGETS) : $(UPDATE_VERSION_INFO_SRC)
+$(UPDATE_VERSION_INFO_TARGETS) &: $(UPDATE_VERSION_INFO_SRC)
 	./bin/update-version-information.sh
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Compile
 #-----------------------------------------------------------------------------------------------------------------------
 
-$(call lp.tsc.add-extra-prerequisites, $(TSCONFIG_TARGETS))
+$(call lp.tsc.add-extra-prerequisites, $(EMBEDDED_TSCONFIG))
 $(call lp.tsc.add-extra-prerequisites, $(EMBEDDED_ASSETS_TARGET))
 $(call lp.tsc.add-extra-prerequisites, $(UPDATE_VERSION_INFO_TARGETS))
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Test
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.test.disable                       )
+# $(call lp.test.set-root-directories, build   )
+# $(call lp.test.set-subdirectory    ,         )
+# $(call lp.test.set-file-extension  , .test.ts)
+
+$(call lp.help.add-phony-target, test.all, ........... generate and compile all variants of projects)
+$(call lp.help.add-phony-target, test.interactive, ... generate and compile a project interactively)
+$(call lp.help.add-phony-target, test.unit, .......... run the unit tests)
+
+test :
+	echo "  Targets: test.init | test.interactive | test.unit"
+
+test.unit : lp.test;
+
+RUN_TEST=\
+	   echo "" \
+   && echo "------------------------------------------------------------------------------------------------------------------------" \
+	&& echo Running test for $(strip $(1)) \
+	&& echo "------------------------------------------------------------------------------------------------------------------------" \
+	&& echo "" \
+	&& rm -rf "test/$(strip $(1))" \
+	&& mkdir -p "test/$(strip $(1))" \
+	&& cd "test/$(strip $(1))" \
+	&& node "../../dist/launchpad.cjs" init $(2)
+
+DEFAULT_OPTIONS  = --auto-selected-dependencies= \
+                   --bundler-out-dir=default \
+                   --create-debug-module=true \
+                   --create-project-template=true \
+                   --create-makefile=true \
+                   --formatter=prettier \
+                   --install-dev-dependencies=false \
+                   --installation-mode=global \
+                   --optional-dependencies= \
+                   --package-manager=npm \
+                   --preselected-dependencies= \
+                   --project-name=default \
+                   --src-dir=default \
+                   --tab-size=4 \
+                   --test-runner=disabled \
+                   --tsc-out-dir=default \
+                   --uplift-dependencies=true \
+                   --vscode-settings=default \
+                   --web-app-dir=default
+CLI              = --runtime=cli
+WEB              = --runtime=web
+APP              = --artifact=app
+LIB              = --artifact=lib
+ESM              = --module-system=esm
+CJS              = --module-system=cjs
+BUNDLER_DISABLED = --bundler=disabled --dts-bundler=disabled
+BUNDLER_APP      = --bundler=default --dts-bundler=disabled
+BUNDLER_LIB      = --bundler=default --dts-bundler=default
+
+AND_MAKE=&& echo "" && $(MAKE)
+
+test.init : $(LP_PREREQUISITE_BUNDLE)
+	echo "Running tests..."
+	+ $(call RUN_TEST, cli-app-cjs         , $(DEFAULT_OPTIONS) $(CLI) $(APP) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, cli-app-cjs-bundled , $(DEFAULT_OPTIONS) $(CLI) $(APP) $(CJS) $(BUNDLER_APP)      $(AND_MAKE))
+	+ $(call RUN_TEST, cli-app-esm         , $(DEFAULT_OPTIONS) $(CLI) $(APP) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, cli-app-esm-bundled , $(DEFAULT_OPTIONS) $(CLI) $(APP) $(ESM) $(BUNDLER_APP)      $(AND_MAKE))
+	+ $(call RUN_TEST, cli-lib-cjs         , $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, cli-lib-cjs-bundled , $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(CJS) $(BUNDLER_LIB)      $(AND_MAKE))
+	+ $(call RUN_TEST, cli-lib-esm         , $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, cli-lib-esm-bundled , $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(ESM) $(BUNDLER_LIB)      $(AND_MAKE))
+	+ $(call RUN_TEST, web-app-cjs         , $(DEFAULT_OPTIONS) $(WEB) $(APP) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, web-app-cjs-bundled , $(DEFAULT_OPTIONS) $(WEB) $(APP) $(CJS) $(BUNDLER_APP)      $(AND_MAKE))
+	+ $(call RUN_TEST, web-app-esm         , $(DEFAULT_OPTIONS) $(WEB) $(APP) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, web-app-esm-bundled , $(DEFAULT_OPTIONS) $(WEB) $(APP) $(ESM) $(BUNDLER_APP)      $(AND_MAKE))
+	+ $(call RUN_TEST, web-lib-cjs         , $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, web-lib-cjs-bundled , $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(CJS) $(BUNDLER_LIB)      $(AND_MAKE))
+	+ $(call RUN_TEST, web-lib-esm         , $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE))
+	+ $(call RUN_TEST, web-lib-esm-bundled , $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(ESM) $(BUNDLER_LIB)      $(AND_MAKE))
+
+test.interactive : $(LP_PREREQUISITE_BUNDLE)
+	+ $(call RUN_TEST, interactive         ,)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Bundle
@@ -105,93 +183,6 @@ publish:
 #-----------------------------------------------------------------------------------------------------------------------
 
 $(call lp.clean.tsc-output)
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Test
-#-----------------------------------------------------------------------------------------------------------------------
-
-TEST_DIRECTORY=./test
-TEST_PATH_TO_DIST_DIRECTORY=../dist
-
-CREATE_AND_GO_TO_TEST_DIRECTORY=$(if $(wildcard $(TEST_DIRECTORY)/$(strip $(1))), \
-                                    rm -rf "$(TEST_DIRECTORY)/$(strip $(1))", \
-                                    echo -n "" \
-                                ) \
-                             && mkdir -p "$(TEST_DIRECTORY)/$(strip $(1))" \
-	                         && cd "$(TEST_DIRECTORY)/$(strip $(1))"
-
-ADD_TEST=$(eval $(call TEST_RULE,$(strip $(1)),$(strip $(2))))
-
-define TEST_RULE
-.PHONY: test.$(strip $(1))
-$(eval TEST_TARGETS+= test.$(strip $(1)))
-test.$(strip $(1)) : $(LP_PREREQUISITE_BUNDLE)
-	   echo "------------------------------------------------------------------------------------------------------------------------" \
-	&& echo Running test for $(strip $(1)) \
-	&& echo "------------------------------------------------------------------------------------------------------------------------" \
-	&& echo "" \
-	&& $(call CREATE_AND_GO_TO_TEST_DIRECTORY, $(1)) \
-	&& node "../$(TEST_PATH_TO_DIST_DIRECTORY)/launchpad.cjs" $(2)
-endef
-
-DEFAULT_OPTIONS  = --auto-selected-dependencies= \
-                   --bundler-out-dir=default \
-                   --create-debug-module=true \
-                   --create-project-template=true \
-                   --create-makefile=true \
-                   --formatter=prettier \
-                   --install-dev-dependencies=false \
-                   --installation-mode=global \
-                   --optional-dependencies= \
-                   --package-manager=npm \
-                   --preselected-dependencies= \
-                   --project-name=default \
-                   --src-dir=default \
-                   --tab-size=4 \
-                   --tsc-out-dir=default \
-                   --uplift-dependencies=true \
-                   --vscode-settings=default \
-                   --web-app-dir=default
-CLI              = --runtime=cli
-WEB              = --runtime=web
-APP              = --artifact=app
-LIB              = --artifact=lib
-ESM              = --module-system=esm
-CJS              = --module-system=cjs
-BUNDLER_DISABLED = --bundler=disabled --dts-bundler=disabled
-BUNDLER_APP      = --bundler=default --dts-bundler=disabled
-BUNDLER_LIB      = --bundler=default --dts-bundler=default
-
-AND_MAKE        = && echo "" && make-plain --silent && echo ""
-
-$(call ADD_TEST, cli-app-cjs         , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, cli-app-cjs-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(CJS) $(BUNDLER_APP)      $(AND_MAKE) )
-$(call ADD_TEST, cli-app-esm         , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, cli-app-esm-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(APP) $(ESM) $(BUNDLER_APP)      $(AND_MAKE) )
-$(call ADD_TEST, cli-lib-cjs         , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, cli-lib-cjs-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(CJS) $(BUNDLER_LIB)      $(AND_MAKE) )
-$(call ADD_TEST, cli-lib-esm         , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, cli-lib-esm-bundled , init $(DEFAULT_OPTIONS) $(CLI) $(LIB) $(ESM) $(BUNDLER_LIB)      $(AND_MAKE) )
-$(call ADD_TEST, web-app-cjs         , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, web-app-cjs-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(CJS) $(BUNDLER_APP)      $(AND_MAKE) )
-$(call ADD_TEST, web-app-esm         , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, web-app-esm-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(APP) $(ESM) $(BUNDLER_APP)      $(AND_MAKE) )
-$(call ADD_TEST, web-lib-cjs         , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(CJS) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, web-lib-cjs-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(CJS) $(BUNDLER_LIB)      $(AND_MAKE) )
-$(call ADD_TEST, web-lib-esm         , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(ESM) $(BUNDLER_DISABLED) $(AND_MAKE) )
-$(call ADD_TEST, web-lib-esm-bundled , init $(DEFAULT_OPTIONS) $(WEB) $(LIB) $(ESM) $(BUNDLER_LIB)      $(AND_MAKE) )
-$(call ADD_TEST, interactive         , init                                                                         )
-
-.PHONY: test test.all
-
-test :;
-	$(info $()  test.all)
-	$(info $()  test.interactive)
-	$(info $()  test.[cli|web]-[app|lib]-[cjs|esm])
-	$(info $()  test.[cli|web]-[app|lib]-[cjs|esm]-bundled)
-
-test.all : $(filter-out test.interactive,$(TEST_TARGETS))
-	echo ✅ All tests have passed
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Built-in default targets

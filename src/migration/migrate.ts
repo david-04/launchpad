@@ -19,6 +19,7 @@ import { recreateLaunchpadDirectoryBiome } from "./actions/recreate-launchpad-di
 import { recreateLaunchpadDirectoryMakefiles } from "./actions/recreate-launchpad-directory-makefiles";
 import { recreateLaunchpadDirectoryNodeMinDts } from "./actions/recreate-launchpad-directory-node-min-dts";
 import { recreateLaunchpadDirectorySettings } from "./actions/recreate-launchpad-directory-settings";
+import { recreateLaunchpadDirectoryTestScripts } from "./actions/recreate-launchpad-directory-test-scripts";
 import { recreateLaunchpadDirectoryTsConfig } from "./actions/recreate-launchpad-directory-tsconfig";
 import { recreateLaunchpadDirectoryUpliftScripts } from "./actions/recreate-launchpad-directory-uplift-scripts";
 import { updateGitignoreBundlerOutput } from "./actions/update-gitignore-bundler-output";
@@ -81,6 +82,8 @@ function prepareMigrationSteps(context: MigrationContext) {
     recreateLaunchpadDirectoryTsConfig(context);
     recreateLaunchpadDirectoryUpliftScripts(context);
     recreateLaunchpadDirectoryBiome(context);
+    recreateLaunchpadDirectoryTestScripts(context);
+    recreateLaunchpadDirectoryTestScripts(context);
 
     // .gitignore
     updateGitignoreBundlerOutput(context);

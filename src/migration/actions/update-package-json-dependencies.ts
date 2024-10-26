@@ -42,7 +42,9 @@ function addAndRemoveDevDependencies<const T extends string>(
 ) {
     const npmPackagesToRemove = new Set<string>();
     for (const key in map) {
-        map[key]?.forEach(npmPackage => npmPackagesToRemove.add(npmPackage));
+        if (Array.isArray(map[key])) {
+            map[key].forEach(npmPackage => npmPackagesToRemove.add(npmPackage));
+        }
     }
     if (installDevDependencies) {
         map[configuredValue]?.forEach(npmPackage => {

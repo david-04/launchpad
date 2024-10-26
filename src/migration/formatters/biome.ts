@@ -1,5 +1,5 @@
 import { Version, VERSION_0_0_0, VERSION_1_0_7 } from "../../config/version-number";
-import { ASSETS } from "../../resources/embedded-assets";
+import { ASSETS } from "../../resources/embedded-assets.generated";
 import { File } from "../data/file";
 import { BIOME_JSON } from "../data/known-files";
 import { MigrationContext } from "../data/migration-context";

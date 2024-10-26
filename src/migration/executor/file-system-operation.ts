@@ -5,12 +5,15 @@ import { Directory } from "../data/directory";
 import { File } from "../data/file";
 import { type FileOrDirectory } from "../data/file-or-directory-cache";
 
+const EXECUTE_PERMISSION = 0o777;
+const READ_WRITE_PERMISSION = 0o666;
+
 //----------------------------------------------------------------------------------------------------------------------
 // A class to create/update/rename/delete files and directories with rollback support
 //----------------------------------------------------------------------------------------------------------------------
 
 export class FileSystemOperation {
-    private type;
+    private readonly type;
     private hasCreatedNew = false;
     private hasRenamedCurrentToOld = false;
     private hasRenamedNewToCurrent = false;
@@ -51,7 +54,7 @@ export class FileSystemOperation {
                 }
                 if (this.fileOrDirectory instanceof File) {
                     const contents = this.fileOrDirectory.contents ?? "";
-                    const mode = this.fileOrDirectory.shouldBeExecutable() ? 0o777 : 0o666;
+                    const mode = this.fileOrDirectory.shouldBeExecutable() ? EXECUTE_PERMISSION : READ_WRITE_PERMISSION;
                     writeFileSync(this.newPath.path, contents, { encoding: "utf-8", flag: "wx", mode });
                 }
                 log.push(`Created ${this.type} ${this.newPath.path}`);
@@ -86,7 +89,7 @@ export class FileSystemOperation {
         try {
             if (this.hasCreatedNew) {
                 renameSync(this.newPath.path, this.path.path);
-                this.hasRenamedNewToCurrent;
+                this.hasRenamedNewToCurrent = true;
                 log.push(`Renamed ${this.type} ${this.newPath.path} to ${this.path.path}`);
             }
         } catch (error) {
@@ -135,7 +138,7 @@ export class FileSystemOperation {
                 throw new Error(`Failed to rename ${this.type} ${this.oldPath.path} to ${this.path.path}`);
             }
             log.push(`Renamed ${this.type} ${this.oldPath.path} to ${this.path.path}`);
-            this.hasRenamedCurrentToOld;
+            this.hasRenamedCurrentToOld = true;
         }
     }
 

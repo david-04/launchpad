@@ -6,6 +6,9 @@ import {
 } from "./config-descriptor-factories";
 import { parseStringArray } from "./config-parsers";
 
+const TRUE_OR_FALSE = "[true | false]";
+const DEPENDENCIES = "<dep1>, <dep2>, ...";
+
 export const COMMAND_LINE_OPTIONS = {
     //
     //------------------------------------------------------------------------------------------------------------------
@@ -24,7 +27,7 @@ export const COMMAND_LINE_OPTIONS = {
         name: "install development tools toggle",
         commandLine: {
             option: "--install-dev-dependencies",
-            placeholder: "[true | false]",
+            placeholder: TRUE_OR_FALSE,
             description: "Install development tools (compiler, bundler, formatter, ...) locally",
         },
     }),
@@ -33,7 +36,7 @@ export const COMMAND_LINE_OPTIONS = {
         name: "auto-selected NPM packages",
         commandLine: {
             option: "--auto-selected-dependencies",
-            placeholder: "<dep1>, <dep2>, ...",
+            placeholder: DEPENDENCIES,
             description: "NPM packages to install without without prompting",
         },
         parseOldValue: parseStringArray,
@@ -44,7 +47,7 @@ export const COMMAND_LINE_OPTIONS = {
         name: "pre-selected NPM packages",
         commandLine: {
             option: "--preselected-dependencies",
-            placeholder: "<dep1>, <dep2>, ...",
+            placeholder: DEPENDENCIES,
             description: "Pre-selected NPM packages offered for installation",
         },
         parseOldValue: parseStringArray,
@@ -55,7 +58,7 @@ export const COMMAND_LINE_OPTIONS = {
         name: "optional NPM packages",
         commandLine: {
             option: "--optional-dependencies",
-            placeholder: "<dep1>, <dep2>, ...",
+            placeholder: DEPENDENCIES,
             description: "Optional (non-pre-selected) NPM packages offered for installation",
         },
         parseOldValue: parseStringArray,
@@ -105,7 +108,7 @@ export const COMMAND_LINE_OPTIONS = {
         name: "project template toggle",
         commandLine: {
             option: "--create-project-template",
-            placeholder: "[true | false]",
+            placeholder: TRUE_OR_FALSE,
             description: "Create a basic project template (main module, Makefile, ...)",
         },
     }),
@@ -114,7 +117,7 @@ export const COMMAND_LINE_OPTIONS = {
         name: "debug module toggle",
         commandLine: {
             option: "--create-debug-module",
-            placeholder: "[true | false]",
+            placeholder: TRUE_OR_FALSE,
             description: "Create a debug.ts file",
         },
     }),
@@ -123,7 +126,7 @@ export const COMMAND_LINE_OPTIONS = {
         name: "Makefile toggle",
         commandLine: {
             option: "--create-makefile",
-            placeholder: "[true | false]",
+            placeholder: TRUE_OR_FALSE,
             description: "Create a template Makefile",
         },
     }),

@@ -1,4 +1,4 @@
-import { TSCONFIG_JSON_TEMPLATES } from "../../resources/embedded-tsconfig";
+import { TSCONFIG_JSON_TEMPLATES } from "../../resources/embedded-tsconfig.generated";
 import { LAUNCHPAD_NODE_MIN_DTS, LAUNCHPAD_TSCONFIG_DEFAULT_JSON } from "../data/known-files";
 import type { MigrationContext } from "../data/migration-context";
 

@@ -46,10 +46,8 @@ export class FileOrDirectoryCache<T extends FileOrDirectory> {
                 if (fileOrDirectory.mustCreateOrOverwrite() || fileOrDirectory.mustDelete()) {
                     fileSystemOperations.push(new FileSystemOperation(fileOrDirectory));
                 }
-            } else {
-                if (fileOrDirectory.mustCreate() || fileOrDirectory.mustDelete()) {
-                    fileSystemOperations.push(new FileSystemOperation(fileOrDirectory));
-                }
+            } else if (fileOrDirectory.mustCreate() || fileOrDirectory.mustDelete()) {
+                fileSystemOperations.push(new FileSystemOperation(fileOrDirectory));
             }
         }
         return fileSystemOperations;

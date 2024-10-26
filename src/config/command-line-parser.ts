@@ -19,9 +19,9 @@ function decomposeCommandLineParameter(argument: string) {
     const key = argument.substring(0, index).trim();
     const value = argument.substring(index + 1).trim();
     if (!key) {
-        fail(`Invalid command line option "${argument}". Try launchpad --help for more information.`);
+        return fail(`Invalid command line option "${argument}". Try launchpad --help for more information.`);
     } else if (!ConfigProperties.arrays.currentAndInitOnly.some(property => property.commandLineInfo?.option === key)) {
-        fail(`Invalid command line option "${key}". Try launchpad --help for more information.`);
+        return fail(`Invalid command line option "${key}". Try launchpad --help for more information.`);
     } else {
         return { key, value };
     }

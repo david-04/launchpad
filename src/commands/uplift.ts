@@ -18,11 +18,11 @@ export async function uplift(projectRoot: Path, configFile: Path, options: Reado
         const lines = [`Failed to load config file ${configFile.path}`];
         if (parsedConfig.errors) {
             if (1 === parsedConfig.errors.length) {
-                parsedConfig.errors.map(line => lines.push(line));
+                parsedConfig.errors.forEach(line => lines.push(line));
                 lines.push('Correct the error manually or run "launchpad init" to reconfigure/reset the project');
             } else {
                 lines.push("");
-                parsedConfig.errors.map(line => lines.push(`- ${line}`));
+                parsedConfig.errors.forEach(line => lines.push(`- ${line}`));
                 lines.push("");
                 lines.push('Correct the errors manually or run "launchpad init" to reconfigure/reset the project');
             }

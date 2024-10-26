@@ -41,7 +41,7 @@ endef
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-lp.fn.assert.param-not-empty    =$(if $(strip $(2)),,$(error Missing parameter in $(if $(strip $(1)), call to $(strip $(1), function call))))
+lp.fn.assert.param-not-empty    =$(if $(strip $(2)),,$(error Missing parameter in $(if $(strip $(1)),call to $(strip $(1)),function call)))
 
 lp.fn.map.empty-to              =$(if $(strip $(1)),$(subst __LP_LINE_BREAK,$(__LP_LINE_BREAK),$(strip $(1))),$(strip $(2)))
 
@@ -145,9 +145,11 @@ $(call lp.fn.config.validate-enum, LP_CFG_MODULE_SYSTEM)
 LP_CFG_BUNDLER_ENUMS="disabled" or "esbuild"
 $(call lp.fn.config.validate-enum, LP_CFG_BUNDLER)
 
-__LP_DEFAULT_DTS_BUNDLER=dts-bundle-generator
-LP_CFG_DTS_BUNDLER_ENUMS="disabled" or "$(__LP_DEFAULT_DTS_BUNDLER)"
+LP_CFG_DTS_BUNDLER_ENUMS="disabled" or "dts-bundle-generator"
 $(call lp.fn.config.validate-enum, LP_CFG_DTS_BUNDLER)
+
+LP_CFG_TEST_RUNNER_ENUMS="disabled" or "node"
+$(call lp.fn.config.validate-enum, LP_CFG_TEST_RUNNER)
 
 LP_CFG_FORMATTER_ENUMS="disabled", "biome" or "prettier"
 $(call lp.fn.config.validate-enum, LP_CFG_FORMATTER)
@@ -320,6 +322,75 @@ LP_PREREQUISITE_TSC                     =$$(call lp.tsc.get-targets)
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
+#  ######## ########  ######  ########
+#     ##    ##       ##    ##    ##
+#     ##    ##       ##          ##
+#     ##    ######    ######     ##
+#     ##    ##             ##    ##
+#     ##    ##       ##    ##    ##
+#     ##    ########  ######     ##
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+__LP_TEST_ROOT_DIRECTORIES             =$(LP_CFG_TSC_OUT_DIR)
+__LP_TEST_SUBDIRECTORY                 =
+__LP_TEST_FILE_EXTENSION               =.test.js
+__LP_TEST_TIMESTAMP_FILE               =$(if $(LP_CFG_TSC_OUT_DIR),$(LP_CFG_TSC_OUT_DIR)/.timestamp.test,$(__LP_HOME_DIR)/.timestamp.test.tmp)
+
+__LP_TEST_ENABLED                      =$(if $(LP_CFG_TEST_RUNNER),true)
+__LP_TEST_DEFAULT_TARGETS              =$(__LP_TEST_TIMESTAMP_FILE)
+__LP_TEST_EFFECTIVE_TARGETS            =$(__LP_TEST_DEFAULT_TARGETS)
+__LP_TEST_DEFAULT_PREREQUISITES        =$(call lp.tsc.get-targets) $(__LP_MAKEFILES_AND_SETTINGS) $(__LP_TSC_TIMESTAMP_FILE)
+__LP_TEST_EFFECTIVE_PREREQUISITES      =$(__LP_TEST_DEFAULT_PREREQUISITES)
+__LP_TEST_DEFAULT_BEFORE_HOOKS         =
+__LP_TEST_EFFECTIVE_BEFORE_HOOKS       =$(__LP_TEST_DEFAULT_BEFORE_HOOKS)
+__LP_TEST_DEFAULT_AFTER_HOOKS          =
+__LP_TEST_EFFECTIVE_AFTER_HOOKS        =$(__LP_TEST_DEFAULT_AFTER_HOOKS)
+
+__LP_TEST_DEFAULT_COMMAND_             =echo Tests are disabled
+__LP_TEST_DEFAULT_COMMAND_node         =. .launchpad/test $(foreach ROOT_DIRECTORY, $(__LP_TEST_ROOT_DIRECTORIES), '$(ROOT_DIRECTORY)/**$(if $(__LP_TEST_SUBDIRECTORY),/$(strip $(__LP_TEST_SUBDIRECTORY)))/*$(strip $(__LP_TEST_FILE_EXTENSION))')
+__LP_TEST_DEFAULT_COMMAND              =$(__LP_TEST_DEFAULT_COMMAND_$(LP_CFG_TEST_RUNNER))
+__LP_TEST_EFFECTIVE_COMMAND            =$(__LP_TEST_DEFAULT_COMMAND)
+
+lp.test.disable                        =$(call lp.fn.var.erase, __LP_TEST_ENABLED)
+
+lp.test.add-extra-prerequisites        =$(call lp.fn.var.append, __LP_TEST_EFFECTIVE_PREREQUISITES, $(1))
+lp.test.overwrite-prerequisites        =$(call lp.fn.var.assign, __LP_TEST_EFFECTIVE_PREREQUISITES, $(1))
+lp.test.add-before-hook                =$(call lp.fn.var.append-with-separator, __LP_TEST_EFFECTIVE_BEFORE_HOOKS, &&, $(1))
+lp.test.overwrite-before-hooks         =$(call lp.fn.var.assign, __LP_TEST_EFFECTIVE_BEFORE_HOOKS, $(1))
+lp.test.add-after-hook                 =$(call lp.fn.var.append-with-separator, __LP_TEST_EFFECTIVE_AFTER_HOOKS, &&, $(1))
+lp.test.overwrite-after-hooks          =$(call lp.fn.var.assign, __LP_TEST_EFFECTIVE_AFTER_HOOKS, $(1))
+lp.test.overwrite-command              =$(call lp.fn.assert.param-not-empty, lp.test.overwrite-command, $(1)) \
+                                        $(call lp.fn.var.assign, __LP_TEST_EFFECTIVE_COMMAND, $(1))
+
+lp.test.set-root-directories           =$(call lp.fn.assert.param-not-empty, set-root-directories, $(1)) \
+                                        $(call lp.fn.var.assign, __LP_TEST_ROOT_DIRECTORIES, $(1))
+lp.test.set-subdirectory               =$(call lp.fn.var.assign, __LP_TEST_SUBDIRECTORY, $(if $(value 1), $(1)))
+lp.test.set-file-extension             =$(call lp.fn.assert.param-not-empty, set-file-extension, $(1)) \
+                                        $(call lp.fn.var.assign, __LP_TEST_FILE_EXTENSION, $(1))
+
+lp.test.get-phony-targets              =test
+lp.test.get-name                       =Test
+lp.test.get-description                =run unit tests
+lp.test.is-enabled                     =$(strip $(__LP_TEST_ENABLED))
+lp.test.get-default-prerequisites      =$(__LP_TEST_DEFAULT_PREREQUISITES)
+lp.test.get-prerequisites              =$(__LP_TEST_EFFECTIVE_PREREQUISITES)
+lp.test.get-default-targets            =$(__LP_TEST_DEFAULT_TARGETS)
+lp.test.get-targets                    =$(__LP_TEST_EFFECTIVE_TARGETS)
+lp.test.get-default-before-hook        =$(strip $(__LP_TEST_DEFAULT_BEFORE_HOOKS))
+lp.test.get-before-hooks               =$(strip $(__LP_TEST_EFFECTIVE_BEFORE_HOOKS))
+lp.test.get-default-after-hook         =$(strip $(__LP_TEST_DEFAULT_AFTER_HOOKS))
+lp.test.get-after-hooks                =$(strip $(__LP_TEST_EFFECTIVE_AFTER_HOOKS))
+lp.test.get-default-command            =$(if $(value 1), echo $(1) && )$(strip $(__LP_TEST_DEFAULT_COMMAND))
+lp.test.get-effective-command          =$(strip $(__LP_TEST_EFFECTIVE_COMMAND))
+lp.test.get-effective-command          =$(if $(strip $(__LP_TEST_EFFECTIVE_COMMAND)),$(strip $(__LP_TEST_EFFECTIVE_COMMAND)) &&) \
+                                        touch "$(__LP_TEST_TIMESTAMP_FILE)"
+lp.test.get-command-with-hooks         =$(call lp.fn.get-command, test, $(if $(value 1), $(1)))
+
+LP_PREREQUISITE_TEST                   =$$(call lp.test.get-targets)
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
 #   ########  ##     ## ##    ## ########  ##       ########
 #   ##     ## ##     ## ###   ## ##     ## ##       ##
 #   ##     ## ##     ## ####  ## ##     ## ##       ##
@@ -482,6 +553,11 @@ __LP_FORMAT_EXTENSIONS_biome            =ts tsx js jsx json # html htm css less 
 __LP_FORMAT_EXTENSIONS                  =$(__LP_FORMAT_EXTENSIONS_$(LP_CFG_FORMATTER))
 
 __LP_FORMAT_ENABLED                     =$(if $(LP_CFG_FORMATTER),true)
+__LP_FORMAT_DEFAULT_PREREQUISITES       =$(call lp.tsc.get-targets) $(__LP_MAKEFILES_AND_SETTINGS)
+__LP_FORMAT_EFFECTIVE_PREREQUISITES     =$(call lp.test.get-default-prerequisites)
+
+
+
 __LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
 __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
 __LP_FORMAT_DEFAULT_AFTER_HOOKS         =
@@ -531,6 +607,7 @@ lp.format.get-effective-command         =$(strip $(__LP_FORMAT_EFFECTIVE_COMMAND
 lp.format.get-command-with-hooks        =$(call lp.fn.get-command, format, $(if $(value 1), $(1)))
 lp.format.get-default-paths             =$(sort $(strip $(__LP_FORMAT_DEFAULT_PATHS)))
 lp.format.get-paths                     =$(wildcard $(sort $(strip $(__LP_FORMAT_EFFECTIVE_PATHS))))
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 #

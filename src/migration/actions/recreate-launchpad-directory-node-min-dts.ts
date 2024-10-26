@@ -1,4 +1,4 @@
-import { ASSETS } from "../../resources/embedded-assets";
+import { ASSETS } from "../../resources/embedded-assets.generated";
 import { LAUNCHPAD_NODE_MIN_DTS } from "../data/known-files";
 import type { MigrationContext } from "../data/migration-context";
 

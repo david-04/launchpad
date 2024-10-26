@@ -10,6 +10,11 @@ import {
 } from "./config-descriptor-factories";
 import { createDirectoryParser, parseProjectName } from "./config-parsers";
 
+const WEB_APP_DIRECTORY = "web app directory";
+const BUNDLER_OUTPUT_DIRECTORY = "bundler output directory";
+const SOURCE_DIRECTORY = "source directory";
+const TYPESCRIPT_OUTPUT_DIRECTORY = "TypeScript output directory";
+
 const CURRENT_CONFIG_PROPERTIES = {
     //
     //------------------------------------------------------------------------------------------------------------------
@@ -84,7 +89,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     //------------------------------------------------------------------------------------------------------------------
 
     bundlerOutDir: createStringProperty({
-        name: "bundler output directory",
+        name: BUNDLER_OUTPUT_DIRECTORY,
         configFile: {
             currentKey: "LP_CFG_BUNDLER_OUT_DIR",
             newConfigObjectName: "bundlerOutDir",
@@ -93,10 +98,10 @@ const CURRENT_CONFIG_PROPERTIES = {
         commandLine: {
             option: "--bundler-out-dir",
             placeholder: "<DIR>",
-            description: "Bundler output directory",
+            description: BUNDLER_OUTPUT_DIRECTORY,
         },
-        parseOldValue: createDirectoryParser("bundler output directory", "optional"),
-        parseNewValue: createDirectoryParser("bundler output directory", "optional"),
+        parseOldValue: createDirectoryParser(BUNDLER_OUTPUT_DIRECTORY, "optional"),
+        parseNewValue: createDirectoryParser(BUNDLER_OUTPUT_DIRECTORY, "optional"),
     }),
 
     //------------------------------------------------------------------------------------------------------------------
@@ -246,7 +251,7 @@ const CURRENT_CONFIG_PROPERTIES = {
         currentValues: [
             ["npm", undefined],
             ["pnpm", "use globally pre-installed pnpm"],
-            ["yarn", "localyl installed Yarn without Plug'n'Play (requires a globally pre-installed Yarn Classic)"],
+            ["yarn", "locally installed Yarn without Plug'n'Play (requires a globally pre-installed Yarn Classic)"],
         ] as const,
         obsoleteValues: [] as const,
     }),
@@ -317,7 +322,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     //------------------------------------------------------------------------------------------------------------------
 
     srcDir: createStringProperty({
-        name: "source directory",
+        name: SOURCE_DIRECTORY,
         configFile: {
             currentKey: "LP_CFG_SRC_DIR",
             newConfigObjectName: "srcDir",
@@ -327,8 +332,8 @@ const CURRENT_CONFIG_PROPERTIES = {
             placeholder: "<DIR>",
             description: "Relative path to the source directory",
         },
-        parseOldValue: createDirectoryParser("source directory", "mandatory"),
-        parseNewValue: createDirectoryParser("source directory", "mandatory"),
+        parseOldValue: createDirectoryParser(SOURCE_DIRECTORY, "mandatory"),
+        parseNewValue: createDirectoryParser(SOURCE_DIRECTORY, "mandatory"),
     }),
 
     //------------------------------------------------------------------------------------------------------------------
@@ -360,6 +365,35 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     //------------------------------------------------------------------------------------------------------------------
     //
+    //   ######## ########  ######  ########       ########  ##     ## ##    ## ##    ## ######## ########
+    //      ##    ##       ##    ##    ##          ##     ## ##     ## ###   ## ###   ## ##       ##     ##
+    //      ##    ##       ##          ##          ##     ## ##     ## ####  ## ####  ## ##       ##     ##
+    //      ##    ######    ######     ##          ########  ##     ## ## ## ## ## ## ## ######   ########
+    //      ##    ##             ##    ##          ##   ##   ##     ## ##  #### ##  #### ##       ##   ##
+    //      ##    ##       ##    ##    ##          ##    ##  ##     ## ##   ### ##   ### ##       ##    ##
+    //      ##    ########  ######     ##          ##     ##  #######  ##    ## ##    ## ######## ##     ##
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    testRunner: createPinnableEnumProperty({
+        name: "test runner",
+        configFile: {
+            currentKey: "LP_CFG_TEST_RUNNER",
+            newConfigObjectName: "testRunner",
+        },
+        commandLine: {
+            option: "--test-runner",
+            description: "Test runner",
+        },
+        currentValues: [
+            ["node", "use NodeJS as the test runner"],
+            ["disabled", "disable testing"],
+        ] as const,
+        obsoleteValues: [] as const,
+    }),
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
     //   ########  ######   ######          #######  ##     ## ########        ########  #### ########
     //      ##    ##    ## ##    ##        ##     ## ##     ##    ##           ##     ##  ##  ##     ##
     //      ##    ##       ##              ##     ## ##     ##    ##           ##     ##  ##  ##     ##
@@ -371,7 +405,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     //------------------------------------------------------------------------------------------------------------------
 
     tscOutDir: createStringProperty({
-        name: "TypeScript output directory",
+        name: TYPESCRIPT_OUTPUT_DIRECTORY,
         configFile: {
             currentKey: "LP_CFG_TSC_OUT_DIR",
             newConfigObjectName: "tscOutDir",
@@ -382,8 +416,8 @@ const CURRENT_CONFIG_PROPERTIES = {
             placeholder: "<DIR>",
             description: "TypeScript compiler output directory",
         },
-        parseOldValue: createDirectoryParser("TypeScript output directory", "optional"),
-        parseNewValue: createDirectoryParser("TypeScript output directory", "optional"),
+        parseOldValue: createDirectoryParser(TYPESCRIPT_OUTPUT_DIRECTORY, "optional"),
+        parseNewValue: createDirectoryParser(TYPESCRIPT_OUTPUT_DIRECTORY, "optional"),
     }),
 
     //------------------------------------------------------------------------------------------------------------------
@@ -475,7 +509,7 @@ const CURRENT_CONFIG_PROPERTIES = {
     //------------------------------------------------------------------------------------------------------------------
 
     webAppDir: createStringProperty({
-        name: "web app directory",
+        name: WEB_APP_DIRECTORY,
         configFile: {
             currentKey: "LP_CFG_WEB_APP_DIR",
             newConfigObjectName: "webAppDir",
@@ -486,8 +520,8 @@ const CURRENT_CONFIG_PROPERTIES = {
             placeholder: "<DIR>",
             description: "Relative path to the web application (with the index.html)",
         },
-        parseOldValue: createDirectoryParser("web app directory", "optional"),
-        parseNewValue: createDirectoryParser("web app directory", "mandatory"),
+        parseOldValue: createDirectoryParser(WEB_APP_DIRECTORY, "optional"),
+        parseNewValue: createDirectoryParser(WEB_APP_DIRECTORY, "mandatory"),
     }),
 } as const;
 

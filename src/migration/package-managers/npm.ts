@@ -20,18 +20,12 @@ export class Npm extends PackageManager {
                 launchpadDlxCommand: ["npm", "exec", "--", `${LAUNCHPAD_PACKAGE_NAME}@latest`],
                 launchpadLocalCommand: ["npm", "exec", "--no", "--", `${LAUNCHPAD_PACKAGE_NAME}`],
             },
-            createOrUpdateNpmConfiguration,
+            () => {},
             removeNpmConfigurationAndArtifacts,
             getNpmUpgradeCommand
         );
     }
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-// Create npm-specific configuration files/settings
-//----------------------------------------------------------------------------------------------------------------------
-
-function createOrUpdateNpmConfiguration(_context: MigrationContext) {}
 
 //----------------------------------------------------------------------------------------------------------------------
 // Remove npm-specific configuration, files and directories

@@ -1,4 +1,5 @@
 import {
+    unpinned,
     ValidationError,
     type AddError,
     type CommandLineOptions,
@@ -25,6 +26,7 @@ export function assembleConfig(properties: ReadonlyArray<ConfigFileProperty>, ad
         runtime: ConfigProperties.runtime.parseOldValue(properties, addError),
         srcDir: ConfigProperties.srcDir.parseOldValue(properties, addError),
         tabSize: ConfigProperties.tabSize.parseOldValue(properties, addError),
+        testRunner: ConfigProperties.testRunner.parseOldValue(properties, addError),
         tscOutDir: ConfigProperties.tscOutDir.parseOldValue(properties, addError),
         upliftDependencies: ConfigProperties.upliftDependencies.parseOldValue(properties, addError),
         version: ConfigProperties.version.parseOldValue(properties, addError),
@@ -52,6 +54,7 @@ export function validateConfig(config: ReturnType<typeof assembleConfig>, addErr
             runtime: ConfigProperties.runtime.assertOldValuePresent(config.runtime),
             srcDir: ConfigProperties.srcDir.assertOldValuePresent(config.srcDir),
             tabSize: ConfigProperties.tabSize.assertOldValuePresent(config.tabSize),
+            testRunner: config.testRunner ?? unpinned("disabled"),
             tscOutDir: ConfigProperties.tscOutDir.assertOldValuePresent(config.tscOutDir),
             upliftDependencies: ConfigProperties.upliftDependencies.assertOldValuePresent(config.upliftDependencies),
             version: ConfigProperties.version.assertOldValuePresent(config.version),
@@ -98,6 +101,7 @@ export type NewConfig = {
     runtime: NewConfigType<"runtime">;
     srcDir: NewConfigType<"srcDir">;
     tabSize: NewConfigType<"tabSize">;
+    testRunner: NewConfigType<"testRunner">;
     tscOutDir: NewConfigType<"tscOutDir">;
     upliftDependencies: NewConfigType<"upliftDependencies">;
     version: NewConfigType<"version">;
@@ -138,6 +142,7 @@ export function assembleConfigFromCommandLineOptions(properties: CommandLineOpti
         runtimeCli: ConfigProperties.runtimeCli.parseFromCommandLine(properties),
         srcDir: ConfigProperties.srcDir.parseFromCommandLine(properties),
         tabSize: ConfigProperties.tabSize.parseFromCommandLine(properties),
+        testRunner: ConfigProperties.testRunner.parseFromCommandLine(properties),
         tscOutDir: ConfigProperties.tscOutDir.parseFromCommandLine(properties),
         upliftDependencies: ConfigProperties.upliftDependencies.parseFromCommandLine(properties),
         vsCodeSettings: ConfigProperties.vsCodeSettings.parseFromCommandLine(properties),

@@ -1,6 +1,7 @@
 import { DEFAULT_ENUM, PINNED_SUFFIX } from "../utilities/constants";
 import { fail } from "../utilities/fail";
 import {
+    CommandLineOption,
     ValidationError,
     type AddError,
     type CommandLineInfo,
@@ -530,20 +531,27 @@ function createCommandLineParser<T>(
 ): (options: CommandLineOptions) => Exclude<T, ConfigError> | undefined | typeof DEFAULT_ENUM {
     return (options: CommandLineOptions) => {
         for (let index = options.length - 1; 0 <= index; index--) {
-            const option = options[index]!;
-            if (option.key === commandLineDescriptor?.option) {
-                if (DEFAULT_ENUM === option.value) {
-                    return DEFAULT_ENUM;
-                } else {
-                    const value = parse(option.value, `command line option ${option.key}`);
-                    if (value && "object" === typeof value && "error" in value) {
-                        fail(value.error);
-                    } else {
-                        return value as Exclude<T, ConfigError>;
-                    }
-                }
+            const option = options[index];
+            if (option && option.key === commandLineDescriptor?.option) {
+                return extractValue(option, parse);
             }
         }
         return undefined;
     };
+}
+
+function extractValue<T>(
+    option: CommandLineOption,
+    parse: (value: string, source: string | undefined) => T | { readonly error: string }
+) {
+    if (DEFAULT_ENUM === option.value) {
+        return DEFAULT_ENUM;
+    } else {
+        const value = parse(option.value, `command line option ${option.key}`);
+        if (value && "object" === typeof value && "error" in value) {
+            return fail(value.error);
+        } else {
+            return value as Exclude<T, ConfigError>;
+        }
+    }
 }

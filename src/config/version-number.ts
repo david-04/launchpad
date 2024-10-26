@@ -28,4 +28,6 @@ export class Version {
 }
 
 export const VERSION_0_0_0 = new Version(0, 0, 0);
+export const VERSION_1_0_4 = new Version(1, 0, 4); // NOSONAR
+export const VERSION_1_0_5 = new Version(1, 0, 5); // NOSONAR
 export const VERSION_1_0_7 = new Version(1, 0, 7); // NOSONAR

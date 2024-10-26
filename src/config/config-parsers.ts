@@ -19,7 +19,7 @@ export function parseProjectName(value: string, source: string | undefined) {
     const trimmed = value.trim();
     if (!trimmed) {
         return error(`${reference} must not be empty`);
-    } else if (trimmed.match(/[\\\/:*<>$#?]/)) {
+    } else if (/[\\/:*<>$#?]/.exec(trimmed)) {
         return error(`${reference} must be a valid file name and not contain any special characters`);
     } else {
         return trimmed;
@@ -46,13 +46,13 @@ export function createDirectoryParser(type: string, mode: "optional" | "mandator
             return error(`${reference} must neither be empty nor the current directory`);
         } else if (!trimmed) {
             return trimmed;
-        } else if (trimmed.match(/^(\/|[a-z]:)/i)) {
+        } else if (/^(\/|[a-z]:)/i.exec(trimmed)) {
             return error(`${reference} must not be a relative (and not an absolute) path`);
         } else {
             const normalized = trimmed.replace(/(^\.\/)|(\/$)/g, "");
             if (!normalized) {
                 return error(`${reference} must not be the current directory`);
-            } else if (normalized.match(/[:*<>$#?]/)) {
+            } else if (/[:*<>$#?]/.exec(normalized)) {
                 return error(`${reference} must be a valid path and not contain any special characters`);
             } else {
                 return normalized;
@@ -76,7 +76,7 @@ export function createDirectoryParser(type: string, mode: "optional" | "mandator
 export function parseVersion(value: string, source: string | undefined) {
     const trimmed = value.trim();
     const split = trimmed.split(".").map(value => value.trim());
-    const parsed = split.map(segment => (segment.match(/^\d+$/) ? parseInt(segment) : NaN));
+    const parsed = split.map(segment => (/^\d+$/.exec(segment) ? parseInt(segment) : NaN));
     const [major, minor, patch, ...other] = parsed;
     const isNumber = (value?: number): value is number => undefined !== value && !isNaN(value) && 0 <= value;
     if (isNumber(major) && isNumber(minor) && isNumber(patch) && !other.length) {
@@ -219,7 +219,7 @@ export function createEnumSetParser<T extends string>(allowedValues: ReadonlyArr
         for (const item of items) {
             const match = allowedValues.filter(allowed => allowed.toLowerCase() === item.toLowerCase())[0];
             if (undefined !== match) {
-                result.add(match as T);
+                result.add(match);
             } else {
                 errors.push(item);
             }

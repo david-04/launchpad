@@ -30,9 +30,9 @@ const COMMANDS = [
 
 export async function launchpad(argv: ReadonlyArray<string>) {
     try {
-        if (argv.some(arg => arg.match(/^--?h(elp)?$/))) {
+        if (argv.some(arg => /^--?h(elp)?$/.exec(arg))) {
             return showHelp();
-        } else if (argv.some(arg => arg.match(/^--?(v|version)$/))) {
+        } else if (argv.some(arg => /^--?(v|version)$/.exec(arg))) {
             return showVersion();
         } else {
             const [command, ...options] = argv.map(item => item.trim());
@@ -40,7 +40,7 @@ export async function launchpad(argv: ReadonlyArray<string>) {
         }
     } catch (error: unknown) {
         console.error("⛔ ERROR:", formatError(error));
-        process.exit(1);
+        return process.exit(1);
     }
 }
 
@@ -51,11 +51,11 @@ export async function launchpad(argv: ReadonlyArray<string>) {
 async function findAndInvokeHandler(argument: string | undefined, options: ReadonlyArray<string>) {
     const [command, ...rest] = COMMANDS.filter(command => command.name.toLowerCase() === argument?.toLowerCase());
     if (!argument) {
-        fail(`Missing command line argument. Try launchpad --help for more information.`);
+        return fail(`Missing command line argument. Try launchpad --help for more information.`);
     } else if (!command) {
-        fail(`Invalid command: ${argument}. Try launchpad --help for more information.`);
+        return fail(`Invalid command: ${argument}. Try launchpad --help for more information.`);
     } else if (rest.length) {
-        fail(`Found more than one handler for command ${argument}`);
+        return fail(`Found more than one handler for command ${argument}`);
     } else {
         const projectRoot = new Path(command.getProjectRootDirectory());
         const configFile = getConfigFilePath(projectRoot);
@@ -77,11 +77,11 @@ function showHelp() {
         "",
         "[COMMAND]",
         "",
-        ...commands.sort(),
+        ...commands.slice(0).sort((a, b) => a.localeCompare(b)),
         "",
         "[OPTIONS]",
         "",
-        ...options.map(option => `  ${option}`).sort(),
+        ...options.map(option => `  ${option}`).sort((a, b) => a.localeCompare(b)),
     ];
     helpMessage.forEach(line => console.log(line));
 }

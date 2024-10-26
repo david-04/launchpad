@@ -1,3 +1,4 @@
+import { pinned } from "../../config/config-data-types";
 import type { NewConfig, OldConfig } from "../../config/config-objects";
 import { DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values";
 import { VERSION_NUMBER } from "../../resources/version-information";
@@ -30,6 +31,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         runtime: oldConfig.runtime,
         srcDir: oldConfig.srcDir,
         tabSize: oldConfig.tabSize,
+        testRunner: oldConfig.testRunner ?? pinned("disabled"),
         tscOutDir: oldConfig.tscOutDir,
         upliftDependencies: oldConfig.upliftDependencies,
         version: VERSION_NUMBER,

@@ -1,4 +1,5 @@
 import { LAUNCHPAD_PACKAGE_NAME } from "../../utilities/constants";
+import { LAUNCHPAD_UPLIFT, LAUNCHPAD_UPLIFT_BAT } from "../data/known-files";
 import { MigrationContext } from "../data/migration-context";
 import { getPackageManager } from "../package-managers/package-manager-registry";
 
@@ -21,7 +22,7 @@ export function recreateLaunchpadDirectoryUpliftScripts(context: MigrationContex
 //----------------------------------------------------------------------------------------------------------------------
 
 function recreateUpliftShellScript(context: MigrationContext, commands: ReadonlyArray<string>) {
-    const file = context.files.get(".launchpad/uplift");
+    const file = context.files.get(LAUNCHPAD_UPLIFT);
     file.lines = [
         "#!/usr/bin/env bash",
         "",
@@ -51,7 +52,7 @@ function recreateUpliftShellScript(context: MigrationContext, commands: Readonly
 //----------------------------------------------------------------------------------------------------------------------
 
 function recreateUpliftBatchScript(context: MigrationContext, commands: ReadonlyArray<string>) {
-    context.files.get(".launchpad/uplift.bat").lines = [
+    context.files.get(LAUNCHPAD_UPLIFT_BAT).lines = [
         "@echo off",
         "",
         'cd /D "%~dp0\\.."',
@@ -104,7 +105,7 @@ function getUpliftCommand(context: MigrationContext) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function serializeCommand(command: ReadonlyArray<string>) {
-    return command.map(element => (element.match(/.*(\s|").*/) ? JSON.stringify(element) : element)).join(" ");
+    return command.map(element => (/.*(\s|").*/.exec(element) ? JSON.stringify(element) : element)).join(" ");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

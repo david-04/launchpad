@@ -1,7 +1,8 @@
 import { NewConfig } from "../../config/config-objects";
 import type { MigrationContext } from "../data/migration-context";
 
-const SEPARATOR_LINE = `#${new Array(119).fill("-").join("")}`;
+const SEPARATOR_LENGTH = 120;
+const SEPARATOR_LINE = `#${new Array(SEPARATOR_LENGTH - 1).fill("-").join("")}`;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Create a makefile
@@ -75,9 +76,7 @@ function getBundleSection({ srcDir, projectName, bundlerOutDir, bundler, artifac
 
 function getCleanSection({ bundler, bundlerOutDir, tscOutDir, webAppDir }: NewConfig) {
     const shouldCleanTscOutput =
-        "disabled" !== bundler.value &&
-        !bundlerOutDir.startsWith(tscOutDir) &&
-        (!webAppDir || !webAppDir.startsWith(tscOutDir));
+        "disabled" !== bundler.value && !bundlerOutDir.startsWith(tscOutDir) && !webAppDir?.startsWith(tscOutDir);
 
     return [
         ...getSpacedSeparator("Clean"),

@@ -3,7 +3,7 @@ import { type Choice, type PromptObject } from "prompts";
 import { unpinned, type ConfigError, type PinnableEnumValue } from "../config/config-data-types";
 import { defaultMightChange } from "./constants";
 
-const prompts = require("prompts");
+const prompts = require("prompts"); // NOSONAR
 
 //----------------------------------------------------------------------------------------------------------------------
 // Data types
@@ -44,7 +44,10 @@ export function createDefaultOption<T extends string>(value: T) {
 //----------------------------------------------------------------------------------------------------------------------
 
 export function toChoice<T>(options: ChoiceOptions<T>): Choice[] {
-    return options.map(option => ({ title: option[0], description: option[1], value: option[2], selected: option[3] }));
+    return options.map(option => {
+        const [title, description, value, selected] = option;
+        return { title, description, value, selected };
+    });
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,11 +96,11 @@ export function findPinnableMatchingChoice<T extends string>(
 // Prompt wrapper that exits if the returned value is "undefined"                     https://github.com/terkelg/prompts
 //----------------------------------------------------------------------------------------------------------------------
 
-export async function prompt<T>(options: Omit<PromptObject<string>, "name">): Promise<T> {
-    return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1);
+export async function prompt<T>(options: Omit<PromptObject, "name">): Promise<T> {
+    return ((await prompts({ ...options, name: "RESULT" })) ?? {})["RESULT"] ?? exit(1); // NOSONAR
 }
 
-export async function promptMultiSelect(options: Omit<PromptObject<string>, "name">) {
+export async function promptMultiSelect(options: Omit<PromptObject, "name">) {
     return await prompt<ReadonlyArray<string>>({
         instructions: false,
         hint: "[space | arrow right/left] = toggle selection; [enter / return] = save and continue",
