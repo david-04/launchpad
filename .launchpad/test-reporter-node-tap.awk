@@ -66,7 +66,7 @@ END {
         output = append(output, getSkipped());
     } else {
         duration = counters["duration_ms"] ? sprintf(" in %.1fs", counters["duration_ms"] * 0.001 + 0.05) : "";
-        output = "✓ " counters["pass"] " tests passed" duration;
+        output = "✓ " counters["pass"] " test" (1 == counters["pass"] ? "" : "s")  " passed" duration;
     }
     if (hasPrintedErrors) {
         print DIVIDER;

@@ -347,7 +347,7 @@ __LP_TEST_EFFECTIVE_BEFORE_HOOKS       =$(__LP_TEST_DEFAULT_BEFORE_HOOKS)
 __LP_TEST_DEFAULT_AFTER_HOOKS          =
 __LP_TEST_EFFECTIVE_AFTER_HOOKS        =$(__LP_TEST_DEFAULT_AFTER_HOOKS)
 
-__LP_TEST_DEFAULT_COMMAND_             =echo Tests are disabled
+__LP_TEST_DEFAULT_COMMAND_             =
 __LP_TEST_DEFAULT_COMMAND_node         =. .launchpad/test $(foreach ROOT_DIRECTORY, $(__LP_TEST_ROOT_DIRECTORIES), '$(ROOT_DIRECTORY)/**$(if $(__LP_TEST_SUBDIRECTORY),/$(strip $(__LP_TEST_SUBDIRECTORY)))/*$(strip $(__LP_TEST_FILE_EXTENSION))')
 __LP_TEST_DEFAULT_COMMAND              =$(__LP_TEST_DEFAULT_COMMAND_$(LP_CFG_TEST_RUNNER))
 __LP_TEST_EFFECTIVE_COMMAND            =$(__LP_TEST_DEFAULT_COMMAND)
@@ -383,8 +383,7 @@ lp.test.get-default-after-hook         =$(strip $(__LP_TEST_DEFAULT_AFTER_HOOKS)
 lp.test.get-after-hooks                =$(strip $(__LP_TEST_EFFECTIVE_AFTER_HOOKS))
 lp.test.get-default-command            =$(if $(value 1), echo $(1) && )$(strip $(__LP_TEST_DEFAULT_COMMAND))
 lp.test.get-effective-command          =$(strip $(__LP_TEST_EFFECTIVE_COMMAND))
-lp.test.get-effective-command          =$(if $(strip $(__LP_TEST_EFFECTIVE_COMMAND)),$(strip $(__LP_TEST_EFFECTIVE_COMMAND)) &&) \
-                                        touch "$(__LP_TEST_TIMESTAMP_FILE)"
+lp.test.get-effective-command          =$(if $(strip $(__LP_TEST_EFFECTIVE_COMMAND)),$(strip $(__LP_TEST_EFFECTIVE_COMMAND)) && touch "$(__LP_TEST_TIMESTAMP_FILE)")
 lp.test.get-command-with-hooks         =$(call lp.fn.get-command, test, $(if $(value 1), $(1)))
 
 LP_PREREQUISITE_TEST                   =$$(call lp.test.get-targets)
@@ -717,7 +716,7 @@ lp.clean.get-files                      =$(strip $(sort \
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-lp.run.js                               =node $(1)
+lp.run.js                               =node --enable-source-maps $(1)
 lp.run.ts                               =$(call lp.fn.if-equal, $(LP_CFG_MODULE_SYSTEM), esm, \
                                                                 ts-node-esm, \
                                                                 ts-node \

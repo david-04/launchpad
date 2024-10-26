@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.7](https://github.com/david-04/launchpad/releases/tag/v1.0.7) (2024-10-26)
+
+- Add support for unit tests via the Node test runner (requires Node 22)
+- Store Biome configuration in `.launchpad/biome.default.json` (and include it from `biome.json`)
+- Upgrade default `tsconfig.json` settings to TypeScript 5.6
+- Use a separate timestamp file instead of `.tsbuildinfo` for tracking Makefile dependencies
+- Avoid accessing undefined Makefile variables
+- Don't set the `<script>` type to `module` when using a bundler
+- Fix SonarLint warnings
+
 ## [1.0.6](https://github.com/david-04/launchpad/releases/tag/v1.0.6) (2024-03-31)
 
 - Auto-include a minimal `d.ts` file for `cli` projects that don't have Node typings installed (includes `console`, timer functions and `argv`, `env` and `exit` from `process`)
