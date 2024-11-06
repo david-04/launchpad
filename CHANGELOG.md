@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.8](https://github.com/david-04/launchpad/releases/tag/v1.0.8) (2024-11-07)
+
+- Print (rather than suppress) console.log output in unit tests
+
 ## [1.0.7](https://github.com/david-04/launchpad/releases/tag/v1.0.7) (2024-10-26)
 
 - Add support for unit tests via the Node test runner (requires Node 22)
