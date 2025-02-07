@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.9](https://github.com/david-04/launchpad/releases/tag/v1.0.9) (2025-02-07)
+
+- Refine formatting of the Node test runner output
+
 ## [1.0.8](https://github.com/david-04/launchpad/releases/tag/v1.0.8) (2024-11-07)
 
 - Print (rather than suppress) console.log output in unit tests
