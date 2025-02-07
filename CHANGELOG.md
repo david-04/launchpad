@@ -2,7 +2,8 @@
 
 ## [1.0.9](https://github.com/david-04/launchpad/releases/tag/v1.0.9) (2025-02-07)
 
-- Refine formatting of the Node test runner output
+- Tweaked the Node test runner output (prepend full `describe` path to test case title)
+- Added file extensions `jsx`, `cjs` and `mjs` to `.gitignore`
 
 ## [1.0.8](https://github.com/david-04/launchpad/releases/tag/v1.0.8) (2024-11-07)
 
