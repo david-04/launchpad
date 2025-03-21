@@ -2,7 +2,8 @@
 
 ## [1.0.10](https://github.com/david-04/launchpad/releases/tag/v1.0.10) (2025-03-21)
 
-- Preserve comments when compiling library projects (for the declaration file)
+- Updated tsconfig.json templates to preserve code comments when compiling library projects
+- Added new compiler options to uplift the tsconfig.json templates to TypeScript 5.8
 
 ## [1.0.9](https://github.com/david-04/launchpad/releases/tag/v1.0.9) (2025-02-07)
 
