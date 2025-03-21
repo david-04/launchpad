@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.10](https://github.com/david-04/launchpad/releases/tag/v1.0.10) (2025-03-21)
+
+- Preserve comments when compiling library projects (for the declaration file)
+
 ## [1.0.9](https://github.com/david-04/launchpad/releases/tag/v1.0.9) (2025-02-07)
 
 - Tweaked the Node test runner output (prepend full `describe` path to test case title)
