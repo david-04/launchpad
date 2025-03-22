@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.11](https://github.com/david-04/launchpad/releases/tag/v1.0.11) (2025-03-23)
+
+- Fixed truncation of the last test failure when displaying unit test results
+
 ## [1.0.10](https://github.com/david-04/launchpad/releases/tag/v1.0.10) (2025-03-21)
 
 - Updated tsconfig.json templates to preserve code comments when compiling library projects
