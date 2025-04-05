@@ -29,6 +29,9 @@
         "inlineSources": false,
         "isolatedDeclarations": false,
         "isolatedModules": true,
+        "lib": [
+            "es2022"
+        ],
         "libReplacement": false,
         "module": "commonjs",
         "moduleDetection": "force",

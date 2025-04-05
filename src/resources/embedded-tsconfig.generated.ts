@@ -30,6 +30,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSources": false,
             "isolatedDeclarations": false,
             "isolatedModules": true,
+            "lib": [
+                "es2022"
+            ],
             "libReplacement": false,
             "module": "commonjs",
             "moduleDetection": "force",
@@ -106,6 +109,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSources": false,
             "isolatedDeclarations": false,
             "isolatedModules": true,
+            "lib": [
+                "es2022"
+            ],
             "libReplacement": false,
             "module": "nodenext",
             "moduleDetection": "force",
@@ -187,6 +193,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSources": false,
             "isolatedDeclarations": false,
             "isolatedModules": true,
+            "lib": [
+                "es2022"
+            ],
             "libReplacement": false,
             "module": "commonjs",
             "moduleDetection": "force",
@@ -263,6 +272,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "inlineSources": false,
             "isolatedDeclarations": false,
             "isolatedModules": true,
+            "lib": [
+                "es2022"
+            ],
             "libReplacement": false,
             "module": "nodenext",
             "moduleDetection": "force",
@@ -346,6 +358,10 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "isolatedModules": true,
             "jsx": "react",
             "jsxFactory": "React.createElement",
+            "lib": [
+                "es6",
+                "dom"
+            ],
             "libReplacement": false,
             "module": "commonjs",
             "moduleDetection": "force",
@@ -424,6 +440,10 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "isolatedModules": true,
             "jsx": "react",
             "jsxFactory": "React.createElement",
+            "lib": [
+                "es6",
+                "dom"
+            ],
             "libReplacement": false,
             "module": "node16",
             "moduleDetection": "force",
@@ -507,6 +527,10 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "isolatedModules": true,
             "jsx": "react",
             "jsxFactory": "React.createElement",
+            "lib": [
+                "es6",
+                "dom"
+            ],
             "libReplacement": false,
             "module": "commonjs",
             "moduleDetection": "force",
@@ -585,6 +609,10 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "isolatedModules": true,
             "jsx": "react",
             "jsxFactory": "React.createElement",
+            "lib": [
+                "es6",
+                "dom"
+            ],
             "libReplacement": false,
             "module": "node16",
             "moduleDetection": "force",
