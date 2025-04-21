@@ -5,8 +5,8 @@
         // Language and environment
         //--------------------------------------------------------------------------------------------------------------
 
-        "target": "ES6", //                                 Set the JavaScript language version for emitted JavaScript and include compatible library declarations.
-        "lib": ["ES6", "DOM"], //                           Specify a set of bundled library declaration files that describe the target runtime environment. - inherits from "target" and auto-includes DOM
+        "target": "ES2022", //                              Set the JavaScript language version for emitted JavaScript and include compatible library declarations.
+        "lib": ["ES2022", "DOM"], //                        Specify a set of bundled library declaration files that describe the target runtime environment. - inherits from "target" and auto-includes DOM
         "jsx": "react", //                                  Specify what JSX code is generated.
         "jsxFactory": "React.createElement", //             only need to override when using preact | Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'.
         // "jsxFragmentFactory": "", //                     same as jsxFactory | Specify the JSX Fragment reference used for fragments when targeting React JSX emit e.g. 'React.Fragment' or 'Fragment'.

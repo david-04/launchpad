@@ -359,7 +359,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "jsx": "react",
             "jsxFactory": "React.createElement",
             "lib": [
-                "es6",
+                "es2022",
                 "dom"
             ],
             "libReplacement": false,
@@ -396,7 +396,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictNullChecks": true,
             "strictPropertyInitialization": true,
             "stripInternal": true,
-            "target": "es6",
+            "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
@@ -441,7 +441,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "jsx": "react",
             "jsxFactory": "React.createElement",
             "lib": [
-                "es6",
+                "es2022",
                 "dom"
             ],
             "libReplacement": false,
@@ -480,7 +480,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictNullChecks": true,
             "strictPropertyInitialization": true,
             "stripInternal": true,
-            "target": "es6",
+            "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
@@ -528,7 +528,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "jsx": "react",
             "jsxFactory": "React.createElement",
             "lib": [
-                "es6",
+                "es2022",
                 "dom"
             ],
             "libReplacement": false,
@@ -565,7 +565,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictNullChecks": true,
             "strictPropertyInitialization": true,
             "stripInternal": true,
-            "target": "es6",
+            "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
@@ -610,7 +610,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "jsx": "react",
             "jsxFactory": "React.createElement",
             "lib": [
-                "es6",
+                "es2022",
                 "dom"
             ],
             "libReplacement": false,
@@ -649,7 +649,7 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "strictNullChecks": true,
             "strictPropertyInitialization": true,
             "stripInternal": true,
-            "target": "es6",
+            "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
