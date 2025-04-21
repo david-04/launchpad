@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.12](https://github.com/david-04/launchpad/releases/tag/v1.0.12) (2025-04-21)
+
+- Set the lib in `tsconfig.json` to `ES2022` for cli and `ES2022` + `DOM` for web projects
+
 ## [1.0.11](https://github.com/david-04/launchpad/releases/tag/v1.0.11) (2025-03-23)
 
 - Fixed truncation of the last test failure when displaying unit test results
