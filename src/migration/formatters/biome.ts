@@ -1,4 +1,4 @@
-import { Version, VERSION_0_0_0, VERSION_1_0_7 } from "../../config/version-number";
+import { VERSION_0_0_0, VERSION_1_0_7, Version } from "../../config/version-number";
 import { ASSETS } from "../../resources/embedded-assets.generated";
 import { File } from "../data/file";
 import { BIOME_JSON } from "../data/known-files";
@@ -148,7 +148,7 @@ function updateSchemaUrl(file: File, tabSize: number) {
                 const json = JSON.parse(file.contents ?? "");
                 json.$schema = currentUrl;
                 file.contents = JSON.stringify(json, undefined, tabSize);
-            } catch (ignored) {}
+            } catch {}
         }
     }
 }

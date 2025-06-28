@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.13](https://github.com/david-04/launchpad/releases/tag/v1.0.13) (2025-06-28)
+
+- Upgrade configuration to Biome 2
+
 ## [1.0.12](https://github.com/david-04/launchpad/releases/tag/v1.0.12) (2025-04-21)
 
 - Set the lib in `tsconfig.json` to `ES2022` for cli and `ES2022` + `DOM` for web projects

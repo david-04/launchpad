@@ -219,7 +219,7 @@ function executeExternalCommands(context: MigrationContext) {
 function failMigration(context: MigrationContext) {
     try {
         createLogFile(context);
-    } catch (ignored) {}
+    } catch {}
     fail(`Failed to ${context.operation} the project`);
 }
 
