@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.14](https://github.com/david-04/launchpad/releases/tag/v1.0.14) (2025-06-29)
+
+- Fixed an issue that caused the uplift operation to overwrite unchanged files
+
 ## [1.0.13](https://github.com/david-04/launchpad/releases/tag/v1.0.13) (2025-06-28)
 
 - Upgrade configuration to Biome 2

@@ -25,7 +25,7 @@ export class File {
         if (this.absolutePath.existsAndIsDirectory()) {
             fail(`${this.absolutePath.path} is a directory (expected it to be a file)`);
         } else if (this.absolutePath.exists()) {
-            this.originalContents = File.serialize(this.absolutePath.loadFileContents(), tabSize);
+            this.originalContents = File.normalize(this.absolutePath.loadFileContents());
             this.newContents = this.originalContents;
         } else {
             this.originalContents = undefined;
@@ -86,7 +86,7 @@ export class File {
     //------------------------------------------------------------------------------------------------------------------
 
     public mustCreateOrOverwrite() {
-        return undefined !== this.newContents && this.newContents !== this.originalContents;
+        return undefined !== this.newContents && this.originalContents !== this.newContents;
     }
 
     public mustDelete() {
@@ -110,13 +110,20 @@ export class File {
     //------------------------------------------------------------------------------------------------------------------
 
     private static serialize(contents: string | ReadonlyArray<string> | object, tabSize: number) {
-        const normalize = (text: string) => text.replaceAll("\r", "").replace(/(\s\n)+$/, "") + "\n";
         if ("string" === typeof contents) {
-            return normalize(contents);
+            return this.normalize(contents);
         } else if (Array.isArray(contents)) {
-            return normalize(contents.join("\n"));
+            return this.normalize(contents.join("\n"));
         } else {
-            return normalize(JSON.stringify(contents, undefined, tabSize));
+            return this.normalize(JSON.stringify(contents, undefined, tabSize));
         }
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Normalize file contents
+    //------------------------------------------------------------------------------------------------------------------
+
+    private static normalize(contents: string) {
+        return contents.replace(/\r\n/g, "\n").replace(/\s+$/, "") + "\n";
     }
 }

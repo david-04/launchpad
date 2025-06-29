@@ -6,14 +6,6 @@
     "devDependencies": {
         "@types/node": "^22.13.10"
     },
-    "prettier": {
-        "arrowParens": "avoid",
-        "printWidth": 120,
-        "tabWidth": 4,
-        "endOfLine": "lf",
-        "trailingComma": "es5",
-        "useTabs": false
-    },
     "private": true,
     "type": "commonjs"
 }

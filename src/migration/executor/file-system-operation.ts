@@ -125,7 +125,7 @@ export class FileSystemOperation {
             const pathToDelete = this.hasRenamedNewToCurrent ? this.path.path : this.newPath.path;
             try {
                 rmSync(pathToDelete, this.fileOrDirectory instanceof Directory ? { recursive: true } : {});
-            } catch (error) {
+            } catch {
                 throw new Error(`Failed to delete ${this.type} ${pathToDelete}`);
             }
             log.push(`Deleted ${this.type} ${pathToDelete}`);
@@ -134,7 +134,7 @@ export class FileSystemOperation {
         if (this.hasRenamedCurrentToOld) {
             try {
                 renameSync(this.oldPath.path, this.path.path);
-            } catch (error) {
+            } catch {
                 throw new Error(`Failed to rename ${this.type} ${this.oldPath.path} to ${this.path.path}`);
             }
             log.push(`Renamed ${this.type} ${this.oldPath.path} to ${this.path.path}`);
