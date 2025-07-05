@@ -2,8 +2,8 @@
 
 ## [1.0.16](https://github.com/david-04/launchpad/releases/tag/v1.0.16) (2025-07-05)
 
-- Set`biome.configurationPath` only when launchpad is configured to maintain VSCode settings
-- Use Biome for CSS formatting
+- Set`biome.configurationPath` only when launchpad is configured to manage VSCode settings
+- Configure Biome to also format CSS
 
 ## [1.0.15](https://github.com/david-04/launchpad/releases/tag/v1.0.15) (2025-07-05)
 
