@@ -1,10 +1,6 @@
 import type { File } from "../data/file";
 
 //----------------------------------------------------------------------------------------------------------------------
-// Default formatters
-//----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------------------------------------------
 // Type definitions
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +21,7 @@ export type VsCodeLanguageId = (typeof VSCODE_LANGUAGE_IDS)[number];
 
 export type VSCodeSettingsValue = string | number | boolean;
 export type VSCodeSettingsObject = {
-    [index: string]: VSCodeSettingsValue | VSCodeSettingsObject | VSCodeSettingsArray;
+    [index: string]: VSCodeSettingsValue | VSCodeSettingsObject | VSCodeSettingsArray | null;
 };
 export type VSCodeSettingsArray = Array<VSCodeSettingsValue | VSCodeSettingsObject | VSCodeSettingsArray>;
 

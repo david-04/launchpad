@@ -15,7 +15,7 @@ export class Biome extends Formatter {
             ["json", "jsonc", "javascript", "javascriptreact", "typescript", "typescriptreact"],
             "biomejs.biome",
             updateBiomeConfigurationExcludingVsCode,
-            context => context.files.get(BIOME_JSON).delete()
+            removeConfigurationExcludingVscode
         );
     }
 }
@@ -31,6 +31,21 @@ function updateBiomeConfigurationExcludingVsCode(context: MigrationContext) {
     } else {
         file.contents = ASSETS[BIOME_JSON];
     }
+    context.fileOperations.vscodeSettings.json = {
+        ...context.fileOperations.vscodeSettings.json,
+        "biome.configurationPath": null,
+    };
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Remove Biome configuration
+//----------------------------------------------------------------------------------------------------------------------
+
+function removeConfigurationExcludingVscode(context: MigrationContext) {
+    context.files.get(BIOME_JSON).delete();
+    const vscodeSettings = context.fileOperations.vscodeSettings.json;
+    delete vscodeSettings["biome.configurationPath"];
+    context.fileOperations.vscodeSettings.json = vscodeSettings;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

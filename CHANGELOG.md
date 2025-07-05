@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.15](https://github.com/david-04/launchpad/releases/tag/v1.0.14) (2025-07-05)
+
+- Set VSCode setting `biome.configurationPath` to null when using Biome
+
 ## [1.0.14](https://github.com/david-04/launchpad/releases/tag/v1.0.14) (2025-06-29)
 
 - Fixed an issue that caused the uplift operation to overwrite unchanged files
