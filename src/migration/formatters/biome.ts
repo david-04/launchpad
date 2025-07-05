@@ -12,7 +12,7 @@ import { Formatter } from "./formatter";
 export class Biome extends Formatter {
     public constructor() {
         super(
-            ["json", "jsonc", "javascript", "javascriptreact", "typescript", "typescriptreact"],
+            ["css", "json", "jsonc", "javascript", "javascriptreact", "typescript", "typescriptreact"],
             "biomejs.biome",
             updateBiomeConfigurationExcludingVsCode,
             removeConfigurationExcludingVscode
@@ -31,10 +31,12 @@ function updateBiomeConfigurationExcludingVsCode(context: MigrationContext) {
     } else {
         file.contents = ASSETS[BIOME_JSON];
     }
-    context.fileOperations.vscodeSettings.json = {
-        ...context.fileOperations.vscodeSettings.json,
-        "biome.configurationPath": null,
-    };
+    if (context.newConfig.vsCodeSettings.has("formatter")) {
+        context.fileOperations.vscodeSettings.json = {
+            ...context.fileOperations.vscodeSettings.json,
+            "biome.configurationPath": null,
+        };
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -43,9 +45,11 @@ function updateBiomeConfigurationExcludingVsCode(context: MigrationContext) {
 
 function removeConfigurationExcludingVscode(context: MigrationContext) {
     context.files.get(BIOME_JSON).delete();
-    const vscodeSettings = context.fileOperations.vscodeSettings.json;
-    delete vscodeSettings["biome.configurationPath"];
-    context.fileOperations.vscodeSettings.json = vscodeSettings;
+    if (context.newConfig.vsCodeSettings.has("formatter")) {
+        const vscodeSettings = context.fileOperations.vscodeSettings.json;
+        delete vscodeSettings["biome.configurationPath"];
+        context.fileOperations.vscodeSettings.json = vscodeSettings;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

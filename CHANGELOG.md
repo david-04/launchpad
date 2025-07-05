@@ -1,8 +1,12 @@
 # Change Log
 
+## [1.0.16](https://github.com/david-04/launchpad/releases/tag/v1.0.16) (2025-07-05)
+
+- Set`biome.configurationPath` only when launchpad is configured to maintain VSCode settings
+
 ## [1.0.15](https://github.com/david-04/launchpad/releases/tag/v1.0.15) (2025-07-05)
 
-- Switch to `pnpm` as the default package manager
+- Switched to `pnpm` as the default package manager
 - Set VSCode setting `biome.configurationPath` to null when using Biome
 
 ## [1.0.14](https://github.com/david-04/launchpad/releases/tag/v1.0.14) (2025-06-29)
