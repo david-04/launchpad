@@ -1,8 +1,13 @@
 # Change Log
 
+
+## [1.0.17](https://github.com/david-04/launchpad/releases/tag/v1.0.17) (unreleased)
+
+- Include CSS files when formatting with Biome via Makefile
+
 ## [1.0.16](https://github.com/david-04/launchpad/releases/tag/v1.0.16) (2025-07-05)
 
-- Set`biome.configurationPath` only when launchpad is configured to manage VSCode settings
+- Set `biome.configurationPath` only when launchpad is configured to manage VSCode settings
 - Configure Biome to also format CSS
 
 ## [1.0.15](https://github.com/david-04/launchpad/releases/tag/v1.0.15) (2025-07-05)
