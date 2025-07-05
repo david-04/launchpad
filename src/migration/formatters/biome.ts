@@ -1,4 +1,4 @@
-import { VERSION_0_0_0, VERSION_1_0_7, Version } from "../../config/version-number";
+import { VERSION_0_0_0, VERSION_1_0_17, VERSION_1_0_7 } from "../../config/version-number";
 import { ASSETS } from "../../resources/embedded-assets.generated";
 import { File } from "../data/file";
 import { BIOME_JSON } from "../data/known-files";
@@ -60,7 +60,9 @@ function migrateExistingBiomeJson(file: File, context: MigrationContext) {
     if ((context.oldConfig?.version ?? VERSION_0_0_0).compareTo(VERSION_1_0_7) < 0) {
         migrateTo107(file);
     }
-    updateSchemaUrl(file, context.newConfig.tabSize);
+    if ((context.oldConfig?.version ?? VERSION_0_0_0).compareTo(VERSION_1_0_17) < 0) {
+        migrateTo1017(file);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,35 +150,11 @@ function addExtends(file: File) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Update the schema URL
+// 1.0.17 - Remove the schema URL
 //----------------------------------------------------------------------------------------------------------------------
 
-const SCHEMA_URL_REGEXP = /https:\/\/biomejs.dev\/schemas\/\d+(\.\d+)+\/schema.json/;
-
-function updateSchemaUrl(file: File, tabSize: number) {
-    const contents = file.contents ?? "";
-    const previousUrls = contents.match(new RegExp(SCHEMA_URL_REGEXP, "g"));
-    const currentUrl = JSON.parse(ASSETS[BIOME_JSON]).$schema as string;
-    if (SCHEMA_URL_REGEXP.exec(currentUrl)) {
-        if (previousUrls) {
-            file.contents = previousUrls
-                .filter(previousUrl => getVersion(previousUrl).compareTo(getVersion(currentUrl)) < 0)
-                .reduce((contents, previousUrl) => contents.replaceAll(previousUrl, currentUrl), contents);
-        } else {
-            try {
-                const json = JSON.parse(file.contents ?? "");
-                json.$schema = currentUrl;
-                file.contents = JSON.stringify(json, undefined, tabSize);
-            } catch {}
-        }
-    }
-}
-
-function getVersion(url: string) {
-    const versionNumber = url.replace(/^[^\d]+/, "").replace(/[^\d]*$/, "");
-    if (new RegExp(/^\d+(\.\d+)*$/).exec(versionNumber)) {
-        const segments = versionNumber.split(".").map(component => parseInt(component));
-        return new Version(segments[0] ?? 0, segments[1] ?? 0, segments[2] ?? 0);
-    }
-    return new Version(0, 0, 0);
+function migrateTo1017(file: File) {
+    const json = file.json;
+    delete json.$schema;
+    file.json = json;
 }
