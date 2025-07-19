@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.18](https://github.com/david-04/launchpad/releases/tag/v1.0.18) (2025-07-19)
+
+- Fixed syntax error (leading backslash) in the bundle
+
 ## [1.0.17](https://github.com/david-04/launchpad/releases/tag/v1.0.17) (2025-07-19)
 
 - Added option `exclude=<package>` to the Makefile function `lp.bundle.add` (to exclude packages from bundling)

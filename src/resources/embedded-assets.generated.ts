@@ -954,7 +954,7 @@ export const ASSETS = {
         "                                                 $(call lp.fn.if-contains, \\",
         "                                                        $(3), \\",
         "                                                        shebang hashbang, \\",
-        "                                                        \"--banner:js=\\#!/usr/bin/env node\" \\",
+        "                                                        \"--banner:js=#!/usr/bin/env node\" \\",
         "                                                  ) \\",
         "                                                 $(if $(value 3), \\",
         "                                                      $(patsubst exclude=%,\\",
