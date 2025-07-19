@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.17](https://github.com/david-04/launchpad/releases/tag/v1.0.17) (unreleased)
+## [1.0.17](https://github.com/david-04/launchpad/releases/tag/v1.0.17) (2025-07-19)
 
 - Added option `exclude=<package>` to the Makefile function `lp.bundle.add` (to exclude packages from bundling)
 - Updated the Makefile `format` target to also include CSS files when using Biome
