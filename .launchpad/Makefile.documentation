@@ -122,6 +122,7 @@ $(call lp.bundle.add,                                  # add a file to be bundle
            inline-sources                              #     - generate a source map and inline sources
            dts                                         #     - generate a bundled d.ts declaration file
            shebang                                     #     - prepend #!/usr/bin/env node to JavaScript bundle
+           exclude=package                             #     - don't bundle the given package (exclude= is repeatable)
        echo "js after-hook",                           # [3] command to run after bundling the js file
 	   echo "dts after-hook"                           # [4] command to run after bundling the d.ts file
  )

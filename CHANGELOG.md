@@ -1,10 +1,10 @@
 # Change Log
 
-
 ## [1.0.17](https://github.com/david-04/launchpad/releases/tag/v1.0.17) (unreleased)
 
-- Include CSS files when formatting with Biome via Makefile
-- Remove the `$schema` property from `biome.json`
+- Added option `exclude=<package>` to the Makefile function `lp.bundle.add` (to exclude packages from bundling)
+- Updated the Makefile `format` target to also include CSS files when using Biome
+- Removed the `$schema` property from `biome.json`
 
 ## [1.0.16](https://github.com/david-04/launchpad/releases/tag/v1.0.16) (2025-07-05)
 
