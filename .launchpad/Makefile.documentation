@@ -234,3 +234,21 @@ $(call lp.run    , dir/js-or-ts-file ) ...arguments  # run a TypeScript source f
 
 $(call lp.run.js , out/my-app.js     ) ...arguments  # run a JavaScript file
 $(call lp.run.ts , src/my-app.ts     ) ...arguments  # run a TypeScript file (via ts-node)
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+#       ###    ##     ## ########  #######          #### ##     ## ########   #######  ########  ########
+#      ## ##   ##     ##    ##    ##     ##          ##  ###   ### ##     ## ##     ## ##     ##    ##
+#     ##   ##  ##     ##    ##    ##     ##          ##  #### #### ##     ## ##     ## ##     ##    ##
+#    ##     ## ##     ##    ##    ##     ## #######  ##  ## ### ## ########  ##     ## ########     ##
+#    ######### ##     ##    ##    ##     ##          ##  ##     ## ##        ##     ## ##   ##      ##
+#    ##     ## ##     ##    ##    ##     ##          ##  ##     ## ##        ##     ## ##    ##     ##
+#    ##     ##  #######     ##     #######          #### ##     ## ##         #######  ##     ##    ##
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+$(call lp.auto-import,                                # generate a file with "import" statements
+       src,                                           # directory containing the file to generate
+       rules.ts,                                      # the file to generate (auto-expands to src/rules.ts)
+       validation-rules/*.ts other-rules/*.ts         # wildcards relative to the base directory (auto-expands to
+)                                                     # src/validation-rules/*.ts and src/other-rules/*.ts)

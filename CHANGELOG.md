@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.20](https://github.com/david-04/launchpad/releases/tag/v1.0.20) (2025-08-10)
+
+- Added Makefile command `lp.auto-import` to generate files with `import` statements for matching globs
+
 ## [1.0.19](https://github.com/david-04/launchpad/releases/tag/v1.0.19) (2025-08-09)
 
 - Tweaked `tsconfig.json` settings
