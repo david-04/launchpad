@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        //------------------------------------------------------------------------------------------------------------------
+        // Modules
+        //------------------------------------------------------------------------------------------------------------------
+
+        "module": "nodenext", //                        Specify what module code is generated.
+        "moduleResolution": "nodenext", //              Specify how TypeScript looks up a file from a given module specifier.
+        "resolvePackageJsonExports": true, //           Enable support for package.json "exports" field.
+        "resolvePackageJsonImports": true //            Enable support for package.json "imports" field.
+    }
+}

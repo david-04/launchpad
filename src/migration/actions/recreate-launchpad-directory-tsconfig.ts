@@ -30,7 +30,7 @@ export function recreateLaunchpadDirectoryTsConfig(context: MigrationContext) {
 }
 
 function getCompilerOptionsOverridePreact(context: MigrationContext) {
-    return context.fileOperations.packageJson.containsDependency("preact") ? { jsxFactory: "h" } : {};
+    return context.fileOperations.packageJson.containsDependency("preact") ? { jsx: "react", jsxFactory: "h" } : {};
 }
 
 function getCompilerOptionsOverrideLib(context: MigrationContext, target: string) {

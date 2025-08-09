@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.19](https://github.com/david-04/launchpad/releases/tag/v1.0.19) (2025-08-09)
+
+- Tweaked `tsconfig.json` settings
+  - For web projects, set `jsx` to `react-jsx` (and don't set `jsxFactory`)
+  - For web projects, set `module` to `esnext` and `moduleResolution` to `bundler`
+  - For cli projects, set `module` to `nodenext` and `moduleResolution` to `nodenext`
+  - For all projects, set `resolvePackageJsonExports` and `resolvePackageJsonImports` to `true`
+- Bump Biome version number to `2.1.3`
+
+
 ## [1.0.18](https://github.com/david-04/launchpad/releases/tag/v1.0.18) (2025-07-19)
 
 - Fixed syntax error (leading backslash) in the bundle

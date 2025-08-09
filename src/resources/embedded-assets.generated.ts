@@ -1228,7 +1228,7 @@ export const ASSETS = {
     ].join("\n"),
     ".launchpad/biome.default.json": [
         "{",
-        "    \"$schema\": \"https://biomejs.dev/schemas/2.1.1/schema.json\",",
+        "    \"$schema\": \"https://biomejs.dev/schemas/2.1.3/schema.json\",",
         "    \"files\": {",
         "        \"ignoreUnknown\": true",
         "    },",

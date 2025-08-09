@@ -3,6 +3,6 @@
         "../02-facets/tsconfig.base.json",
         "../02-facets/tsconfig.runtime-web.json",
         "../02-facets/tsconfig.artifact-library.json",
-        "../02-facets/tsconfig.module-esmodules-web.json"
+        "../02-facets/tsconfig.module-esm-web.json"
     ]
 }
