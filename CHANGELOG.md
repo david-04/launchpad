@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.21](https://github.com/david-04/launchpad/releases/tag/v1.0.21) (2026-01-27)
+
+- Fixed a Makefile glitch that caused a wrong error message when no bundles were defined
+
 ## [1.0.20](https://github.com/david-04/launchpad/releases/tag/v1.0.20) (2025-08-10)
 
 - Added Makefile command `lp.auto-import` to generate files with `import` statements for matching globs

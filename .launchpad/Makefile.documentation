@@ -124,7 +124,7 @@ $(call lp.bundle.add,                                  # add a file to be bundle
            shebang                                     #     - prepend #!/usr/bin/env node to JavaScript bundle
            exclude=package                             #     - don't bundle the given package (exclude= is repeatable)
        echo "js after-hook",                           # [3] command to run after bundling the js file
-	   echo "dts after-hook"                           # [4] command to run after bundling the d.ts file
+       echo "dts after-hook"                           # [4] command to run after bundling the d.ts file
  )
 
 $(call lp.bundle.add-extra-prerequisites , ...files  ) # add extra prerequisite files that should cause a re-bundle
