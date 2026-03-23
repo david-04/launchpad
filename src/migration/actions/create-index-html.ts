@@ -1,4 +1,4 @@
-import { relative } from "path";
+import { relative } from "node:path";
 import { ASSETS } from "../../resources/embedded-assets.generated";
 import { adjustTabSize } from "../../utilities/string-utilities";
 import { MigrationContext } from "../data/migration-context";
@@ -12,8 +12,8 @@ export function createIndexHtml(context: MigrationContext) {
         const html = context.files.get(`${context.newConfig.webAppDir}/index.html`);
         if (!html.exists) {
             const contents = ASSETS["resources/templates/index.html"]
-                .replace(/<!--\s*PROJECT_NAME\s*-->/g, context.newConfig.projectName)
-                .replace(/<!--\s*JAVASCRIPT\s*-->/g, getScriptTag(context));
+                .replaceAll(/<!--\s*PROJECT_NAME\s*-->/g, context.newConfig.projectName)
+                .replaceAll(/<!--\s*JAVASCRIPT\s*-->/g, getScriptTag(context));
             html.contents = adjustTabSize(contents, 4, context.newConfig.tabSize);
         }
     }

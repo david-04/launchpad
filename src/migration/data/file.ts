@@ -124,6 +124,6 @@ export class File {
     //------------------------------------------------------------------------------------------------------------------
 
     private static normalize(contents: string) {
-        return contents.replace(/\r\n/g, "\n").replace(/\s+$/, "") + "\n";
+        return `${contents.replaceAll("\r\n", "\n").replace(/\s+$/, "")}\n`;
     }
 }

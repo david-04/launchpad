@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 //----------------------------------------------------------------------------------------------------------------------
 // Settings
@@ -65,9 +65,9 @@ function normalizeTsconfig(fileName, json) {
     const compilerOptionsIn = json.compilerOptions;
     const compilerOptionsOut = {};
     Object.keys(compilerOptionsIn)
-        .sort()
+        .sort((a, b) => a.localeCompare(b))
         .forEach(key => (compilerOptionsOut[key] = normalizeTsconfigValue(compilerOptionsIn[key])));
-    const tsNode = 0 <= fileName.indexOf("-esm") ? { "ts-node": { esm: true } } : {};
+    const tsNode = fileName.includes("-esm") ? { "ts-node": { esm: true } } : {};
     return { compilerOptions: compilerOptionsOut, include: ["__SRC_DIR__/**/*.ts", "__SRC_DIR__/**/*.tsx"], ...tsNode };
 }
 
@@ -105,7 +105,7 @@ function createTsconfigDefaultJsonFile(outputPath, files, sourceFileName) {
     const matchingFiles = files.filter(file => file.name === sourceFileName);
     if (1 === matchingFiles.length) {
         const stringified = JSON.stringify(matchingFiles[0].json, undefined, INDENT);
-        const populated = stringified.replace(/__SRC_DIR__/g, "../src").replace(/__OUT_DIR__/g, "../build");
+        const populated = stringified.replaceAll("__SRC_DIR__", "../src").replaceAll("__OUT_DIR__", "../build");
         writeFileSync(outputPath, populated);
     } else {
         throw new Error(`Failed to create ${outputPath} - source file ${sourceFileName} does not exist `);

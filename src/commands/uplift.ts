@@ -14,7 +14,13 @@ export async function uplift(projectRoot: Path, configFile: Path, options: Reado
     const oldConfig = parsedConfig?.validated;
     if (!parsedConfig) {
         fail(`Config file ${configFile.path} does not exist`);
-    } else if (!oldConfig) {
+    } else if (oldConfig) {
+        const project = oldConfig.projectName ? `project ${oldConfig.projectName}` : "the project";
+        console.log(`Uplifting ${project}...`);
+        migrate({ operation: "uplift", oldConfig, newConfig: undefined, projectRoot, ...commandLineOptions });
+        console.log("");
+        console.log(`✅ Successfully uplifted ${project}`);
+    } else {
         const lines = [`Failed to load config file ${configFile.path}`];
         if (parsedConfig.errors) {
             if (1 === parsedConfig.errors.length) {
@@ -23,19 +29,12 @@ export async function uplift(projectRoot: Path, configFile: Path, options: Reado
             } else {
                 lines.push("");
                 parsedConfig.errors.forEach(line => lines.push(`- ${line}`));
-                lines.push("");
-                lines.push('Correct the errors manually or run "launchpad init" to reconfigure/reset the project');
+                lines.push("", 'Correct the errors manually or run "launchpad init" to reconfigure/reset the project');
             }
         } else {
             lines.push('Try running "launchpad init" to reconfigure/reset the project');
         }
         fail(lines.flatMap(breakLine).join("\n"));
-    } else {
-        const project = oldConfig.projectName ? `project ${oldConfig.projectName}` : "the project";
-        console.log(`Uplifting ${project}...`);
-        migrate({ operation: "uplift", oldConfig, newConfig: undefined, projectRoot, ...commandLineOptions });
-        console.log("");
-        console.log(`✅ Successfully uplifted ${project}`);
     }
 }
 

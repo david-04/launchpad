@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs";
+import { writeFileSync } from "node:fs";
 import type { NewConfig, OldConfig, OldPartialConfig } from "../config/config-objects";
 import { ERROR_LOG_FILE } from "../utilities/constants";
 import { fail } from "../utilities/fail";
@@ -199,8 +199,10 @@ function executeExternalCommands(context: MigrationContext) {
                 command.execute();
                 context.activityLog.push(`Ran command: ${stringifiedCommand}`);
             } catch (error) {
-                context.activityLog.push(`Tried to run command: ${stringifiedCommand}`);
-                context.activityLog.push(`Encountered an error: ${error}`);
+                context.activityLog.push(
+                    `Tried to run command: ${stringifiedCommand}`,
+                    `Encountered an error: ${error}`
+                );
                 console.log("");
                 breakAndLog(`Encountered an error: ${error}`);
                 context.manualActionRequired = "complete";
@@ -235,24 +237,25 @@ function createLogFile(context: MigrationContext) {
     }
     lines.push(...createSeparator(`${context.startedAt.toISOString()} ${context.operation}`));
     if (context.activityLog.length) {
-        lines.push("Performed the following actions:");
-        lines.push("");
-        lines.push(...context.activityLog.map(line => `- ${line}`));
-        lines.push("");
+        lines.push("Performed the following actions:", "", ...context.activityLog.map(line => `- ${line}`), "");
     }
     if ("rollback" === context.manualActionRequired) {
         if (context.manualFileSystemInstructions.length) {
-            lines.push("Please complete the rollback manually as follows:");
-            lines.push("");
-            lines.push(...context.manualFileSystemInstructions.map(line => `- ${line}`));
-            lines.push("");
+            lines.push(
+                "Please complete the rollback manually as follows:",
+                "",
+                ...context.manualFileSystemInstructions.map(line => `- ${line}`),
+                ""
+            );
         }
     } else {
         if (context.manualFileSystemInstructions.length) {
-            lines.push(`Please complete the operation manually as follows:`);
-            lines.push("");
-            lines.push(...context.manualFileSystemInstructions.map(line => `- ${line}`));
-            lines.push("");
+            lines.push(
+                `Please complete the operation manually as follows:`,
+                "",
+                ...context.manualFileSystemInstructions.map(line => `- ${line}`),
+                ""
+            );
         }
         if (context.manualCommandInstructions.length) {
             if (context.manualFileSystemInstructions.length) {
@@ -260,9 +263,7 @@ function createLogFile(context: MigrationContext) {
             } else {
                 lines.push(`Please complete operation manually by running the following commands:`);
             }
-            lines.push("");
-            lines.push(...context.manualCommandInstructions.map(line => `- ${line}`));
-            lines.push("");
+            lines.push("", ...context.manualCommandInstructions.map(line => `- ${line}`), "");
         }
     }
     writeFileSync(file.path, lines.flatMap(breakLine).join("\n"), { encoding: "utf-8", flag: "a" });

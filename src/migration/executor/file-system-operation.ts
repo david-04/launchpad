@@ -1,4 +1,4 @@
-import { mkdirSync, renameSync, rmSync, writeFileSync } from "fs";
+import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { LP_NEW_FILE_EXTENSION, LP_OLD_FILE_EXTENSION } from "../../utilities/constants";
 import { Path } from "../../utilities/path";
 import { Directory } from "../data/directory";

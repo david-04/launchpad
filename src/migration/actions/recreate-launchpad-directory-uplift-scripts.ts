@@ -55,7 +55,7 @@ function recreateUpliftBatchScript(context: MigrationContext, commands: Readonly
     context.files.get(LAUNCHPAD_UPLIFT_BAT).lines = [
         "@echo off",
         "",
-        'cd /D "%~dp0\\.."',
+        String.raw`cd /D "%~dp0\.."`,
         "",
         'if not exist ".launchpad" (',
         "    echo ERROR: .launchpad/uplift.bat must be run from the project root directory",
@@ -113,9 +113,8 @@ function serializeCommand(command: ReadonlyArray<string>) {
 //----------------------------------------------------------------------------------------------------------------------
 
 function toBatchCommandWithErrorHandler(command: string) {
-    return !command
-        ? []
-        : [
+    return command
+        ? [
               "",
               command.replaceAll(UPLIFT_PARAMETERS, "uplift %*"),
               'if not "%ERRORLEVEL%" == "0" (',
@@ -123,5 +122,6 @@ function toBatchCommandWithErrorHandler(command: string) {
               "    echo ERROR: The uplift has failed",
               "    exit /b 1",
               ")",
-          ];
+          ]
+        : [];
 }

@@ -16,7 +16,7 @@ export function serializeConfig(config: NewConfig) {
     const maxKeyLength = properties.reduce((max, property) => Math.max(max, property?.key.length ?? 0), 0);
     const maxValueLength = properties.reduce((max, property) => Math.max(max, property?.value.length ?? 0), 0);
     const lines = properties.map(property => (property ? formatProperty(property, maxKeyLength, maxValueLength) : ""));
-    return [...header, "", ...lines.filter(line => line)].map(line => line.trim()).join("\n");
+    return [...header, "", ...lines.filter(Boolean)].map(line => line.trim()).join("\n");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

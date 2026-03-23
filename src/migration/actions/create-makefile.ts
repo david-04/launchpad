@@ -59,9 +59,9 @@ function getBundleSection({ srcDir, projectName, bundlerOutDir, bundler, artifac
             "lib" === artifact && "disabled" !== dtsBundler.value ? ["dts"] : [],
             "app" === artifact && "web" !== runtime.value ? ["shebang"] : [],
         ]
-            .flatMap(option => option)
+            .flat()
             .map(option => option.trim())
-            .filter(option => option)
+            .filter(Boolean)
             .join(" ");
         return [
             ...getSpacedSeparator("Bundling"),

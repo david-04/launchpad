@@ -41,7 +41,7 @@ export function parseProjectName(value: string, source: string | undefined) {
 export function createDirectoryParser(type: string, mode: "optional" | "mandatory") {
     return (value: string, source: string | undefined) => {
         const reference = source ? `${source.substring(0, 1).toUpperCase()}${source.substring(1)}` : `The ${type}`;
-        const trimmed = value.trim().replace(/\\/g, "/");
+        const trimmed = value.trim().replaceAll("\\", "/");
         if (!trimmed && "mandatory" === mode) {
             return error(`${reference} must neither be empty nor the current directory`);
         } else if (!trimmed) {
@@ -49,7 +49,7 @@ export function createDirectoryParser(type: string, mode: "optional" | "mandator
         } else if (/^(\/|[a-z]:)/i.exec(trimmed)) {
             return error(`${reference} must not be a relative (and not an absolute) path`);
         } else {
-            const normalized = trimmed.replace(/(^\.\/)|(\/$)/g, "");
+            const normalized = trimmed.replaceAll(/(^\.\/)|(\/$)/g, "");
             if (!normalized) {
                 return error(`${reference} must not be the current directory`);
             } else if (/[:*<>$#?]/.exec(normalized)) {
@@ -76,9 +76,9 @@ export function createDirectoryParser(type: string, mode: "optional" | "mandator
 export function parseVersion(value: string, source: string | undefined) {
     const trimmed = value.trim();
     const split = trimmed.split(".").map(value => value.trim());
-    const parsed = split.map(segment => (/^\d+$/.exec(segment) ? parseInt(segment) : NaN));
+    const parsed = split.map(segment => (/^\d+$/.exec(segment) ? Number.parseInt(segment) : Number.NaN));
     const [major, minor, patch, ...other] = parsed;
-    const isNumber = (value?: number): value is number => undefined !== value && !isNaN(value) && 0 <= value;
+    const isNumber = (value?: number): value is number => undefined !== value && !Number.isNaN(value) && 0 <= value;
     if (isNumber(major) && isNumber(minor) && isNumber(patch) && !other.length) {
         return new Version(major, minor, patch);
     } else {
@@ -128,8 +128,8 @@ export function parseBoolean(value: string, source: string | undefined) {
 
 export function createIntegerParser<T extends number>(name: string, min: number, max: number) {
     return (value: string, source: string | undefined) => {
-        const parsed = parseInt(value);
-        if (isNaN(parsed)) {
+        const parsed = Number.parseInt(value);
+        if (Number.isNaN(parsed)) {
             return source
                 ? error(`"${value}" is not a valid value for ${source} (it must be a number/integer)`)
                 : error(`"${value}" is not a valid ${name} (it must be a number/integer)`);
@@ -157,7 +157,7 @@ export function createIntegerParser<T extends number>(name: string, min: number,
 
 export function createNonPinnableEnumParser<T extends string>(allowedValues: ReadonlyArray<T>) {
     return (value: string, source: string | undefined) => {
-        if (allowedValues.some(allowed => allowed === value)) {
+        if (allowedValues.includes(value as T)) {
             return value as T;
         } else {
             const message = [
@@ -165,7 +165,7 @@ export function createNonPinnableEnumParser<T extends string>(allowedValues: Rea
                 source ? `for ${source}` : "",
                 `(allowed values: ${allowedValues.join(", ")})`,
             ];
-            return error(message.join(" ").replace(/ +/g, " "));
+            return error(message.join(" ").replaceAll(/ +/g, " "));
         }
     };
 }
@@ -215,13 +215,13 @@ export function createEnumSetParser<T extends string>(allowedValues: ReadonlyArr
         const items = value
             .split(",")
             .map(value => value.trim())
-            .filter(value => value);
+            .filter(Boolean);
         for (const item of items) {
-            const match = allowedValues.filter(allowed => allowed.toLowerCase() === item.toLowerCase())[0];
-            if (undefined !== match) {
-                result.add(match);
-            } else {
+            const match = allowedValues.find(allowed => allowed.toLowerCase() === item.toLowerCase());
+            if (undefined === match) {
                 errors.push(item);
+            } else {
+                result.add(match);
             }
         }
         if (errors.length) {
@@ -230,7 +230,7 @@ export function createEnumSetParser<T extends string>(allowedValues: ReadonlyArr
                 source ? `for ${source}` : "",
                 `(allowed values: default or a comma-separated list of ${allowedValues.join(",")})`,
             ];
-            return error(message.join(" ").replace(/ +/g, " "));
+            return error(message.join(" ").replaceAll(/ +/g, " "));
         } else {
             return result;
         }
@@ -253,7 +253,7 @@ export function parseStringArray(value: string) {
     return value
         .split(",")
         .map(value => value.trim())
-        .filter(value => value);
+        .filter(Boolean);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

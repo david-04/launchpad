@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 const [target, ...sources] = process.argv.slice(2);
 
@@ -18,7 +18,7 @@ function assembleFileContents(sources) {
 function append(sourceCode, fileName) {
     const lines = readFileSync(join("..", fileName))
         .toString()
-        .replace(/\r/g, "")
+        .replaceAll("\r", "")
         .split("\n")
         .map(line => JSON.stringify(line))
         .map(line => `        ${line},`)

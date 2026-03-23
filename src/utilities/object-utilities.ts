@@ -17,7 +17,7 @@ export function deepClone<T>(value: T): T {
 function recursiveClone(value: unknown, stack: Array<{ value: unknown; clone: unknown }>) {
     let clone: unknown = value;
     if (value && "object" === typeof value) {
-        const parent = stack.filter(item => item.value === value)[0];
+        const parent = stack.find(item => item.value === value);
         if (parent) {
             return parent.clone;
         }

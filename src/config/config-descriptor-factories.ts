@@ -451,8 +451,8 @@ function createConfigFileKeyMatcher<KEY extends string>(descriptor: ConfigFileDe
     if (descriptor) {
         const name: keyof CurrentConfigFileDescriptor<KEY> = "currentKey";
         const activeKey = name in descriptor ? [descriptor[name]] : [];
-        const allKeys = [...activeKey, ...(descriptor.obsoleteKeys ?? [])];
-        return (key: string) => allKeys.some(currentKey => currentKey === key);
+        const allKeys = new Set([...activeKey, ...(descriptor.obsoleteKeys ?? [])]);
+        return (key: string) => allKeys.has(key);
     } else {
         return () => false;
     }
@@ -467,7 +467,7 @@ function createOldValueParser<OLD>(
     parse: (value: string, source: string | undefined) => OLD | ConfigError
 ) {
     return (properties: ConfigFileProperties, addError: AddError) => {
-        const property = properties.filter(property => matchesConfigFileKey(property.key)).pop();
+        const property = properties.filter(property => matchesConfigFileKey(property.key)).at(-1); // NOSONAR
         if (property) {
             const value = parse(property.value, property.key);
             if (value && "object" === typeof value && "error" in value) {

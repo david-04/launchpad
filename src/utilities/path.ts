@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import { normalize, resolve } from "path";
+import * as fs from "node:fs";
+import { normalize, resolve } from "node:path";
 import { LAUNCHPAD_CFG } from "../migration/data/known-files";
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ export class Path {
     private static normalize(path: string) {
         const normalized = normalize(resolve(path));
         return /^[a-z]:/i.exec(normalized)
-            ? normalized.substring(0, 1).toUpperCase() + normalized.substring(1).replace(/\\/g, "/")
+            ? normalized.substring(0, 1).toUpperCase() + normalized.substring(1).replaceAll("\\", "/")
             : normalized;
     }
 

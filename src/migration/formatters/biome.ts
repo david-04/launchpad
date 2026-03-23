@@ -143,7 +143,7 @@ function addExtends(file: File) {
     const json = file.json;
     const pathFromTemplate = JSON.parse(ASSETS[BIOME_JSON]).extends[0];
     json.extends ??= [];
-    if (!json.extends.some((path: string) => path === pathFromTemplate)) {
+    if (!json.extends.includes(pathFromTemplate)) {
         json.extends.push(pathFromTemplate);
     }
     file.json = json;

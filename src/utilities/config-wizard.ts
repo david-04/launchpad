@@ -1,4 +1,4 @@
-import { exit } from "process";
+import { exit } from "node:process";
 import type { Choice } from "prompts";
 import { pinned, unpinned } from "../config/config-data-types";
 import type { ParsedConfig } from "../config/config-loader";
@@ -543,7 +543,7 @@ function toSet(
     value: ReadonlyArray<string> | DefaultEnum | undefined,
     defaultValues: ReadonlyArray<string>
 ): ReadonlySet<string> {
-    return value instanceof Array ? new Set(value) : new Set(defaultValues);
+    return Array.isArray(value) ? new Set(value) : new Set(defaultValues);
 }
 
 function toDependencyOptions(dependencies: Record<"mandatory" | "preselected" | "optional", ReadonlySet<string>>) {
@@ -567,15 +567,15 @@ function toDependencyOptions(dependencies: Record<"mandatory" | "preselected" | 
 async function getInstallDevDependencies(presets: Presets) {
     const FIELD = "installDevDependencies";
     const preselectedOption = presets.commandLineConfig[FIELD];
-    if (undefined !== preselectedOption) {
-        return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
-    } else {
+    if (undefined === preselectedOption) {
         return promptYesNo({
             message: "Install dev dependencies (compiler, bundler, formatter, ...)",
             yesHint: "Install locally",
             noHint: "Rely on globally installed versions",
             default: DEFAULT_INSTALL_DEV_DEPENDENCIES,
         });
+    } else {
+        return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
     }
 }
 
@@ -586,15 +586,15 @@ async function getInstallDevDependencies(presets: Presets) {
 async function getUpliftDependencies(presets: Presets) {
     const FIELD = "upliftDependencies";
     const preselectedOption = presets.commandLineConfig[FIELD];
-    if (undefined !== preselectedOption) {
-        return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
-    } else {
+    if (undefined === preselectedOption) {
         return promptYesNo({
             message: "Uplift all dependencies (not just launchpad)",
             yesHint: "Upgrade all npm packages during uplifts",
             noHint: "Only upgrade launchpad itself during uplifts",
             default: DEFAULT_UPLIFT_DEPENDENCIES,
         });
+    } else {
+        return DEFAULT_ENUM === preselectedOption ? true : preselectedOption;
     }
 }
 
@@ -607,15 +607,15 @@ async function getCreateProjectTemplate(presets: Presets) {
     const preselectedOption = presets.commandLineConfig[FIELD];
     if (undefined !== preselectedOption) {
         return DEFAULT_ENUM === preselectedOption ? !presets.oldConfig : preselectedOption;
-    } else if (!presets.oldConfig) {
-        return true;
-    } else {
+    } else if (presets.oldConfig) {
         return promptYesNo({
             message: "Create project template",
             yesHint: "Scaffold a minimal project",
             noHint: "Don't create any source files",
             default: DEFAULT_CREATE_PROJECT_TEMPLATE,
         });
+    } else {
+        return true;
     }
 }
 
@@ -629,9 +629,7 @@ async function getVsCodeSettings(presets: Presets) {
     const allCurrentValues = ConfigProperties.vsCodeSettings.options.map(item => item[0]);
     type CURRENT = (typeof allCurrentValues)[0];
     const defaultValue: Set<CURRENT> = new Set(allCurrentValues);
-    if (undefined !== preselectedOption) {
-        return DEFAULT_ENUM === preselectedOption ? defaultValue : preselectedOption;
-    } else {
+    if (undefined === preselectedOption) {
         const selection = await promptMultiSelect({
             type: "multiselect",
             choices: ConfigProperties.vsCodeSettings.options.map(item => {
@@ -645,6 +643,8 @@ async function getVsCodeSettings(presets: Presets) {
             message: "Manage VSCode settings",
         });
         return new Set(selection) as Set<CURRENT>;
+    } else {
+        return DEFAULT_ENUM === preselectedOption ? defaultValue : preselectedOption;
     }
 }
 

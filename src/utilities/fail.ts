@@ -1,16 +1,10 @@
-//  _____ ____  ____   ___  ____
-// | ____|  _ \|  _ \ / _ \|  _ \
-// |  _| | |_) | |_) | | | | |_) |
-// | |___|  _ <|  _ <| |_| |  _ <
-// |_____|_| \_\_| \_\\___/|_| \_\
-
-export const ERROR_BANNER = `
+export const ERROR_BANNER = String.raw`
 
  _____ ____  ____   ___  ____
-| ____|  _ \\|  _ \\ / _ \\|  _ \\
+| ____|  _ \|  _ \ / _ \|  _ \
 |  _| | |_) | |_) | | | | |_) |
 | |___|  _ <|  _ <| |_| |  _ <
-|_____|_| \\_\\_| \\_\\\\___/|_| \\_\\
+|_____|_| \_\_| \_\\___/|_| \_\
 
 `
     .replace(/^( *\r?\n)+/m, "")
@@ -40,7 +34,7 @@ export function fail(message: string): never {
 
 export function formatError(error: unknown) {
     if (error instanceof FriendlyError) {
-        return `${error.message}`;
+        return error.message;
     } else if (error instanceof Error) {
         return error.stack ?? `${error.name}: ${error.message}`;
     } else {

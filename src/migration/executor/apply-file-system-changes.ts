@@ -54,8 +54,7 @@ function prepareFileSystemChanges(context: MigrationContext, operations: FileSys
             });
         });
     } catch (error) {
-        context.activityLog.push(`Encountered an error: ${error}`);
-        context.activityLog.push(`Rolling back changes...`);
+        context.activityLog.push(`Encountered an error: ${error}`, `Rolling back changes...`);
         rollBackFileSystemChanges(context, operations);
         if (!context.manualActionRequired) {
             fail(`Failed to ${context.operation} the project: ${error}`);
