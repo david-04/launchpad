@@ -51,11 +51,11 @@ export async function launchpad(argv: ReadonlyArray<string>) {
 async function findAndInvokeHandler(argument: string | undefined, options: ReadonlyArray<string>) {
     const [command, ...rest] = COMMANDS.filter(command => command.name.toLowerCase() === argument?.toLowerCase());
     if (!argument) {
-        return fail(`Missing command line argument. Try launchpad --help for more information.`);
+        fail(`Missing command line argument. Try launchpad --help for more information.`);
     } else if (!command) {
-        return fail(`Invalid command: ${argument}. Try launchpad --help for more information.`);
+        fail(`Invalid command: ${argument}. Try launchpad --help for more information.`);
     } else if (rest.length) {
-        return fail(`Found more than one handler for command ${argument}`);
+        fail(`Found more than one handler for command ${argument}`);
     } else {
         const projectRoot = new Path(command.getProjectRootDirectory());
         const configFile = getConfigFilePath(projectRoot);

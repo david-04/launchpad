@@ -546,12 +546,11 @@ function extractValue<T>(
 ) {
     if (DEFAULT_ENUM === option.value) {
         return DEFAULT_ENUM;
+    }
+    const value = parse(option.value, `command line option ${option.key}`);
+    if (value && "object" === typeof value && "error" in value) {
+        fail(value.error);
     } else {
-        const value = parse(option.value, `command line option ${option.key}`);
-        if (value && "object" === typeof value && "error" in value) {
-            return fail(value.error);
-        } else {
-            return value as Exclude<T, ConfigError>;
-        }
+        return value as Exclude<T, ConfigError>;
     }
 }
