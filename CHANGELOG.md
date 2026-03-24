@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.23](https://github.com/david-04/launchpad/releases/tag/v1.0.23) (2026-03-24)
+
+- Updated `tsconfig.json` settings to always include all type declarations
+
 ## [1.0.22](https://github.com/david-04/launchpad/releases/tag/v1.0.22) (2026-03-24)
 
 - Upgraded to TypeScript 6
