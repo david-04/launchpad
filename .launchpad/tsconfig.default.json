@@ -68,6 +68,9 @@
         "stripInternal": true,
         "target": "es2022",
         "tsBuildInfoFile": "../build/.tsbuildinfo",
+        "types": [
+            "*"
+        ],
         "useDefineForClassFields": true,
         "useUnknownInCatchVariables": true,
         "verbatimModuleSyntax": false

@@ -69,6 +69,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
@@ -148,6 +151,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
@@ -230,6 +236,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
@@ -309,6 +318,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
@@ -393,6 +405,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
@@ -474,6 +489,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
@@ -558,6 +576,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
@@ -639,6 +660,9 @@ export const TSCONFIG_JSON_TEMPLATES = {
             "stripInternal": true,
             "target": "es2022",
             "tsBuildInfoFile": "__OUT_DIR__/.tsbuildinfo",
+            "types": [
+                "*"
+            ],
             "useDefineForClassFields": true,
             "useUnknownInCatchVariables": true,
             "verbatimModuleSyntax": false
