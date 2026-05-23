@@ -11,6 +11,7 @@ export const VSCODE_LANGUAGE_IDS = [
     "jsonc",
     "javascript",
     "javascriptreact",
+    "graphql",
     "less",
     "scss",
     "typescript",

@@ -12,7 +12,17 @@ import { Formatter } from "./formatter";
 export class Biome extends Formatter {
     public constructor() {
         super(
-            ["css", "json", "jsonc", "javascript", "javascriptreact", "typescript", "typescriptreact"],
+            [
+                "css",
+                "graphql",
+                "html",
+                "javascript",
+                "javascriptreact",
+                "json",
+                "jsonc",
+                "typescript",
+                "typescriptreact",
+            ],
             "biomejs.biome",
             updateBiomeConfigurationExcludingVsCode,
             removeConfigurationExcludingVscode

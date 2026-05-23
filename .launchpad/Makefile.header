@@ -554,8 +554,8 @@ LP_PREREQUISITE_BUNDLE_DTS              =$$(call lp.bundle.get-dts-targets)
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_FORMAT_EXTENSIONS_prettier         =ts tsx js jsx json html htm css less sass
-__LP_FORMAT_EXTENSIONS_biome            =ts tsx js jsx json css # html htm less sass
+__LP_FORMAT_EXTENSIONS_prettier         =css             htm html js json             jsx less sass ts tsx
+__LP_FORMAT_EXTENSIONS_biome            =css gql graphql htm html js json jsonc json5 jsx           ts tsx
 __LP_FORMAT_EXTENSIONS                  =$(__LP_FORMAT_EXTENSIONS_$(LP_CFG_FORMATTER))
 
 __LP_FORMAT_ENABLED                     =$(if $(LP_CFG_FORMATTER),true)

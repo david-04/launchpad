@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.0.24](https://github.com/david-04/launchpad/releases/tag/v1.0.24) (2026-05-24)
+
+- Refined the Biome configuration
+  - Upgraded schema to version 2.4.15
+  - Removed settings that didn't alter the default value
+  - Enabled support for `.editorconfig`
+  - Only allow JSX syntax in `.jsx` and `.tsx` files (but neither in `.js` nor `.ts`)
+  - Move operators (like `&&`) to the beginning of the new line (rather than the end of the previous one)
+  - Allow trailing commas in the JSON parser (but remove them when formatting the file)
+  - Enable formatting for HTML and GraphQL
+
 ## [1.0.23](https://github.com/david-04/launchpad/releases/tag/v1.0.23) (2026-03-24)
 
 - Updated `tsconfig.json` settings to always include all type declarations
