@@ -16,7 +16,7 @@ Launchpad is a command-line tool for creating TypeScript projects from built-in 
 
 - Create common configuration files (like `tsconfig.json` and `package.json`)
 - Set up a package manager ([npm](https://www.npmjs.com/package/npm), [pnpm](https://pnpm.io), or [yarn](https://yarnpkg.com))
-- Set up a code formatter ([Biome](https://biomejs.dev) or [Prettier](https://prettier.io))
+- Set up a code formatter ([Biome](https://biomejs.dev), [oxfmt](https://oxc.rs/docs/guide/usage/formatter.html) or [Prettier](https://prettier.io))
 - Set up a bundler ([esbuild](https://esbuild.github.io)) and a declaration bundler ([DTS Bundle Generator](https://www.npmjs.com/package/dts-bundle-generator))
 - Deploy a framework of pre-configured rules and dependencies for [GNU Make](https://www.gnu.org/software/make/)
 - Create template source files with a matching Makefile
@@ -138,7 +138,7 @@ Usage: launchpad [COMMAND] [OPTIONS]
   --create-makefile=[true | false]                                          Create a template Makefile
   --create-project-template=[true | false]                                  Create a basic project template (main module, Makefile, ...)
   --dts-bundler=[default | dts-bundle-generator | disabled]                 Bundler for declaration files (d.ts)
-  --formatter=[default | prettier | biome | disabled]                       Code formatter
+  --formatter=[default | biome | oxfmt | prettier | disabled]               Code formatter
   --install-dev-dependencies=[true | false]                                 Install development tools (compiler, bundler, formatter, ...) locally
   --installation-mode=[local | global | temp | npx | pnpm-dlx | yarn-dlx]   Location of the the launchpad npm package
   --module-system=[default | cjs | esm]                                     Target module system

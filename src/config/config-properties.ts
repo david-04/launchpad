@@ -156,8 +156,9 @@ const CURRENT_CONFIG_PROPERTIES = {
             description: "Code formatter",
         },
         currentValues: [
-            ["prettier", undefined],
             ["biome", undefined],
+            ["oxfmt", undefined],
+            ["prettier", undefined],
             ["disabled", "don't format sources"],
         ] as const,
         obsoleteValues: [] as const,

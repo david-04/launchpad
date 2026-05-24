@@ -24,7 +24,7 @@ export class Biome extends Formatter {
                 "typescriptreact",
             ],
             "biomejs.biome",
-            updateBiomeConfigurationExcludingVsCode,
+            updateConfigurationExcludingVsCode,
             removeConfigurationExcludingVscode
         );
     }
@@ -34,7 +34,7 @@ export class Biome extends Formatter {
 // Update the Biome formatting options
 //----------------------------------------------------------------------------------------------------------------------
 
-function updateBiomeConfigurationExcludingVsCode(context: MigrationContext) {
+function updateConfigurationExcludingVsCode(context: MigrationContext) {
     const file = context.files.get(BIOME_JSON);
     if (file.exists) {
         migrateExistingBiomeJson(file, context);

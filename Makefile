@@ -32,7 +32,7 @@ $(EMBEDDED_TSCONFIG) &: $(TSCONFIG_SRC) ./bin/embed-tsconfig.sh  ./bin/embed-tsc
 # Embed assets
 #-----------------------------------------------------------------------------------------------------------------------
 
-EMBEDDED_ASSETS_SOURCE = $(filter-out .launchpad/launchpad.cfg .launchpad/tsconfig.default.json, $(call lp.fn.wildcard, .launchpad resources/templates, *) biome.json)
+EMBEDDED_ASSETS_SOURCE = $(filter-out .launchpad/launchpad.cfg .launchpad/tsconfig.default.json, $(call lp.fn.wildcard, .launchpad resources/templates, *)) biome.json oxfmt.config.mjs
 EMBEDDED_ASSETS_TARGET = src/resources/embedded-assets.generated.ts
 
 embed : $(EMBEDDED_ASSETS_TARGET)

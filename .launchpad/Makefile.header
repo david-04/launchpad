@@ -151,7 +151,7 @@ $(call lp.fn.config.validate-enum, LP_CFG_DTS_BUNDLER)
 LP_CFG_TEST_RUNNER_ENUMS="disabled" or "node"
 $(call lp.fn.config.validate-enum, LP_CFG_TEST_RUNNER)
 
-LP_CFG_FORMATTER_ENUMS="disabled", "biome" or "prettier"
+LP_CFG_FORMATTER_ENUMS="disabled", "biome", "oxfmt" or "prettier"
 $(call lp.fn.config.validate-enum, LP_CFG_FORMATTER)
 
 LP_CFG_PACKAGE_MANAGER_ENUMS="npm", "pnpm" or "yarn"
@@ -554,8 +554,9 @@ LP_PREREQUISITE_BUNDLE_DTS              =$$(call lp.bundle.get-dts-targets)
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
-__LP_FORMAT_EXTENSIONS_prettier         =css             htm html js json             jsx less sass ts tsx
-__LP_FORMAT_EXTENSIONS_biome            =css gql graphql htm html js json jsonc json5 jsx           ts tsx
+__LP_FORMAT_EXTENSIONS_biome            =css gql graphql htm html js json jsonc json5 jsx                        ts tsx
+__LP_FORMAT_EXTENSIONS_oxfmt            =css gql graphql htm html js json jsonc json5 jsx less md      scss toml ts tsx yaml yml
+__LP_FORMAT_EXTENSIONS_prettier         =css             htm html js json             jsx less md sass           ts tsx
 __LP_FORMAT_EXTENSIONS                  =$(__LP_FORMAT_EXTENSIONS_$(LP_CFG_FORMATTER))
 
 __LP_FORMAT_ENABLED                     =$(if $(LP_CFG_FORMATTER),true)
@@ -568,8 +569,9 @@ __LP_FORMAT_DEFAULT_BEFORE_HOOKS        =
 __LP_FORMAT_EFFECTIVE_BEFORE_HOOKS      =$(__LP_FORMAT_DEFAULT_BEFORE_HOOKS)
 __LP_FORMAT_DEFAULT_AFTER_HOOKS         =
 __LP_FORMAT_EFFECTIVE_AFTER_HOOKS       =$(__LP_FORMAT_DEFAULT_AFTER_HOOKS)
-__LP_FORMAT_DEFAULT_COMMAND_prettier    =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-paths))
 __LP_FORMAT_DEFAULT_COMMAND_biome       =biome format --write --files-ignore-unknown=true $(patsubst %, '%', $(call lp.format.get-paths))
+__LP_FORMAT_DEFAULT_COMMAND_oxfmt       =oxfmt -c oxfmt.config.mjs --write $(patsubst %, '%', $(call lp.format.get-paths))
+__LP_FORMAT_DEFAULT_COMMAND_prettier    =prettier --write --ignore-unknown $(patsubst %, '%', $(call lp.format.get-paths))
 __LP_FORMAT_DEFAULT_COMMAND             =$(__LP_FORMAT_DEFAULT_COMMAND_$(LP_CFG_FORMATTER))
 __LP_FORMAT_EFFECTIVE_COMMAND           =$(if $(__LP_FORMAT_EFFECTIVE_PATHS),$(call lp.format.get-default-command))
 __LP_FORMAT_DEFAULT_PATHS               =$(filter-out .launchpad .vscode .yarn node_modules $(LP_CFG_TSC_OUT_DIR), \

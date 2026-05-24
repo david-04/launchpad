@@ -10,6 +10,7 @@
   - Move operators (like `&&`) to the beginning of the new line (rather than the end of the previous one)
   - Allow trailing commas in the JSON parser (but remove them when formatting the file)
   - Enable formatting for HTML and GraphQL
+- Added [oxfmt](https://oxc.rs/docs/guide/usage/formatter.html) as the new default formatter
 
 ## [1.0.23](https://github.com/david-04/launchpad/releases/tag/v1.0.23) (2026-03-24)
 

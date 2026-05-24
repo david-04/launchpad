@@ -12,10 +12,13 @@ export const VSCODE_LANGUAGE_IDS = [
     "javascript",
     "javascriptreact",
     "graphql",
+    "markdown",
     "less",
     "scss",
+    "toml",
     "typescript",
     "typescriptreact",
+    "yaml",
 ] as const;
 
 export type VsCodeLanguageId = (typeof VSCODE_LANGUAGE_IDS)[number];

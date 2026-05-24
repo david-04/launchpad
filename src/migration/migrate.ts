@@ -18,6 +18,7 @@ import { installOrUpgradeNpmPackages } from "./actions/install-or-upgrade-npm-pa
 import { recreateLaunchpadDirectoryBiome } from "./actions/recreate-launchpad-directory-biome";
 import { recreateLaunchpadDirectoryMakefiles } from "./actions/recreate-launchpad-directory-makefiles";
 import { recreateLaunchpadDirectoryNodeMinDts } from "./actions/recreate-launchpad-directory-node-min-dts";
+import { recreateLaunchpadDirectoryOxfmt } from "./actions/recreate-launchpad-directory-oxfmt";
 import { recreateLaunchpadDirectorySettings } from "./actions/recreate-launchpad-directory-settings";
 import { recreateLaunchpadDirectoryTestScripts } from "./actions/recreate-launchpad-directory-test-scripts";
 import { recreateLaunchpadDirectoryTsConfig } from "./actions/recreate-launchpad-directory-tsconfig";
@@ -82,6 +83,7 @@ function prepareMigrationSteps(context: MigrationContext) {
     recreateLaunchpadDirectoryTsConfig(context);
     recreateLaunchpadDirectoryUpliftScripts(context);
     recreateLaunchpadDirectoryBiome(context);
+    recreateLaunchpadDirectoryOxfmt(context);
     recreateLaunchpadDirectoryTestScripts(context);
     recreateLaunchpadDirectoryTestScripts(context);
 

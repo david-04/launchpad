@@ -1,0 +1,30 @@
+{
+    "arrowParens": "avoid",
+    "ignorePatterns": [
+        "**/node_modules/**",
+        ".launchpad/**",
+        ".git/**"
+    ],
+    "objectWrap": "collapse",
+    "printWidth": 120,
+    "quoteProps": "as-needed",
+    "sortImports": {
+        "groups": [
+            [
+                "external",
+                "builtin"
+            ],
+            [
+                "import"
+            ],
+            [
+                "side_effect"
+            ]
+        ]
+    },
+    "sortPackageJson": {
+        "sortScripts": true
+    },
+    "tabWidth": 4,
+    "trailingComma": "es5"
+}
