@@ -1,11 +1,11 @@
 {
+    "private": true,
+    "type": "commonjs",
     "dependencies": {
         "prompts": "^2.4.2"
     },
     "devDependencies": {
         "@types/node": "24",
         "@types/prompts": "^2.4.9"
-    },
-    "private": true,
-    "type": "commonjs"
+    }
 }
