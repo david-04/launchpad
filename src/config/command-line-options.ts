@@ -79,11 +79,7 @@ export const COMMAND_LINE_OPTIONS = {
 
     runtimeCli: createNonPinnableEnumProperty({
         name: "runtime environment",
-        commandLine: {
-            option: "--runtime",
-            description: "Runtime environment",
-            placeholder: "[cli | node | web]",
-        },
+        commandLine: { option: "--runtime", description: "Runtime environment", placeholder: "[cli | node | web]" },
         currentValues: [
             ["cli", defaultMightChange("node")],
             ["node", "command line"],

@@ -1,4 +1,5 @@
 import { relative } from "node:path";
+
 import { ASSETS } from "../../resources/embedded-assets.generated";
 import { adjustTabSize } from "../../utilities/string-utilities";
 import { MigrationContext } from "../data/migration-context";

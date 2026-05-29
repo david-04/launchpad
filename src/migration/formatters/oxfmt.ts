@@ -45,7 +45,7 @@ function updateConfigurationExcludingVsCode(context: MigrationContext) {
     if (context.newConfig.vsCodeSettings.has("formatter")) {
         context.fileOperations.vscodeSettings.json = {
             ...context.fileOperations.vscodeSettings.json,
-            "oxc.fmt.configPath": " oxfmt.config.mjs",
+            "oxc.fmt.configPath": "oxfmt.config.mjs",
         };
     }
 }

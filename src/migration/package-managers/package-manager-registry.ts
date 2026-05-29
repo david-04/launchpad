@@ -9,11 +9,7 @@ import { Yarn } from "./yarn";
 // Package managers
 //----------------------------------------------------------------------------------------------------------------------
 
-const PACKAGE_MANAGERS = {
-    npm: new Npm(),
-    pnpm: new Pnpm(),
-    yarn: new Yarn(),
-} as const satisfies Record<
+const PACKAGE_MANAGERS = { npm: new Npm(), pnpm: new Pnpm(), yarn: new Yarn() } as const satisfies Record<
     NewConfig["packageManager"]["value"] | OldConfig["packageManager"]["value"],
     PackageManager
 >;

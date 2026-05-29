@@ -90,8 +90,8 @@ function getUpliftCommand(context: MigrationContext) {
     } else {
         const packageManager = (
             {
-                temp: getPackageManager(context),
-                npx: getPackageManager("npm"),
+                "temp": getPackageManager(context),
+                "npx": getPackageManager("npm"),
                 "pnpm-dlx": getPackageManager("pnpm"),
                 "yarn-dlx": getPackageManager("yarn"),
             } as const

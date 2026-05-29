@@ -29,14 +29,10 @@ export type VSCodeSettingsObject = {
 };
 export type VSCodeSettingsArray = Array<VSCodeSettingsValue | VSCodeSettingsObject | VSCodeSettingsArray>;
 
-export type VSCodeSettingsLanguage = VSCodeSettingsObject & {
-    readonly "editor.defaultFormatter"?: string;
-};
+export type VSCodeSettingsLanguage = VSCodeSettingsObject & { readonly "editor.defaultFormatter"?: string };
 
 export type VSCodeSettings = VSCodeSettingsObject &
-    Readonly<Record<`[${VsCodeLanguageId}]`, VSCodeSettingsLanguage>> & {
-        "editor.formatOnSave"?: boolean;
-    };
+    Readonly<Record<`[${VsCodeLanguageId}]`, VSCodeSettingsLanguage>> & { "editor.formatOnSave"?: boolean };
 
 const DEFAULT_FORMATTER = "editor.defaultFormatter";
 

@@ -16,10 +16,7 @@ export class ValidationError extends Error {
 // Key-value pairs extracted from the command line
 //----------------------------------------------------------------------------------------------------------------------
 
-export type CommandLineOption = {
-    readonly key: string;
-    readonly value: string;
-};
+export type CommandLineOption = Readonly<{ key: string; value: string }>;
 
 export type CommandLineOptions = ReadonlyArray<CommandLineOption>;
 
@@ -27,11 +24,7 @@ export type CommandLineOptions = ReadonlyArray<CommandLineOption>;
 // Key-value pairs imported from the configuration file
 //----------------------------------------------------------------------------------------------------------------------
 
-export type ConfigFileProperty = {
-    readonly key: string;
-    readonly value: string;
-    readonly formatError: FormatError;
-};
+export type ConfigFileProperty = Readonly<{ key: string; value: string; formatError: FormatError }>;
 
 export type ConfigFileProperties = ReadonlyArray<ConfigFileProperty>;
 
@@ -39,30 +32,19 @@ export type ConfigFileProperties = ReadonlyArray<ConfigFileProperty>;
 // Components used to serialize a property into the config file
 //----------------------------------------------------------------------------------------------------------------------
 
-export type SerializationDetails = {
-    readonly key: string;
-    readonly value: string;
-    readonly comment: string;
-};
+export type SerializationDetails = Readonly<{ key: string; value: string; comment: string }>;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Components to describe the property's command line parameter
 //----------------------------------------------------------------------------------------------------------------------
 
-export type CommandLineInfo = {
-    readonly option: string;
-    readonly placeholder: string;
-    readonly description: string;
-};
+export type CommandLineInfo = Readonly<{ option: string; placeholder: string; description: string }>;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Pinnable enum values
 //----------------------------------------------------------------------------------------------------------------------
 
-export type PinnableEnumValue<T> = {
-    readonly value: T;
-    readonly pinned: boolean;
-};
+export type PinnableEnumValue<T> = Readonly<{ value: T; pinned: boolean }>;
 
 export function pinned<T extends string>(value: T) {
     return { value, pinned: true } as const;

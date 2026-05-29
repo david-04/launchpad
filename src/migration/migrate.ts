@@ -1,4 +1,5 @@
 import { writeFileSync } from "node:fs";
+
 import type { NewConfig, OldConfig, OldPartialConfig } from "../config/config-objects";
 import { ERROR_LOG_FILE } from "../utilities/constants";
 import { fail } from "../utilities/fail";

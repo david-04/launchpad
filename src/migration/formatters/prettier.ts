@@ -60,10 +60,7 @@ function updatePrettierConfigurationExcludingVsCode(context: MigrationContext) {
     const { packageJson } = context.fileOperations;
     packageJson.json = {
         ...packageJson.json,
-        prettier: {
-            ...packageJson.json.prettier,
-            ...getDefaultPrettierConfiguration(context.newConfig.tabSize),
-        },
+        prettier: { ...packageJson.json.prettier, ...getDefaultPrettierConfiguration(context.newConfig.tabSize) },
     };
 }
 

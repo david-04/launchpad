@@ -31,15 +31,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     artifact: createNonPinnableEnumProperty({
         name: "artifact",
-        configFile: {
-            currentKey: "LP_CFG_ARTIFACT",
-            newConfigObjectName: "artifact",
-        },
-        commandLine: {
-            option: "--artifact",
-            description: "Project type",
-            placeholder: "[app | lib]",
-        },
+        configFile: { currentKey: "LP_CFG_ARTIFACT", newConfigObjectName: "artifact" },
+        commandLine: { option: "--artifact", description: "Project type", placeholder: "[app | lib]" },
         currentValues: [
             ["app", "a stand-alone application"],
             ["lib", "a library with typings"],
@@ -61,14 +54,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     bundler: createPinnableEnumProperty({
         name: "bundler",
-        configFile: {
-            currentKey: "LP_CFG_BUNDLER",
-            newConfigObjectName: "bundler",
-        },
-        commandLine: {
-            option: "--bundler",
-            description: "Bundler",
-        },
+        configFile: { currentKey: "LP_CFG_BUNDLER", newConfigObjectName: "bundler" },
+        commandLine: { option: "--bundler", description: "Bundler" },
         currentValues: [
             ["esbuild", undefined],
             ["disabled", "don't use bundling"],
@@ -95,11 +82,7 @@ const CURRENT_CONFIG_PROPERTIES = {
             newConfigObjectName: "bundlerOutDir",
             comment: "only applicable if bundling is enabled",
         },
-        commandLine: {
-            option: "--bundler-out-dir",
-            placeholder: "<DIR>",
-            description: BUNDLER_OUTPUT_DIRECTORY,
-        },
+        commandLine: { option: "--bundler-out-dir", placeholder: "<DIR>", description: BUNDLER_OUTPUT_DIRECTORY },
         parseOldValue: createDirectoryParser(BUNDLER_OUTPUT_DIRECTORY, "optional"),
         parseNewValue: createDirectoryParser(BUNDLER_OUTPUT_DIRECTORY, "optional"),
     }),
@@ -118,14 +101,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     dtsBundler: createPinnableEnumProperty({
         name: "d.ts bundler",
-        configFile: {
-            currentKey: "LP_CFG_DTS_BUNDLER",
-            newConfigObjectName: "dtsBundler",
-        },
-        commandLine: {
-            option: "--dts-bundler",
-            description: "Bundler for declaration files (d.ts)",
-        },
+        configFile: { currentKey: "LP_CFG_DTS_BUNDLER", newConfigObjectName: "dtsBundler" },
+        commandLine: { option: "--dts-bundler", description: "Bundler for declaration files (d.ts)" },
         currentValues: [
             ["dts-bundle-generator", undefined],
             ["disabled", "don't bundle declaration files"],
@@ -147,14 +124,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     formatter: createPinnableEnumProperty({
         name: "formatter",
-        configFile: {
-            currentKey: "LP_CFG_FORMATTER",
-            newConfigObjectName: "formatter",
-        },
-        commandLine: {
-            option: "--formatter",
-            description: "Code formatter",
-        },
+        configFile: { currentKey: "LP_CFG_FORMATTER", newConfigObjectName: "formatter" },
+        commandLine: { option: "--formatter", description: "Code formatter" },
         currentValues: [
             ["biome", undefined],
             ["oxfmt", undefined],
@@ -178,10 +149,7 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     installationMode: createNonPinnableEnumProperty({
         name: "launchpad installation mode",
-        configFile: {
-            currentKey: "LP_CFG_INSTALLATION_MODE",
-            newConfigObjectName: "installationMode",
-        },
+        configFile: { currentKey: "LP_CFG_INSTALLATION_MODE", newConfigObjectName: "installationMode" },
         commandLine: {
             option: "--installation-mode",
             description: "Location of the the launchpad npm package",
@@ -212,14 +180,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     moduleSystem: createNonPinnableEnumProperty({
         name: "module system",
-        configFile: {
-            currentKey: "LP_CFG_MODULE_SYSTEM",
-            newConfigObjectName: "moduleSystem",
-        },
-        commandLine: {
-            option: "--module-system",
-            description: "Target module system",
-        },
+        configFile: { currentKey: "LP_CFG_MODULE_SYSTEM", newConfigObjectName: "moduleSystem" },
+        commandLine: { option: "--module-system", description: "Target module system" },
         currentValues: [
             ["cjs", "CommonJS"],
             ["esm", "ECMAScript modules"],
@@ -241,14 +203,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     packageManager: createPinnableEnumProperty({
         name: "package manager",
-        configFile: {
-            currentKey: "LP_CFG_PACKAGE_MANAGER",
-            newConfigObjectName: "packageManager",
-        },
-        commandLine: {
-            option: "--package-manager",
-            description: "Package manager",
-        },
+        configFile: { currentKey: "LP_CFG_PACKAGE_MANAGER", newConfigObjectName: "packageManager" },
+        commandLine: { option: "--package-manager", description: "Package manager" },
         currentValues: [
             ["npm", undefined],
             ["pnpm", "use globally pre-installed pnpm"],
@@ -299,10 +255,7 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     runtime: createPinnableEnumProperty({
         name: "runtime environment",
-        configFile: {
-            currentKey: "LP_CFG_RUNTIME",
-            newConfigObjectName: "runtime",
-        },
+        configFile: { currentKey: "LP_CFG_RUNTIME", newConfigObjectName: "runtime" },
         currentValues: [
             ["node", "command line"],
             ["web", "web browser"],
@@ -324,10 +277,7 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     srcDir: createStringProperty({
         name: SOURCE_DIRECTORY,
-        configFile: {
-            currentKey: "LP_CFG_SRC_DIR",
-            newConfigObjectName: "srcDir",
-        },
+        configFile: { currentKey: "LP_CFG_SRC_DIR", newConfigObjectName: "srcDir" },
         commandLine: {
             option: "--src-dir",
             placeholder: "<DIR>",
@@ -356,11 +306,7 @@ const CURRENT_CONFIG_PROPERTIES = {
             newConfigObjectName: "tabSize",
             comment: "only applicable if code formatting is enabled",
         },
-        commandLine: {
-            option: "--tab-size",
-            placeholder: "<SIZE>",
-            description: "Tab size (for code formatting)",
-        },
+        commandLine: { option: "--tab-size", placeholder: "<SIZE>", description: "Tab size (for code formatting)" },
         range: { min: 2, max: 20 },
     }),
 
@@ -378,14 +324,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     testRunner: createPinnableEnumProperty({
         name: "test runner",
-        configFile: {
-            currentKey: "LP_CFG_TEST_RUNNER",
-            newConfigObjectName: "testRunner",
-        },
-        commandLine: {
-            option: "--test-runner",
-            description: "Test runner",
-        },
+        configFile: { currentKey: "LP_CFG_TEST_RUNNER", newConfigObjectName: "testRunner" },
+        commandLine: { option: "--test-runner", description: "Test runner" },
         currentValues: [
             ["node", "use NodeJS as the test runner"],
             ["disabled", "disable testing"],
@@ -461,10 +401,7 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     version: createVersionProperty({
         name: "version number",
-        configFile: {
-            currentKey: "LP_CFG_VERSION",
-            newConfigObjectName: "version",
-        },
+        configFile: { currentKey: "LP_CFG_VERSION", newConfigObjectName: "version" },
     }),
 
     //------------------------------------------------------------------------------------------------------------------
@@ -481,14 +418,8 @@ const CURRENT_CONFIG_PROPERTIES = {
 
     vsCodeSettings: createEnumSetProperty({
         name: "Manage selected VSCode settings",
-        commandLine: {
-            option: "--vscode-settings",
-            description: "Create settings for VSCode",
-        },
-        configFile: {
-            currentKey: "LP_CFG_VSCODE_SETTINGS",
-            newConfigObjectName: "vsCodeSettings",
-        },
+        commandLine: { option: "--vscode-settings", description: "Create settings for VSCode" },
+        configFile: { currentKey: "LP_CFG_VSCODE_SETTINGS", newConfigObjectName: "vsCodeSettings" },
         currentValues: [
             ["formatter", "use the project's formatter (if it has any)"],
             ["format-on-save", "enabled auto-format"],
@@ -546,10 +477,7 @@ const ALL_CONFIG_PROPERTIES = {
     ...COMMAND_LINE_OPTIONS,
 } as const;
 const CURRENT_AND_OBSOLETE_CONFIG_PROPERTIES = { ...CURRENT_CONFIG_PROPERTIES, ...OBSOLETE_CONFIG_PROPERTIES } as const;
-const CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES = {
-    ...CURRENT_CONFIG_PROPERTIES,
-    ...COMMAND_LINE_OPTIONS,
-} as const;
+const CURRENT_AND_INIT_ONLY_CONFIG_PROPERTIES = { ...CURRENT_CONFIG_PROPERTIES, ...COMMAND_LINE_OPTIONS } as const;
 
 const toArray = <T extends object>(properties: T) => Object.keys(properties).map(key => properties[key as keyof T]);
 

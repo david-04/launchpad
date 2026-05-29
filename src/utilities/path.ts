@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import { normalize, resolve } from "node:path";
+
 import { LAUNCHPAD_CFG } from "../migration/data/known-files";
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -53,10 +53,7 @@ type CurrentConfigFileDescriptor<KEY extends string> = {
 type ObsoleteConfigFileDescriptor = { obsoleteKeys: ReadonlyArray<string> };
 type ConfigFileDescriptor<KEY extends string> = CurrentConfigFileDescriptor<KEY> | ObsoleteConfigFileDescriptor;
 
-type CommandLineDescriptor = {
-    readonly option: string;
-    readonly description: string;
-};
+type CommandLineDescriptor = { readonly option: string; readonly description: string };
 
 type CommandLineDescriptorWithPlaceholder = CommandLineDescriptor & { readonly placeholder: string };
 type CommandLineDescriptorWithOptionalPlaceholder = CommandLineDescriptor & { readonly placeholder?: string };

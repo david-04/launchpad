@@ -10,10 +10,7 @@ export class Npm extends PackageManager {
     public constructor() {
         super(
             {
-                gitignorePatterns: {
-                    current: ["/node_modules"],
-                    deprecated: [],
-                },
+                gitignorePatterns: { current: ["/node_modules"], deprecated: [] },
                 swpmIdentifier: "npm",
                 installCommand: ["npm", "install"],
                 upgradeAllCommand: undefined,

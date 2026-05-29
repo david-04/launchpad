@@ -10,10 +10,7 @@ export class Pnpm extends PackageManager {
     public constructor() {
         super(
             {
-                gitignorePatterns: {
-                    current: ["/node_modules"],
-                    deprecated: [],
-                },
+                gitignorePatterns: { current: ["/node_modules"], deprecated: [] },
                 swpmIdentifier: "pnpm",
                 installCommand: ["pnpm", "install"],
                 upgradeAllCommand: ["pnpm", "up", "--latest"],

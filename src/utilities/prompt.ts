@@ -1,5 +1,6 @@
 import { exit } from "node:process";
 import { type Choice, type PromptObject } from "prompts";
+
 import { unpinned, type ConfigError, type PinnableEnumValue } from "../config/config-data-types";
 import { defaultMightChange } from "./constants";
 

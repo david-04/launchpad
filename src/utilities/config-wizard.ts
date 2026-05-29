@@ -1,5 +1,6 @@
 import { exit } from "node:process";
 import type { Choice } from "prompts";
+
 import { pinned, unpinned } from "../config/config-data-types";
 import type { ParsedConfig } from "../config/config-loader";
 import type { CommandLineConfig, NewConfig, OldPartialConfig } from "../config/config-objects";
@@ -46,10 +47,7 @@ import {
 // Data types
 //----------------------------------------------------------------------------------------------------------------------
 
-type Presets = {
-    oldConfig: OldPartialConfig | undefined;
-    commandLineConfig: CommandLineConfig;
-};
+type Presets = { oldConfig: OldPartialConfig | undefined; commandLineConfig: CommandLineConfig };
 
 type VALUE_OR_DEFAULT_OR_UNDEFINED<T> = T | typeof DEFAULT_ENUM | undefined;
 

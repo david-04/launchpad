@@ -8,8 +8,6 @@ import type { MigrationContext } from "../data/migration-context";
 export function createTsconfigJson(context: MigrationContext) {
     const tsconfigJson = context.files.get(TSCONFIG_JSON);
     if (!tsconfigJson.exists) {
-        tsconfigJson.json = {
-            extends: "./.launchpad/tsconfig.default.json",
-        };
+        tsconfigJson.json = { extends: "./.launchpad/tsconfig.default.json" };
     }
 }
