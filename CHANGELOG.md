@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.24](https://github.com/david-04/launchpad/releases/tag/v1.0.24) (2026-05-24)
+## [1.0.24](https://github.com/david-04/launchpad/releases/tag/v1.0.24) (2026-05-29)
 
 - Refined the Biome configuration
   - Upgraded schema to version 2.4.15

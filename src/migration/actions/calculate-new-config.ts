@@ -1,6 +1,6 @@
 import { pinned } from "../../config/config-data-types";
 import type { NewConfig, OldConfig } from "../../config/config-objects";
-import { DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values";
+import { DEFAULT_FORMATTER, DEFAULT_PACKAGE_MANAGER } from "../../config/default-config-values";
 import { VERSION_NUMBER } from "../../resources/version-information";
 import { File } from "../data/file";
 import { PACKAGE_JSON } from "../data/known-files";
@@ -22,7 +22,7 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
         createProjectTemplate: false,
         dependencies: [],
         dtsBundler: oldConfig.dtsBundler,
-        formatter: oldConfig.formatter,
+        formatter: calculateNewFormatter(oldConfig),
         installationMode: oldConfig.installationMode,
         installDevDependencies: packageJson.containsTypeScriptDependency(),
         moduleSystem: oldConfig.moduleSystem,
@@ -41,15 +41,17 @@ export function calculateNewConfig(options: MigrateOptions, oldConfig: OldConfig
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Calculate the
+// Calculate the new default package manager
 //----------------------------------------------------------------------------------------------------------------------
 
-function calculateNewPackageManager(oldConfig: OldConfig): NewConfig["packageManager"] {
-    const oldPackageManager = oldConfig.packageManager;
-    const defaultPackageManager = DEFAULT_PACKAGE_MANAGER;
-    if (oldPackageManager.pinned || oldPackageManager.value === defaultPackageManager.value) {
-        return oldPackageManager;
-    } else {
-        return defaultPackageManager;
-    }
+function calculateNewPackageManager({ packageManager: oldPackageManager }: OldConfig): NewConfig["packageManager"] {
+    return oldPackageManager.pinned ? oldPackageManager : DEFAULT_PACKAGE_MANAGER;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Calculate the new default formatter
+//----------------------------------------------------------------------------------------------------------------------
+
+function calculateNewFormatter({ formatter: oldFormatter }: OldConfig): NewConfig["formatter"] {
+    return oldFormatter.pinned ? oldFormatter : DEFAULT_FORMATTER;
 }
