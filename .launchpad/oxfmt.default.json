@@ -6,8 +6,20 @@
         ".git/**"
     ],
     "objectWrap": "collapse",
+    "overrides": [
+        {
+            "files": [
+                "*.md",
+                "*.yml",
+                "*.yaml"
+            ],
+            "options": {
+                "tabWidth": 2
+            }
+        }
+    ],
     "printWidth": 120,
-    "quoteProps": "as-needed",
+    "quoteProps": "consistent",
     "sortImports": {
         "groups": [
             [
