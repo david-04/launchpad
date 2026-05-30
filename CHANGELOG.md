@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.25](https://github.com/david-04/launchpad/releases/tag/v1.0.25) (2026-05-30)
+
+- Modified oxfmt configuration to sort internal and external imports into a single group
+
 ## [1.0.24](https://github.com/david-04/launchpad/releases/tag/v1.0.24) (2026-05-29)
 
 - Refined the Biome configuration

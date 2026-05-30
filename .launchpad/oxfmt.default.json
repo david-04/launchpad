@@ -23,10 +23,6 @@
     "sortImports": {
         "groups": [
             [
-                "external",
-                "builtin"
-            ],
-            [
                 "import"
             ],
             [
