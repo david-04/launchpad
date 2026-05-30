@@ -1,6 +1,6 @@
 {
     "name": "@david-04/launchpad",
-    "version": "1.0.24",
+    "version": "1.0.25",
     "description": "A TypeScript starter app that keeps generated projects and their toolchains up to date",
     "keywords": [
         "project starter",
